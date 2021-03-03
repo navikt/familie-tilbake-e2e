@@ -1,0 +1,52 @@
+version: "3"
+services:
+  familie-mock-server:
+    image: docker.pkg.github.com/navikt/familie-mock-server:latest
+    ports:
+      - 1337:1337
+  # For Azure
+  mock-oauth2-server:
+    image: docker.pkg.github.com/navikt/mock-oauth2-server/mock-oauth2-server:0.1.33
+    ports:
+      - 1111:1111
+  postgres-tilbake:
+    image: postgres:11
+    environment:
+      POSTGRES_USER: familie
+      POSTGRES_DB: familie-tilbake
+      POSTGRES_PASSWORD: familie-pwd
+    ports:
+      - 5438:5432
+  familie-integrasjoner:
+    restart: always
+    image: docker.pkg.github.com/navikt/familie-integrasjoner/familie-integrasjoner:latest
+    depends_on:
+      - familie-mock-server
+      - mock-oauth2-server
+    volumes:
+      - ./modig:/root/.modig
+    environment:
+      SPRING_PROFILES_ACTIVE: e2e
+      APPD_ENABLED: 0
+      INTEGRASJONER_CLIENT_ID: ${INTEGRASJONER_CLIENT_ID}
+      INTEGRASJONER_CLIENT_SECRET: ${INTEGRASJONER_CLIENT_SECRET}
+      INFOTRYGD_KS_SCOPE: ${INTEGRASJONER_INFOTRYGD_KS_SCOPE}
+      AAD_GRAPH_SCOPE: ${INTEGRASJONER_AAD_GRAPH_SCOPE}
+    ports:
+      - 8085:8085
+  familie-tilbake:
+    restart: always
+#    image: docker.pkg.github.com/navikt/familie-tilbake/familie-tilbake:latest
+    image: familie-tilbake:latest
+    depends_on:
+      - postgres-tilbake
+      - mock-oauth2-server
+      - familie-integrasjoner
+    environment:
+      SPRING_PROFILES_ACTIVE: ${ENV}
+      APPD_ENABLED: 0
+      TILBAKE_CLIENT_ID: ${TILBAKE_CLIENT_ID}
+      BA_SAK_CLIENT_ID: ${BA_SAK_CLIENT_ID}
+      FAMILIE_TILBAKE_FRONTEND_CLIENT_ID=: ${FAMILIE_TILBAKE_FRONTEND_CLIENT_ID}
+    ports:
+      - 8030:8030
