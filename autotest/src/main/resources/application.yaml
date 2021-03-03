@@ -15,7 +15,7 @@ no.nav.security.jwt:
         scope: ${FAMILIE_TILBAKE_SCOPE}
         authentication:
           client-id: ${TILBAKE_CLIENT_ID}
-          client-secret: ${CLIENT_SECRET}
+          client-secret: ${TILBAKE_CLIENT_SECRET}
           client-auth-method: client_secret_basic
 
 FAMILIE_TILBAKE_API_URL: http://localhost:8030
