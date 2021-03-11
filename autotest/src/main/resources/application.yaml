@@ -1,0 +1,26 @@
+application:
+  name: familie-tilbake-e2e
+server:
+  servlet:
+    context-path: /
+  port: 8032
+
+no.nav.security.jwt:
+  client:
+    registration:
+      familie-tilbake:
+        resource-url: ${FAMILIE_TILBAKE_API_URL}
+        token-endpoint-url: http://localhost:1111/v2.0/token
+        grant-type: client_credentials
+        scope: ${FAMILIE_TILBAKE_SCOPE}
+        authentication:
+          client-id: ${TILBAKE_CLIENT_ID}
+          client-secret: ${TILBAKE_CLIENT_SECRET}
+          client-auth-method: client_secret_basic
+
+FAMILIE_TILBAKE_API_URL: http://localhost:8030
+FAMILIE_TILBAKE_SCOPE: api://dd201057-70b9-4641-b358-1668207826be/.default
+
+logging:
+  level:
+    root: INFO
