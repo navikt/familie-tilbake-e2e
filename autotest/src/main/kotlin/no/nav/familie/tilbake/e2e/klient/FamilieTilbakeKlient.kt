@@ -1,19 +1,17 @@
 package no.nav.familie.tilbake.e2e.klient
 
 import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.kontrakter.felles.simulering.FagOmrådeKode
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.Behandling
-import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
-import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
-import no.nav.familie.tilbake.e2e.domene.Fagsak
-import no.nav.familie.tilbake.e2e.domene.Venteårsak
-import no.nav.familie.tilbake.e2e.domene.VersjonInfo
+import no.nav.familie.tilbake.e2e.domene.*
 import no.nav.familie.tilbake.e2e.util.JsonRest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.net.URI
+import java.util.*
+import javax.validation.constraints.Max
 
 @Service
 class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val familieTilbakeApiUrl: String,
@@ -24,9 +22,11 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     private final val BEHANDLING_URL_V1: URI = URI.create("$API_URL/behandling/v1")
     private final val FAGSAK_URL_V1: URI = URI.create("$API_URL/fagsak/v1")
 
-    fun hentVersjonInfo(): Ressurs<VersjonInfo> {
+    private lateinit var gjeldndeBehandling: GjeldendeBehandling
+
+    fun hentVersjonInfo(): VersjonInfo? {
         val uri = URI.create("$VERSION_URL")
-        return getForEntity(uri)
+        return getOgHentData(uri)
     }
 
     fun opprettTilbakekreving(
@@ -36,6 +36,9 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         varsel: Boolean,
         verge: Boolean
     ): String? {
+        gjeldndeBehandling.eksternFagsakId = eksternFagsakId
+        gjeldndeBehandling.fagsystem = fagsystem
+        gjeldndeBehandling.ytelsestype = ytelsestype
         val request = opprettTilbakekrevingBuilder.requestBuilder(
             eksternFagsakId,
             fagsystem,
@@ -43,30 +46,43 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
             varsel,
             verge
         )
-        return postOgVerifiser(BEHANDLING_URL_V1, request, Ressurs.Status.SUKSESS)
+        gjeldndeBehandling.eksternBehandlingId = request.eksternId
+        gjeldndeBehandling.eksternBrukId = postOgVerifiser(BEHANDLING_URL_V1, request, Ressurs.Status.SUKSESS)
+        return gjeldndeBehandling.eksternBrukId
     }
 
-    fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Ressurs<Fagsak> {
+    fun opprettKravgrunnlag(
+        status: KodeStatusKrav,
+        @Max(29)
+        antallPerioder: Int,
+        under4rettsgebyr: Boolean,
+        muligforeldelse: Boolean
+    ) {
+        //TODO
+    }
+
+    private fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Fagsak? {
         val uri = URI.create("$FAGSAK_URL_V1?fagsystem=$fagsystem&fagsak=$eksternFagsakId")
-        return getForEntity(uri)
+        return getOgHentData(uri)
     }
 
-    fun hentBehandling(behandlingId: String): Ressurs<Behandling> {
+    private fun hentBehandling(behandlingId: String): Behandling? {
         val uri = URI.create("$BEHANDLING_URL_V1/$behandlingId")
-        return getForEntity(uri)
+        return getOgHentData(uri)
     }
 
     fun hentBehandlingId(fagsystem: Fagsystem, eksternFagsakId: String, eksternBrukId: String?): String {
-        hentFagsak(fagsystem, eksternFagsakId).data?.behandlinger?.forEach {
+        hentFagsak(fagsystem, eksternFagsakId)?.behandlinger?.forEach {
             if (it.eksternBrukId.toString() == eksternBrukId) {
+                gjeldndeBehandling.behandlingId = it.behandlingId.toString()
                 return it.behandlingId.toString()
             }
         }
         throw Exception("Fantes ikke noen behandling med eksternBrukId $eksternBrukId på kombinasjonen eksternFagsakId $eksternFagsakId og fagsystem $fagsystem")
     }
 
-    fun behandlingPåVent(behandlingId: String, venteårsak: Venteårsak): Boolean {
-        hentBehandling(behandlingId).data?.behandlingsstegsinfo?.forEach {
+    fun erBehandlingPåVent(behandlingId: String, venteårsak: Venteårsak): Boolean {
+        hentBehandling(behandlingId)?.behandlingsstegsinfo?.forEach {
             if (it.behandlingsstegstatus == Behandlingsstegstatus.VENTER){
                 if (it.venteårsak == venteårsak){
                     return true
@@ -76,12 +92,23 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         }
         return false
     }
-    fun behandlingISteg(behandlingId: String, behandlingssteg: Behandlingssteg, behandlingsstegstatus: Behandlingsstegstatus): Boolean {
-        hentBehandling(behandlingId).data?.behandlingsstegsinfo?.forEach {
+    fun erBehandlingISteg(behandlingId: String, behandlingssteg: Behandlingssteg, behandlingsstegstatus: Behandlingsstegstatus): Boolean {
+        hentBehandling(behandlingId)?.behandlingsstegsinfo?.forEach {
             if (it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus){
-                return true;
+                return true
             }
         }
         return false
     }
 }
+
+class GjeldendeBehandling(
+    var fagsystem: Fagsystem?,
+    var ytelsestype: Ytelsestype?,
+    var eksternFagsakId: String?,
+    var eksternBehandlingId: String?,
+    var eksternBrukId: String?,
+    var behandlingId: String?,
+    var vedtakId: String?,
+    var kravgrunnlagId: String?
+)

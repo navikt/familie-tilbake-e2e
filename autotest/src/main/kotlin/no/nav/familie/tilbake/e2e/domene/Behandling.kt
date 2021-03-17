@@ -1,6 +1,6 @@
 package no.nav.familie.tilbake.e2e.domene
 
-import java.text.DateFormat
+import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -84,5 +84,6 @@ data class Behandling(val eksternBrukId: UUID,
 data class Behandlingsstegsinfo(val behandlingssteg: Behandlingssteg,
                                 val behandlingsstegstatus: Behandlingsstegstatus,
                                 val venteårsak: Venteårsak?,
-                                val tidsfrist: DateFormat?
+                                @JsonFormat(pattern = "yyyy-MM-dd")
+                                val tidsfrist: LocalDate?
 )

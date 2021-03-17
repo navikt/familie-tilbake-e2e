@@ -15,7 +15,6 @@ class SjekkVersion(@Autowired private val familieTilbakeKlient: FamilieTilbakeKl
 
     @Test
     fun `Skal hente versjon og dermed teste om familie-tilbake er oppe`() {
-        val respons = familieTilbakeKlient.hentVersjonInfo()
-        assertTrue(respons.status == Ressurs.Status.SUKSESS, "Versjoninfo skulle ha blitt hentet!")
+        familieTilbakeKlient.hentVersjonInfo()
     }
 }
