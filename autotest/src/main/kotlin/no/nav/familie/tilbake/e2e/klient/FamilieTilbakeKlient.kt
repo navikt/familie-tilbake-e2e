@@ -1,10 +1,14 @@
 package no.nav.familie.tilbake.e2e.klient
 
-import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.*
+import no.nav.familie.tilbake.e2e.domene.Behandling
+import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
+import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
+import no.nav.familie.tilbake.e2e.domene.Fagsak
+import no.nav.familie.tilbake.e2e.domene.Venteårsak
+import no.nav.familie.tilbake.e2e.domene.VersjonInfo
 import no.nav.familie.tilbake.e2e.util.JsonRest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -13,10 +17,8 @@ import java.net.URI
 
 @Service
 class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val familieTilbakeApiUrl: String,
-                           private val restOperations: RestOperations,
-                           private val rest: JsonRest,
-                           private val opprettTilbakekrevingBuilder: OpprettTilbakekrevingBuilder) : AbstractRestClient(restOperations,
-                                                                                            "familie-tilbake") {
+                           restOperations: RestOperations,
+                           private val opprettTilbakekrevingBuilder: OpprettTilbakekrevingBuilder) : JsonRest(restOperations) {
     private final val API_URL: String = "$familieTilbakeApiUrl/api"
     private final val VERSION_URL: URI = URI.create("$API_URL/info")
     private final val BEHANDLING_URL_V1: URI = URI.create("$API_URL/behandling/v1")
@@ -41,7 +43,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
             varsel,
             verge
         )
-        return rest.postOgVerifiser(BEHANDLING_URL_V1, request, Ressurs.Status.SUKSESS)
+        return postOgVerifiser(BEHANDLING_URL_V1, request, Ressurs.Status.SUKSESS)
     }
 
     fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Ressurs<Fagsak> {

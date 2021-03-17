@@ -2,6 +2,7 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.http.config.INaisProxyCustomizer
 import no.nav.familie.http.config.RestTemplateAzure
+import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.springframework.boot.SpringBootConfiguration
@@ -24,6 +25,11 @@ class ApplicationConfig {
 
     companion object {
         const val pakkenavn = "no.nav.familie.tilbake.e2e"
+    }
+
+    @Bean
+    fun opprettTilbakekrevingBuilder(): OpprettTilbakekrevingBuilder {
+        return OpprettTilbakekrevingBuilder()
     }
 
     @Bean

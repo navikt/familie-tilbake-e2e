@@ -84,5 +84,5 @@ data class Behandling(val eksternBrukId: UUID,
 data class Behandlingsstegsinfo(val behandlingssteg: Behandlingssteg,
                                 val behandlingsstegstatus: Behandlingsstegstatus,
                                 val venteårsak: Venteårsak?,
-                                val tidsfrist: DateFormat
+                                val tidsfrist: DateFormat?
 )

@@ -1,9 +1,19 @@
 package no.nav.familie.tilbake.e2e.klient
 
-import no.nav.familie.kontrakter.felles.tilbakekreving.*
+import no.nav.familie.kontrakter.felles.tilbakekreving.Behandlingstype
+import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
+import no.nav.familie.kontrakter.felles.tilbakekreving.Faktainfo
+import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
+import no.nav.familie.kontrakter.felles.tilbakekreving.Periode
+import no.nav.familie.kontrakter.felles.tilbakekreving.Språkkode
+import no.nav.familie.kontrakter.felles.tilbakekreving.Tilbakekrevingsvalg
+import no.nav.familie.kontrakter.felles.tilbakekreving.Varsel
+import no.nav.familie.kontrakter.felles.tilbakekreving.Verge
+import no.nav.familie.kontrakter.felles.tilbakekreving.Vergetype
+import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 class OpprettTilbakekrevingBuilder {
 
@@ -13,7 +23,7 @@ class OpprettTilbakekrevingBuilder {
         ytelsestype: Ytelsestype,
         varsel: Boolean,
         verge: Boolean
-    ):OpprettTilbakekrevingRequest {
+    ): OpprettTilbakekrevingRequest {
         val eksternBehandlingId = UUID.randomUUID().toString()
         var tilbakekrevingsvalg: Tilbakekrevingsvalg = Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_UTEN_VARSEL
         var varselinfo: Varsel? = null
