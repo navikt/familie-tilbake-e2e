@@ -1,5 +1,6 @@
 package no.nav.familie.tilbake.e2e.autotest
 
+import net.bytebuddy.implementation.bytecode.Throw
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import org.junit.jupiter.api.Assertions.assertTrue

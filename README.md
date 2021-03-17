@@ -22,6 +22,6 @@ For effektiv utvikling kan disse kommandoene være nyttige:
 
 Start familie-tilbake i IntelliJ som vanlig med CLIENT_ID og FAMILIE_TILBAKE_FRONTEND_CLIENT_ID for azuread familie-tilbake-lokal og familie-tilbake-frontend-lokal.
 
-Kjør testene med spring-profil "local". Hent TILBAKE_CLIENT_SECRET frå vault prod-fss/familie/default/familie-tilbake-e2e-env og legg det inn i Environment-variables for testen.
+Kjør testene med spring-profil "-Dspring.profiles.active=local". Hent TILBAKE_CLIENT_SECRET frå vault prod-fss/familie/default/familie-tilbake-e2e-env og legg det inn i Environment-variables for testen.
 
 
