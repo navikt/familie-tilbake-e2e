@@ -5,7 +5,7 @@ data class Statusmelding(val endringKravOgVedtakstatus: EndringKravOgVedtakstatu
         data class KravOgVedtakstatus(
             val vedtakId: Int,
             val kodeStatusKrav: KodeStatusKrav,
-            val kodeFagomraade: KodeFagomraade,
+            val kodeFagomraade: Fagsaksstatus,
             val fagsystemId: Int,
             val vedtakGjelderId: Int,
             val typeGjelderId: String,

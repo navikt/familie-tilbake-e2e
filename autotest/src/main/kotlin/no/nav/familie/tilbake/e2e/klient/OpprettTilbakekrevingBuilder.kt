@@ -13,18 +13,23 @@ import no.nav.familie.kontrakter.felles.tilbakekreving.Vergetype
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.UUID
+import kotlin.random.Random
 
 class OpprettTilbakekrevingBuilder {
 
     fun requestBuilder(
         eksternFagsakId: String,
+        eksternBehandlingId: String?,
         fagsystem: Fagsystem,
         ytelsestype: Ytelsestype,
         varsel: Boolean,
         verge: Boolean
     ): OpprettTilbakekrevingRequest {
-        val eksternBehandlingId = UUID.randomUUID().toString()
+        val finalEksternBehandlingId: String = if (eksternBehandlingId.isNullOrEmpty()) {
+            Random.nextInt(1000000, 9999999).toString()
+        } else {
+            eksternBehandlingId
+        }
         var tilbakekrevingsvalg: Tilbakekrevingsvalg = Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_UTEN_VARSEL
         var varselinfo: Varsel? = null
         if (varsel){
@@ -58,7 +63,7 @@ class OpprettTilbakekrevingBuilder {
             fagsystem = fagsystem,
             ytelsestype = ytelsestype,
             eksternFagsakId = eksternFagsakId,
-            eksternId = eksternBehandlingId,
+            eksternId = finalEksternBehandlingId,
             personIdent = "12345678901",
             behandlingstype = Behandlingstype.TILBAKEKREVING,
             språkkode = Språkkode.NB,

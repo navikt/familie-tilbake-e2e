@@ -10,10 +10,15 @@ import java.net.URI
 open class JsonRest(restOperations: RestOperations): AbstractRestClient(restOperations, "familie-tilbake") {
 
     /*POST*/
-    fun postOgVerifiser(uri: URI, request: Any, expectedStatus: Ressurs.Status): String? {
+    fun postOgHentData(uri: URI, request: Any, expectedStatus: Ressurs.Status): String? {
         val response = post(uri, request)
         assertTrue(response.status == expectedStatus, "Opprett behandling skulle hatt status $expectedStatus. Istede fikk den ${response.status} med melding ${response.melding}")
         return response.data
+    }
+
+    fun postOgVerifiser(uri: URI, request: Any, expectedStatus: Ressurs.Status) {
+        val response = post(uri, request)
+        assertTrue(response.status == expectedStatus, "Opprett behandling skulle hatt status $expectedStatus. Istede fikk den ${response.status} med melding ${response.melding}")
     }
 
     private fun post(uri: URI, request: Any): Ressurs<String> {

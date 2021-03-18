@@ -1,6 +1,7 @@
 package no.nav.familie.tilbake.e2e.domene
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -17,7 +18,7 @@ data class DetaljertKravgrunnlag(
     val kravgrunnlagId: Int,
     val vedtakId: Int,
     val kodeStatusKrav: KodeStatusKrav,
-    val kodeFagomraade: KodeFagomraade,
+    val kodeFagomraade: Fagsystem,
     val fagsystemId: Int,
     val vedtakIdOmgjort: Int,
     val vedtakGjelderId: Int,
@@ -62,12 +63,6 @@ enum class KodeStatusKrav {
     ENDR,
     SPER,
     AVSL
-}
-
-enum class KodeFagomraade {
-    BA,
-    EF,
-    KS
 }
 
 enum class KodeKlasse {

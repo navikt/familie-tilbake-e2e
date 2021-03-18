@@ -2,6 +2,7 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
+import no.nav.familie.tilbake.e2e.domene.Behandling
 import no.nav.familie.tilbake.e2e.domene.Venteårsak
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -19,6 +20,9 @@ class OpprettTilbakekrevingBA(@Autowired private val familieTilbakeKlient: Famil
 
     @Test
     fun `Tilbakekrevingsbehandling med varsel`() {
+
+        val behandling: Behandling? = familieTilbakeKlient.hentBehandling("d51e59dc-f11a-4d74-827c-36ba9f54a416")
+
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = familieTilbakeKlient.opprettTilbakekreving(
             eksternFagsakId = eksternFagsakId,
