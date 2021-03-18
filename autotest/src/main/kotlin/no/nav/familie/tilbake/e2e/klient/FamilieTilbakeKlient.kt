@@ -1,24 +1,24 @@
 package no.nav.familie.tilbake.e2e.klient
 
+import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
-import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.*
+import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
+import no.nav.familie.tilbake.e2e.domene.Behandling
+import no.nav.familie.tilbake.e2e.domene.Fagsak
+import no.nav.familie.tilbake.e2e.domene.Kravgrunnlag
+import no.nav.familie.tilbake.e2e.domene.VersjonInfo
 import no.nav.familie.tilbake.e2e.domene.steg.Fakta
-import no.nav.familie.tilbake.e2e.util.JsonRest
-import org.hibernate.validator.internal.util.Contracts.assertTrue
+import org.hibernate.validator.internal.util.Contracts
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.net.URI
-import javax.validation.constraints.Max
-import kotlin.random.Random
 
 @Service
 class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val familieTilbakeApiUrl: String,
-                           restOperations: RestOperations,
-                           private val opprettTilbakekrevingBuilder: OpprettTilbakekrevingBuilder,
-                           private val opprettKravgrunnlagBuilder: OpprettKravgrunnlagBuilder) : JsonRest(restOperations) {
+                           restOperations: RestOperations) : AbstractRestClient(restOperations, "familie-tilbake") {
+
     private final val API_URL: String = "$familieTilbakeApiUrl/api"
     private final val VERSION_URL: URI = URI.create("$API_URL/info")
     private final val BEHANDLING_BASE: URI = URI.create("$API_URL/behandling")
@@ -29,141 +29,48 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     private final val OPPRETT_KRAVGRUNNLAG_URI: URI = URI.create("$AUTOTEST_API/opprett/kravgrunnlag")
     private final val OPPRETT_STATUSMELDING_URI: URI = URI.create("$AUTOTEST_API/opprett/statusmelding")
 
-    private lateinit var gjeldndeBehandling: GjeldendeBehandling
-
-    /*OPPRETT METODER*/
-
-    fun opprettTilbakekreving(
-        eksternFagsakId: String,
-        fagsystem: Fagsystem,
-        ytelsestype: Ytelsestype,
-        varsel: Boolean,
-        verge: Boolean
-    ): String? {
-        gjeldndeBehandling.eksternFagsakId = eksternFagsakId
-        gjeldndeBehandling.fagsystem = fagsystem
-        gjeldndeBehandling.ytelsestype = ytelsestype
-        val request = opprettTilbakekrevingBuilder.requestBuilder(
-            eksternFagsakId = eksternFagsakId,
-            eksternBehandlingId = gjeldndeBehandling.eksternBehandlingId,
-            fagsystem = fagsystem,
-            ytelsestype = ytelsestype,
-            varsel = varsel,
-            verge = verge
-        )
-        gjeldndeBehandling.eksternBehandlingId = request.eksternId
-        gjeldndeBehandling.eksternBrukId = postOgHentData(BEHANDLING_URL_V1, request, Ressurs.Status.SUKSESS)
-        return gjeldndeBehandling.eksternBrukId
+    fun opprettTilbakekreving(opprettTilbakekrevingRequest: OpprettTilbakekrevingRequest): String? {
+        val response: Ressurs<String> = postForEntity(BEHANDLING_URL_V1, opprettTilbakekrevingRequest)
+        Contracts.assertTrue(response.status == Ressurs.Status.SUKSESS,
+                             "Opprett behandling skulle hatt status SUKSESS. Istedet fikk den ${response.status} med melding ${response.melding}")
+        return response.data
     }
 
-    fun opprettKravgrunnlagUtenBehandling(
-        status: KodeStatusKrav,
-        fagsystem: Fagsystem,
-        ytelsestype: Ytelsestype,
-        eksternFagsakId: String,
-        @Max(29)
-        antallPerioder: Int,
-        under4rettsgebyr: Boolean,
-        muligforeldelse: Boolean
-    ): GjeldendeBehandling {
-        gjeldndeBehandling.eksternBehandlingId = Random.nextInt(1000000, 9999999).toString()
-        gjeldndeBehandling.fagsystem = fagsystem
-        gjeldndeBehandling.ytelsestype = ytelsestype
-        gjeldndeBehandling.eksternFagsakId = eksternFagsakId
-        opprettKravgrunnlag(
-            status, antallPerioder, under4rettsgebyr, muligforeldelse
-        )
-        return gjeldndeBehandling
+    fun opprettKravgrunnlag(kravgrunnlag: Kravgrunnlag) {
+        val response: Ressurs<String> = postForEntity(OPPRETT_KRAVGRUNNLAG_URI, kravgrunnlag)
+        Contracts.assertTrue(response.status == Ressurs.Status.SUKSESS,
+                             "Opprett behandling skulle hatt status SUKSESS. Istedet fikk den ${response.status} med melding ${response.melding}")
     }
 
-    fun opprettKravgrunnlag(
-        status: KodeStatusKrav,
-        @Max(29)
-        antallPerioder: Int,
-        under4rettsgebyr: Boolean,
-        muligforeldelse: Boolean
-    ) {
-        assertTrue(gjeldndeBehandling.fagsystem != null, "Fagsystem ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
-        assertTrue(gjeldndeBehandling.ytelsestype != null, "Ytelsestype ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
-        assertTrue(gjeldndeBehandling.eksternFagsakId != null, "EksternFagsakId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
-        assertTrue(gjeldndeBehandling.eksternBehandlingId != null, "EksternBehandlingId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
-        val request = opprettKravgrunnlagBuilder.requestBuilder(
-            status = status,
-            fagområde = gjeldndeBehandling.fagsystem!!,
-            ytelsestype = gjeldndeBehandling.ytelsestype!!,
-            eksternFagsakId = gjeldndeBehandling.eksternFagsakId!!,
-            eksternBehandlingId = gjeldndeBehandling.eksternBehandlingId!!,
-            kravgrunnlagId = gjeldndeBehandling.kravgrunnlagId,
-            vedtakId = gjeldndeBehandling.vedtakId,
-            antallPerioder = antallPerioder,
-            under4rettsgebyr = under4rettsgebyr,
-            muligforeldelse = muligforeldelse
-        )
-        postOgVerifiser(OPPRETT_KRAVGRUNNLAG_URI, request!!, Ressurs.Status.SUKSESS)
-    }
-
-    /*HENT METODER*/
-
-    fun hentVersjonInfo(): VersjonInfo? {
-        val uri = URI.create("$VERSION_URL")
-        return getOgHentData(uri)
-    }
-
-    private fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Fagsak? {
+    fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Fagsak? {
         val uri = URI.create("$FAGSAK_URL_V1?fagsystem=$fagsystem&fagsak=$eksternFagsakId")
-        return getOgHentData(uri)
+        val response: Ressurs<Fagsak> = getForEntity(uri)
+        Contracts.assertTrue(response.status == Ressurs.Status.SUKSESS,
+                             "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        return response.data
     }
 
     fun hentBehandling(behandlingId: String): Behandling? {
         val uri = URI.create("$BEHANDLING_URL_V1/$behandlingId")
-        return getOgHentData(uri)
-    }
-
-    fun hentBehandlingId(fagsystem: Fagsystem, eksternFagsakId: String, eksternBrukId: String?): String {
-        hentFagsak(fagsystem, eksternFagsakId)?.behandlinger?.forEach {
-            if (it.eksternBrukId.toString() == eksternBrukId) {
-                gjeldndeBehandling.behandlingId = it.behandlingId.toString()
-                return it.behandlingId.toString()
-            }
-        }
-        throw Exception("Fantes ikke noen behandling med eksternBrukId $eksternBrukId på kombinasjonen eksternFagsakId $eksternFagsakId og fagsystem $fagsystem")
+        val response: Ressurs<Behandling> = getForEntity(uri)
+        Contracts.assertTrue(response.status == Ressurs.Status.SUKSESS,
+                             "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        return response.data
     }
 
     private fun hentFakta(behandlingId: String): Fakta? {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/fakta/v1")
-        return getOgHentData(uri)
+        val response: Ressurs<Fakta> = getForEntity(uri)
+        Contracts.assertTrue(response.status == Ressurs.Status.SUKSESS,
+                             "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        return response.data
     }
 
-    /*BEKREFTELSES METODER (aka sjekker)*/
-
-    fun erBehandlingPåVent(behandlingId: String, venteårsak: Venteårsak): Boolean {
-        hentBehandling(behandlingId)?.behandlingsstegsinfo?.forEach {
-            if (it.behandlingsstegstatus == Behandlingsstegstatus.VENTER){
-                if (it.venteårsak == venteårsak){
-                    return true
-                }
-                throw Exception("Behandling $behandlingId var på vent men med årsak: ${it.venteårsak}. Forventet $venteårsak")
-            }
-        }
-        return false
-    }
-    fun erBehandlingISteg(behandlingId: String, behandlingssteg: Behandlingssteg, behandlingsstegstatus: Behandlingsstegstatus): Boolean {
-        hentBehandling(behandlingId)?.behandlingsstegsinfo?.forEach {
-            if (it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus){
-                return true
-            }
-        }
-        return false
+    fun hentVersjonInfo(): VersjonInfo? {
+        val uri = URI.create("$VERSION_URL")
+        val response: Ressurs<VersjonInfo> = getForEntity(uri)
+        Contracts.assertTrue(response.status == Ressurs.Status.SUKSESS,
+                             "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        return response.data
     }
 }
-
-class GjeldendeBehandling(
-    var fagsystem: Fagsystem?,
-    var ytelsestype: Ytelsestype?,
-    var eksternFagsakId: String?,
-    var eksternBehandlingId: String?,
-    var eksternBrukId: String?,
-    var behandlingId: String?,
-    var vedtakId: Int?,
-    var kravgrunnlagId: Int?
-)

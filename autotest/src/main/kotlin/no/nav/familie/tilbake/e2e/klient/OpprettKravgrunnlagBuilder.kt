@@ -7,7 +7,8 @@ import no.nav.familie.tilbake.e2e.domene.Kravgrunnlag
 import javax.validation.constraints.Max
 
 class OpprettKravgrunnlagBuilder {
-    fun requestBuilder(
+
+    fun opprettKravgrunnlag(
         status: KodeStatusKrav,
         fagområde: Fagsystem,
         ytelsestype: Ytelsestype,
