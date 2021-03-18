@@ -5,6 +5,32 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
+data class Behandling(val eksternBrukId: UUID,
+                      val behandlingId: UUID,
+                      val erBehandlingHenlagt: Boolean,
+                      val type: Behandlingstype,
+                      val status: Behandlingsstatus,
+                      val opprettetDato: LocalDate,
+                      val avsluttetDato: LocalDate? = null,
+                      val endretTidspunkt: LocalDateTime,
+                      val vedtaksdato: LocalDate? = null,
+                      val enhetskode: String,
+                      val enhetsnavn: String,
+                      val resultatstype: Behandlingsresultatstype? = null,
+                      val ansvarligSaksbehandler: String,
+                      val ansvarligBeslutter: String? = null,
+                      val erBehandlingPåVent: Boolean,
+                      val kanHenleggeBehandling: Boolean,
+                      val harVerge: Boolean,
+                      val behandlingsstegsinfo: Set<Behandlingsstegsinfo>)
+
+data class Behandlingsstegsinfo(val behandlingssteg: Behandlingssteg,
+                                val behandlingsstegstatus: Behandlingsstegstatus,
+                                val venteårsak: Venteårsak?,
+                                @JsonFormat(pattern = "yyyy-MM-dd")
+                                val tidsfrist: LocalDate?
+)
+
 enum class Behandlingsstatus {
     AVSLUTTET,
     FATTER_VEDTAK,
@@ -61,29 +87,3 @@ enum class Behandlingsstegstatus {
     TILBAKEFØRT,
     AVBRUTT;
 }
-
-data class Behandling(val eksternBrukId: UUID,
-                 val behandlingId: UUID,
-                 val erBehandlingHenlagt: Boolean,
-                 val type: Behandlingstype,
-                 val status: Behandlingsstatus,
-                 val opprettetDato: LocalDate,
-                 val avsluttetDato: LocalDate? = null,
-                 val endretTidspunkt: LocalDateTime,
-                 val vedtaksdato: LocalDate? = null,
-                 val enhetskode: String,
-                 val enhetsnavn: String,
-                 val resultatstype: Behandlingsresultatstype? = null,
-                 val ansvarligSaksbehandler: String,
-                 val ansvarligBeslutter: String? = null,
-                 val erBehandlingPåVent: Boolean,
-                 val kanHenleggeBehandling: Boolean,
-                 val harVerge: Boolean,
-                 val behandlingsstegsinfo: Set<Behandlingsstegsinfo>)
-
-data class Behandlingsstegsinfo(val behandlingssteg: Behandlingssteg,
-                                val behandlingsstegstatus: Behandlingsstegstatus,
-                                val venteårsak: Venteårsak?,
-                                @JsonFormat(pattern = "yyyy-MM-dd")
-                                val tidsfrist: LocalDate?
-)

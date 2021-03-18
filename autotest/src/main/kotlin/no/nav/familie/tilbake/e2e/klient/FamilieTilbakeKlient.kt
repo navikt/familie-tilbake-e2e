@@ -5,6 +5,7 @@ import no.nav.familie.kontrakter.felles.simulering.FagOmrådeKode
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.domene.*
+import no.nav.familie.tilbake.e2e.domene.steg.Fakta
 import no.nav.familie.tilbake.e2e.util.JsonRest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -19,15 +20,13 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
                            private val opprettTilbakekrevingBuilder: OpprettTilbakekrevingBuilder) : JsonRest(restOperations) {
     private final val API_URL: String = "$familieTilbakeApiUrl/api"
     private final val VERSION_URL: URI = URI.create("$API_URL/info")
-    private final val BEHANDLING_URL_V1: URI = URI.create("$API_URL/behandling/v1")
+    private final val BEHANDLING_BASE: URI = URI.create("$API_URL/behandling")
+    private final val BEHANDLING_URL_V1: URI = URI.create("$BEHANDLING_BASE/v1")
     private final val FAGSAK_URL_V1: URI = URI.create("$API_URL/fagsak/v1")
 
     private lateinit var gjeldndeBehandling: GjeldendeBehandling
 
-    fun hentVersjonInfo(): VersjonInfo? {
-        val uri = URI.create("$VERSION_URL")
-        return getOgHentData(uri)
-    }
+    /*OPPRETT METODER*/
 
     fun opprettTilbakekreving(
         eksternFagsakId: String,
@@ -61,6 +60,13 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         //TODO
     }
 
+    /*HENT METODER*/
+
+    fun hentVersjonInfo(): VersjonInfo? {
+        val uri = URI.create("$VERSION_URL")
+        return getOgHentData(uri)
+    }
+
     private fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Fagsak? {
         val uri = URI.create("$FAGSAK_URL_V1?fagsystem=$fagsystem&fagsak=$eksternFagsakId")
         return getOgHentData(uri)
@@ -80,6 +86,13 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         }
         throw Exception("Fantes ikke noen behandling med eksternBrukId $eksternBrukId på kombinasjonen eksternFagsakId $eksternFagsakId og fagsystem $fagsystem")
     }
+
+    private fun hentFakta(behandlingId: String): Fakta? {
+        val uri = URI.create("$BEHANDLING_BASE/$behandlingId/fakta/v1")
+        return getOgHentData(uri)
+    }
+
+    /*BEKREFTELSES METODER (aka sjekker)*/
 
     fun erBehandlingPåVent(behandlingId: String, venteårsak: Venteårsak): Boolean {
         hentBehandling(behandlingId)?.behandlingsstegsinfo?.forEach {
