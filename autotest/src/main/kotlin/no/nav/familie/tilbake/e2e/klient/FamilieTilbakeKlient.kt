@@ -6,17 +6,16 @@ import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
 import no.nav.familie.tilbake.e2e.domene.Behandling
 import no.nav.familie.tilbake.e2e.domene.Fagsak
-import no.nav.familie.tilbake.e2e.domene.Kravgrunnlag
 import no.nav.familie.tilbake.e2e.domene.VersjonInfo
 import no.nav.familie.tilbake.e2e.domene.steg.Fakta
+import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import org.hibernate.validator.internal.util.Contracts
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.server.ServerHttpResponse
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.io.StringWriter
 import java.net.URI
-import javax.servlet.http.HttpServletResponseWrapper
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
 
@@ -41,20 +40,21 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return response.data
     }
 
-    fun opprettKravgrunnlag(kravgrunnlag: Kravgrunnlag) {
+    fun opprettKravgrunnlag(kravgrunnlag: DetaljertKravgrunnlagMelding) {
         val xml = jaxbObjectToXML(kravgrunnlag)
-        println(xml)
-        val response: ServerHttpResponse = postForEntity(OPPRETT_KRAVGRUNNLAG_URI, xml)
+
+        val response: HttpStatus = postForEntity(OPPRETT_KRAVGRUNNLAG_URI, xml)
 
         println(response)
-        Contracts.assertTrue(response.equals(200),
+        Contracts.assertTrue(response.is2xxSuccessful,
                              "Opprett kravgrunnlag skulle hatt status 200 OK. Istedet fikk den $response")
     }
 
-    private fun jaxbObjectToXML(kravgrunnlag: Kravgrunnlag): String {
-        val jaxbContext = JAXBContext.newInstance(Kravgrunnlag::class.java)
+    private fun jaxbObjectToXML(kravgrunnlag: DetaljertKravgrunnlagMelding): String {
+        val jaxbContext = JAXBContext.newInstance(DetaljertKravgrunnlagMelding::class.java)
         val jaxcMarshaller = jaxbContext.createMarshaller()
-        jaxcMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false)
+        jaxcMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
+//        jaxcMarshaller.setProperty("com.sun.xml.bind.xmlHeaders", "<?xml version=\"1.0\" encoding=\"utf-8\"?>")
         val sw = StringWriter()
         sw.use { jaxcMarshaller.marshal(kravgrunnlag, sw) }
         return sw.toString()

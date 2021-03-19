@@ -10,6 +10,7 @@ import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
 import org.junit.jupiter.api.Assertions.assertTrue
+import java.math.BigInteger
 import javax.validation.constraints.Max
 import kotlin.random.Random
 
@@ -96,8 +97,8 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                 under4rettsgebyr = under4rettsgebyr,
                 muligforeldelse = muligforeldelse
         )
-        gjeldendeBehandling!!.kravgrunnlagId = request.detaljertKravgrunnlagMelding.detaljertKravgrunnlag.kravgrunnlagId
-        gjeldendeBehandling!!.vedtakId = request.detaljertKravgrunnlagMelding.detaljertKravgrunnlag.vedtakId
+        gjeldendeBehandling!!.kravgrunnlagId = request.detaljertKravgrunnlag?.kravgrunnlagId
+        gjeldendeBehandling!!.vedtakId = request.detaljertKravgrunnlag?.vedtakId
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = request)
     }
 
@@ -142,7 +143,7 @@ class GjeldendeBehandling(
         var eksternBehandlingId: String?,
         var eksternBrukId: String?,
         var behandlingId: String? = null,
-        var vedtakId: Int? = null,
-        var kravgrunnlagId: Int? = null
+        var vedtakId: BigInteger? = null,
+        var kravgrunnlagId: BigInteger? = null
 )
 
