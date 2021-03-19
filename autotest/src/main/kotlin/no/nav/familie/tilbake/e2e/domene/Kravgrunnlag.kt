@@ -3,8 +3,12 @@ package no.nav.familie.tilbake.e2e.domene
 import com.fasterxml.jackson.annotation.JsonFormat
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import java.math.BigDecimal
-import java.time.LocalDate
+import javax.xml.bind.annotation.XmlAccessType
+import javax.xml.bind.annotation.XmlAccessorType
+import javax.xml.bind.annotation.XmlRootElement
 
+@XmlRootElement(name = "detaljertKravgrunnlagMelding")
+@XmlAccessorType(XmlAccessType.FIELD)
 data class Kravgrunnlag(
     val detaljertKravgrunnlagMelding: DetaljertKravgrunnlagMelding
 )
@@ -30,13 +34,13 @@ data class DetaljertKravgrunnlag(
     val kontrollfelt: String,
     val saksbehId: String,
     val referanse: String,
-    val tilbakekrevingsPeriode: Set<TilbakekrevingsPeriode>
+    val tilbakekrevingsPeriode: List<TilbakekrevingsPeriode>
 )
 
 data class TilbakekrevingsPeriode(
     val periode: Periode,
     val belopSkattMnd: BigDecimal,
-    val tilbakekrevingsBelop: Set<TilbakekrevingsBelop>
+    val tilbakekrevingsBelop: List<TilbakekrevingsBelop>
 )
 
 data class Periode(

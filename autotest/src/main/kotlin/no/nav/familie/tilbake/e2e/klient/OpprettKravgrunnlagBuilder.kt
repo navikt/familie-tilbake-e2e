@@ -4,8 +4,8 @@ import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.domene.*
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.math.RoundingMode
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import javax.validation.constraints.Max
 import kotlin.random.Random
@@ -65,13 +65,13 @@ class OpprettKravgrunnlagBuilder {
         under4rettsgebyr: Boolean,
         muligforeldelse: Boolean,
         ytelsestype: Ytelsestype
-    ): Set<TilbakekrevingsPeriode> {
+    ): List<TilbakekrevingsPeriode> {
         /*Lager alltid periodene 3 måneder lange med 1 måned mellom, så derfor gange med 4.
         Første periode starter for 3 år siden når det skal være muligforeldelse eller for 4 måneder siden gange med antall perioder*/
-        val startDato = if (muligforeldelse) {
+        var startDato = if (muligforeldelse) {
             LocalDate.now().minusYears(3).withDayOfMonth(1)
         } else {
-            LocalDate.now().minusMonths(BigDecimal(4).multiply(BigDecimal(antallPerioder)).toLong())
+            LocalDate.now().minusMonths(BigDecimal(4).multiply(BigDecimal(antallPerioder)).toLong()).withDayOfMonth(1)
         }
 
         /*Setter feilutbetalt beløp til 20000 kr, med mindre det skal være under4rettsgebyr, da skal det være under 4796 kr pr jan.2021*/
@@ -81,30 +81,30 @@ class OpprettKravgrunnlagBuilder {
             BigDecimal(20000).divide(BigDecimal(antallPerioder).multiply(BigDecimal(3)),0, RoundingMode.HALF_DOWN)
         }
 
-        val tilbakekrevingsperioder: MutableSet<TilbakekrevingsPeriode> = mutableSetOf()
-        for (i in 1..antallPerioder) { //TODO Disse for-loopene fungerer ikke :(
+        val tilbakekrevingsperiodeList: MutableList<TilbakekrevingsPeriode> = mutableListOf()
+        for (i in 1..antallPerioder) {
             for (j in 1..3) {
-                tilbakekrevingsperioder.add(
+                tilbakekrevingsperiodeList.add(
                     TilbakekrevingsPeriode(
                         periode = Periode(
                             fom = startDato.toString(),
                             tom = startDato.withDayOfMonth(startDato.lengthOfMonth()).toString()
                         ),
-                        belopSkattMnd = BigDecimal.ZERO,
+                        belopSkattMnd = BigDecimal(BigInteger.ZERO, 2),
                         tilbakekrevingsBelop = tilbakekrevingsBelopGenerator(beløpprmåned, ytelsestype)
                     )
                 )
-                startDato.plusMonths(1)
+                startDato = startDato.plusMonths(1)
             }
-            startDato.plusMonths(1)
+            startDato = startDato.plusMonths(1)
         }
-        return tilbakekrevingsperioder
+        return tilbakekrevingsperiodeList
     }
 
     private fun tilbakekrevingsBelopGenerator(
         beløpprmåned: BigDecimal,
         ytelsestype: Ytelsestype
-    ): Set<TilbakekrevingsBelop> {
+    ): List<TilbakekrevingsBelop> {
         val ytelKodeKlasse: KodeKlasse
         val feilKodeKlasse: KodeKlasse
         when (ytelsestype) {
@@ -128,8 +128,8 @@ class OpprettKravgrunnlagBuilder {
                 throw Exception("Barnetilsyn er ikke implementert enda")
             }
         }
-        val tilbakekrevingsBelopSet: MutableSet<TilbakekrevingsBelop> = mutableSetOf()
-        tilbakekrevingsBelopSet.add(
+        val tilbakekrevingsBelopList: MutableList<TilbakekrevingsBelop> = mutableListOf()
+        tilbakekrevingsBelopList.add(
             TilbakekrevingsBelop(
                 kodeKlasse = ytelKodeKlasse,
                 typeKlasse = TypeKlasse.YTEL,
@@ -140,7 +140,7 @@ class OpprettKravgrunnlagBuilder {
                 skattProsent = BigDecimal.ZERO
             )
         )
-        tilbakekrevingsBelopSet.add(
+        tilbakekrevingsBelopList.add(
             TilbakekrevingsBelop(
                 kodeKlasse = feilKodeKlasse,
                 typeKlasse = TypeKlasse.FEIL,
@@ -151,6 +151,6 @@ class OpprettKravgrunnlagBuilder {
                 skattProsent = BigDecimal.ZERO
             )
         )
-        return tilbakekrevingsBelopSet
+        return tilbakekrevingsBelopList
     }
 }

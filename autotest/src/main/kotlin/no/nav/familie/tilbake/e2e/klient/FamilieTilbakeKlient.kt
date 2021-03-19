@@ -1,7 +1,6 @@
 package no.nav.familie.tilbake.e2e.klient
 
 import no.nav.familie.http.client.AbstractRestClient
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
@@ -12,9 +11,14 @@ import no.nav.familie.tilbake.e2e.domene.VersjonInfo
 import no.nav.familie.tilbake.e2e.domene.steg.Fakta
 import org.hibernate.validator.internal.util.Contracts
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.server.ServerHttpResponse
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
+import java.io.StringWriter
 import java.net.URI
+import javax.servlet.http.HttpServletResponseWrapper
+import javax.xml.bind.JAXBContext
+import javax.xml.bind.Marshaller
 
 @Service
 class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val familieTilbakeApiUrl: String,
@@ -38,11 +42,22 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     }
 
     fun opprettKravgrunnlag(kravgrunnlag: Kravgrunnlag) {
-        val mapper = jacksonObjectMapper()
-        println(mapper.writeValueAsString(kravgrunnlag))
-        val response: Ressurs<String> = postForEntity(OPPRETT_KRAVGRUNNLAG_URI, kravgrunnlag)
-        Contracts.assertTrue(response.status == Ressurs.Status.SUKSESS,
-                             "Opprett behandling skulle hatt status SUKSESS. Istedet fikk den ${response.status} med melding ${response.melding}")
+        val xml = jaxbObjectToXML(kravgrunnlag)
+        println(xml)
+        val response: ServerHttpResponse = postForEntity(OPPRETT_KRAVGRUNNLAG_URI, xml)
+
+        println(response)
+        Contracts.assertTrue(response.equals(200),
+                             "Opprett kravgrunnlag skulle hatt status 200 OK. Istedet fikk den $response")
+    }
+
+    private fun jaxbObjectToXML(kravgrunnlag: Kravgrunnlag): String {
+        val jaxbContext = JAXBContext.newInstance(Kravgrunnlag::class.java)
+        val jaxcMarshaller = jaxbContext.createMarshaller()
+        jaxcMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false)
+        val sw = StringWriter()
+        sw.use { jaxcMarshaller.marshal(kravgrunnlag, sw) }
+        return sw.toString()
     }
 
     fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Fagsak? {
