@@ -1,6 +1,7 @@
 package no.nav.familie.tilbake.e2e.klient
 
 import no.nav.familie.http.client.AbstractRestClient
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
@@ -26,8 +27,8 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     private final val FAGSAK_URL_V1: URI = URI.create("$API_URL/fagsak/v1")
 
     private final val AUTOTEST_API: URI = URI.create("$API_URL/autotest")
-    private final val OPPRETT_KRAVGRUNNLAG_URI: URI = URI.create("$AUTOTEST_API/opprett/kravgrunnlag")
-    private final val OPPRETT_STATUSMELDING_URI: URI = URI.create("$AUTOTEST_API/opprett/statusmelding")
+    private final val OPPRETT_KRAVGRUNNLAG_URI: URI = URI.create("$AUTOTEST_API/opprett/kravgrunnlag/")
+    private final val OPPRETT_STATUSMELDING_URI: URI = URI.create("$AUTOTEST_API/opprett/statusmelding/")
 
     fun opprettTilbakekreving(opprettTilbakekrevingRequest: OpprettTilbakekrevingRequest): String? {
         val response: Ressurs<String> = postForEntity(BEHANDLING_URL_V1, opprettTilbakekrevingRequest)
@@ -37,6 +38,8 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     }
 
     fun opprettKravgrunnlag(kravgrunnlag: Kravgrunnlag) {
+        val mapper = jacksonObjectMapper()
+        println(mapper.writeValueAsString(kravgrunnlag))
         val response: Ressurs<String> = postForEntity(OPPRETT_KRAVGRUNNLAG_URI, kravgrunnlag)
         Contracts.assertTrue(response.status == Ressurs.Status.SUKSESS,
                              "Opprett behandling skulle hatt status SUKSESS. Istedet fikk den ${response.status} med melding ${response.melding}")

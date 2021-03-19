@@ -2,6 +2,7 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
+import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.Venteårsak
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
@@ -60,7 +61,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         val behandlingId = saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         assertTrue(saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG),
                    "Behandling står ikke på vent og/eller med riktig venteårsak")
-        //TODO: Registere kravgrunnlag
+        saksbehandler.opprettKravgrunnlag(KodeStatusKrav.NY,2, false, false)
+        //TODO: Registere kravgrunnlag og verifisere neste steg
     }
 
 }

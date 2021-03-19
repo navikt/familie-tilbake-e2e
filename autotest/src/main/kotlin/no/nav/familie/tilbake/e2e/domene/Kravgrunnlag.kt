@@ -3,7 +3,6 @@ package no.nav.familie.tilbake.e2e.domene
 import com.fasterxml.jackson.annotation.JsonFormat
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import java.math.BigDecimal
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 
 data class Kravgrunnlag(
@@ -19,19 +18,18 @@ data class DetaljertKravgrunnlag(
     val vedtakId: Int,
     val kodeStatusKrav: KodeStatusKrav,
     val kodeFagomraade: Fagsystem,
-    val fagsystemId: Int,
+    val fagsystemId: String,
     val vedtakIdOmgjort: Int,
-    val vedtakGjelderId: Int,
+    val vedtakGjelderId: String,
     val typeGjelderId: String,
-    val utbetalesTilId: Int,
+    val utbetalesTilId: String,
     val typeUtbetId: String,
     val enhetAnsvarlig: Int,
     val enhetBosted: Int,
     val enhetBehandl: Int,
-    @JsonFormat(pattern = "yyyy-MM-dd-hh-mm-ss-SSSSSS")
-    val kontrollfelt: SimpleDateFormat,
+    val kontrollfelt: String,
     val saksbehId: String,
-    val referanse: Int,
+    val referanse: String,
     val tilbakekrevingsPeriode: Set<TilbakekrevingsPeriode>
 )
 
@@ -43,9 +41,9 @@ data class TilbakekrevingsPeriode(
 
 data class Periode(
     @JsonFormat(pattern = "yyyy-MM-dd")
-    var fom: LocalDate,
+    var fom: String,
     @JsonFormat(pattern = "yyyy-MM-dd")
-    var tom: LocalDate
+    var tom: String
 )
 
 data class TilbakekrevingsBelop(

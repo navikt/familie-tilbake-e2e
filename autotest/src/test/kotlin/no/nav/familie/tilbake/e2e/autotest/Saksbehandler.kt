@@ -9,7 +9,7 @@ import no.nav.familie.tilbake.e2e.domene.Venteårsak
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
-import org.hibernate.validator.internal.util.Contracts
+import org.junit.jupiter.api.Assertions.assertTrue
 import javax.validation.constraints.Max
 import kotlin.random.Random
 
@@ -49,23 +49,23 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
             fagsystem: Fagsystem,
             ytelsestype: Ytelsestype,
             eksternFagsakId: String,
-            @Max(29)
+            @Max(6)
             antallPerioder: Int,
             under4rettsgebyr: Boolean,
             muligforeldelse: Boolean
     ) {
+        gjeldendeBehandling = GjeldendeBehandling(eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
+            fagsystem = fagsystem,
+            ytelsestype = ytelsestype,
+            eksternFagsakId = eksternFagsakId,
+            eksternBrukId = null)
+
         opprettKravgrunnlag(
                 status = status,
                 antallPerioder = antallPerioder,
                 under4rettsgebyr = under4rettsgebyr,
                 muligforeldelse = muligforeldelse
         )
-
-        gjeldendeBehandling = GjeldendeBehandling(eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = ytelsestype,
-                                                  eksternFagsakId = eksternFagsakId,
-                                                  eksternBrukId = null)
     }
 
     fun opprettKravgrunnlag(
@@ -75,13 +75,13 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
             under4rettsgebyr: Boolean,
             muligforeldelse: Boolean
     ) {
-        Contracts.assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.fagsystem != null,
+        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.fagsystem != null,
                              "Fagsystem ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
-        Contracts.assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.ytelsestype != null,
+        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.ytelsestype != null,
                              "Ytelsestype ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
-        Contracts.assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.eksternFagsakId != null,
+        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.eksternFagsakId != null,
                              "EksternFagsakId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
-        Contracts.assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.eksternBehandlingId != null,
+        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.eksternBehandlingId != null,
                              "EksternBehandlingId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
 
         val request = opprettKravgrunnlagBuilder.opprettKravgrunnlag(
@@ -90,14 +90,15 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                 ytelsestype = gjeldendeBehandling?.ytelsestype!!,
                 eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
                 eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!,
-                kravgrunnlagId = null, // gjeldendeBehandling.kravgrunnlagId,
-                vedtakId = null, // gjeldendeBehandling.vedtakId,
+                kravgrunnlagId =  gjeldendeBehandling?.kravgrunnlagId,
+                vedtakId =  gjeldendeBehandling?.vedtakId,
                 antallPerioder = antallPerioder,
                 under4rettsgebyr = under4rettsgebyr,
                 muligforeldelse = muligforeldelse
         )
-
-        familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = request!!)
+        gjeldendeBehandling!!.kravgrunnlagId = request.detaljertKravgrunnlagMelding.detaljertKravgrunnlag.kravgrunnlagId
+        gjeldendeBehandling!!.vedtakId = request.detaljertKravgrunnlagMelding.detaljertKravgrunnlag.vedtakId
+        familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = request)
     }
 
     fun hentBehandlingId(fagsystem: Fagsystem, eksternFagsakId: String, eksternBrukId: String?): String {
@@ -141,7 +142,7 @@ class GjeldendeBehandling(
         var eksternBehandlingId: String?,
         var eksternBrukId: String?,
         var behandlingId: String? = null,
-        var vedtakId: String? = null,
-        var kravgrunnlagId: String? = null
+        var vedtakId: Int? = null,
+        var kravgrunnlagId: Int? = null
 )
 
