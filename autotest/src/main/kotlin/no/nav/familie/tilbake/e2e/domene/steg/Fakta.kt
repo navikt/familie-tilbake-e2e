@@ -19,9 +19,10 @@ data class Fakta(
 data class FaktaSteg(
     @JsonProperty("@type")
     val type: String = "FAKTA",
-    val feilutbetaltePerioder: Set<FeilutbetaltePeriode>,
-    val begrunnelse: String
+    val feilutbetaltePerioder: Set<FeilutbetaltePeriode>? = emptySet(),
+    val begrunnelse: String? = null
 ) {
+
     fun addFaktaVurdering() {
 
     }

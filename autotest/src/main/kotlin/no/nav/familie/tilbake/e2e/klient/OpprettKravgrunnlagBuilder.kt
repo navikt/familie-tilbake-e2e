@@ -8,6 +8,8 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDt
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto
+import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
+import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsbelopDto
 import no.nav.tilbakekreving.typer.v1.PeriodeDto
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto
@@ -64,6 +66,25 @@ class OpprettKravgrunnlagBuilder {
             ytelsestype
         )
         )
+        return response
+    }
+
+    fun opprettStatusmelding(
+        vedtakId: BigInteger,
+        kodeStatusKrav: KodeStatusKrav,
+        fagområde: Fagsystem,
+        eksternFagsakId: String,
+        eksternBehandlingId: String
+    ): EndringKravOgVedtakstatus {
+        val response = EndringKravOgVedtakstatus()
+        response.kravOgVedtakstatus = KravOgVedtakstatus()
+        response.kravOgVedtakstatus.vedtakId = vedtakId
+        response.kravOgVedtakstatus.kodeStatusKrav = kodeStatusKrav.toString()
+        response.kravOgVedtakstatus.kodeFagomraade = fagområde.toString()
+        response.kravOgVedtakstatus.fagsystemId = eksternFagsakId
+        response.kravOgVedtakstatus.vedtakGjelderId = "12345678901"
+        response.kravOgVedtakstatus.typeGjelderId = TypeGjelderDto.PERSON
+        response.kravOgVedtakstatus.referanse = eksternBehandlingId
         return response
     }
 

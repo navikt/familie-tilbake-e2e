@@ -2,8 +2,11 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
+import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
+import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
 import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.Venteårsak
+import no.nav.familie.tilbake.e2e.domene.steg.FaktaSteg
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -42,8 +45,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         )
 
         val behandlingId = saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
-        assertTrue(saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING),
-                   "Behandling står ikke på vent og/eller med riktig venteårsak")
+        saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
         //TODO: Registrere brukerrespons og verifisere neste steg
     }
 
@@ -59,10 +61,26 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         )
 
         val behandlingId = saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
-        assertTrue(saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG),
-                   "Behandling står ikke på vent og/eller med riktig venteårsak")
+        saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
         saksbehandler.opprettKravgrunnlag(KodeStatusKrav.NY,2, false, false)
-        //TODO: Registere kravgrunnlag og verifisere neste steg
+        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+        saksbehandler.opprettStatusmelding(KodeStatusKrav.SPER)
+        saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+    }
+
+    @Test
+    fun `Kravgrunnlag uten at behandling opprettes først`() {
+        val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
+        saksbehandler.opprettKravgrunnlagUtenBehandling(
+            status = KodeStatusKrav.NY,
+            fagsystem = Fagsystem.BA,
+            ytelsestype = Ytelsestype.BARNETRYGD,
+            eksternFagsakId = eksternFagsakId,
+            antallPerioder = 1,
+            under4rettsgebyr = false,
+            muligforeldelse = false
+        )
     }
 
 }
