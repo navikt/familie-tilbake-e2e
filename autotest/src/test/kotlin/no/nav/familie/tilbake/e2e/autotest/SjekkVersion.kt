@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest
 class SjekkVersion(@Autowired private val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     @Test
-    fun `Skal hente versjon og dermed teste om familie-tilbake er oppe`() {
+    fun `hentVersjonInfo skal hente versjon og dermed teste om familie-tilbake er oppe`() {
         familieTilbakeKlient.hentVersjonInfo()
     }
 }

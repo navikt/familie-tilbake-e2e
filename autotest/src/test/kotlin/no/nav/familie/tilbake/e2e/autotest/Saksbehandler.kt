@@ -14,46 +14,47 @@ import java.math.BigInteger
 import javax.validation.constraints.Max
 import kotlin.random.Random
 
-class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
-                    private val opprettTilbakekrevingBuilder: OpprettTilbakekrevingBuilder,
-                    private val opprettKravgrunnlagBuilder: OpprettKravgrunnlagBuilder,
-                    var gjeldendeBehandling: GjeldendeBehandling? = null
+class Saksbehandler(
+    private val familieTilbakeKlient: FamilieTilbakeKlient,
+    private val opprettTilbakekrevingBuilder: OpprettTilbakekrevingBuilder,
+    private val opprettKravgrunnlagBuilder: OpprettKravgrunnlagBuilder,
+    var gjeldendeBehandling: GjeldendeBehandling? = null,
 ) {
 
     fun opprettTilbakekreving(
-            eksternFagsakId: String,
-            fagsystem: Fagsystem,
-            ytelsestype: Ytelsestype,
-            varsel: Boolean,
-            verge: Boolean
+        eksternFagsakId: String,
+        fagsystem: Fagsystem,
+        ytelsestype: Ytelsestype,
+        varsel: Boolean,
+        verge: Boolean
     ): String? {
         val request = opprettTilbakekrevingBuilder.opprettTilbakekrevingRequest(
-                eksternFagsakId = eksternFagsakId,
-                fagsystem = fagsystem,
-                ytelsestype = ytelsestype,
-                varsel = varsel,
-                verge = verge
+            eksternFagsakId = eksternFagsakId,
+            fagsystem = fagsystem,
+            ytelsestype = ytelsestype,
+            varsel = varsel,
+            verge = verge
         )
         val eksternBrukId = familieTilbakeKlient.opprettTilbakekreving(request)
         println("Opprettet behandling med eksternFagsakId: $eksternFagsakId og eksternBrukId: $eksternBrukId")
 
         gjeldendeBehandling = GjeldendeBehandling(eksternFagsakId = eksternFagsakId,
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = ytelsestype,
-                                                  eksternBehandlingId = request.eksternId,
-                                                  eksternBrukId = eksternBrukId)
+            fagsystem = fagsystem,
+            ytelsestype = ytelsestype,
+            eksternBehandlingId = request.eksternId,
+            eksternBrukId = eksternBrukId)
         return eksternBrukId
     }
 
     fun opprettKravgrunnlagUtenBehandling(
-            status: KodeStatusKrav,
-            fagsystem: Fagsystem,
-            ytelsestype: Ytelsestype,
-            eksternFagsakId: String,
-            @Max(6)
-            antallPerioder: Int,
-            under4rettsgebyr: Boolean,
-            muligforeldelse: Boolean
+        status: KodeStatusKrav,
+        fagsystem: Fagsystem,
+        ytelsestype: Ytelsestype,
+        eksternFagsakId: String,
+        @Max(6)
+        antallPerioder: Int,
+        under4rettsgebyr: Boolean,
+        muligforeldelse: Boolean
     ) {
         gjeldendeBehandling = GjeldendeBehandling(eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
             fagsystem = fagsystem,
@@ -62,40 +63,40 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
             eksternBrukId = null)
 
         opprettKravgrunnlag(
-                status = status,
-                antallPerioder = antallPerioder,
-                under4rettsgebyr = under4rettsgebyr,
-                muligforeldelse = muligforeldelse
+            status = status,
+            antallPerioder = antallPerioder,
+            under4rettsgebyr = under4rettsgebyr,
+            muligforeldelse = muligforeldelse
         )
     }
 
     fun opprettKravgrunnlag(
-            status: KodeStatusKrav,
-            @Max(29)
-            antallPerioder: Int,
-            under4rettsgebyr: Boolean,
-            muligforeldelse: Boolean
+        status: KodeStatusKrav,
+        @Max(29)
+        antallPerioder: Int,
+        under4rettsgebyr: Boolean,
+        muligforeldelse: Boolean
     ) {
         assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.fagsystem != null,
-                             "Fagsystem ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
+            "Fagsystem ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
         assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.ytelsestype != null,
-                             "Ytelsestype ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
+            "Ytelsestype ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
         assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.eksternFagsakId != null,
-                             "EksternFagsakId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
+            "EksternFagsakId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
         assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.eksternBehandlingId != null,
-                             "EksternBehandlingId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
+            "EksternBehandlingId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
 
         val request = opprettKravgrunnlagBuilder.opprettKravgrunnlag(
-                status = status,
-                fagområde = gjeldendeBehandling?.fagsystem!!,
-                ytelsestype = gjeldendeBehandling?.ytelsestype!!,
-                eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
-                eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!,
-                kravgrunnlagId =  gjeldendeBehandling?.kravgrunnlagId,
-                vedtakId =  gjeldendeBehandling?.vedtakId,
-                antallPerioder = antallPerioder,
-                under4rettsgebyr = under4rettsgebyr,
-                muligforeldelse = muligforeldelse
+            status = status,
+            fagområde = gjeldendeBehandling?.fagsystem!!,
+            ytelsestype = gjeldendeBehandling?.ytelsestype!!,
+            eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
+            eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!,
+            kravgrunnlagId = gjeldendeBehandling?.kravgrunnlagId,
+            vedtakId = gjeldendeBehandling?.vedtakId,
+            antallPerioder = antallPerioder,
+            under4rettsgebyr = under4rettsgebyr,
+            muligforeldelse = muligforeldelse
         )
         gjeldendeBehandling!!.kravgrunnlagId = request.detaljertKravgrunnlag?.kravgrunnlagId
         gjeldendeBehandling!!.vedtakId = request.detaljertKravgrunnlag?.vedtakId
@@ -112,38 +113,34 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         throw Exception("Fantes ikke noen behandling med eksternBrukId $eksternBrukId på kombinasjonen eksternFagsakId $eksternFagsakId og fagsystem $fagsystem")
     }
 
-    fun erBehandlingPåVent(behandlingId: String, venteårsak: Venteårsak): Boolean {
-        familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.forEach {
-            if (it.behandlingsstegstatus == Behandlingsstegstatus.VENTER) {
-                if (it.venteårsak == venteårsak) {
+    fun erBehandlingPåVent(behandlingId: String, venteårsak: Venteårsak) {
+        familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.any {
+            it.behandlingsstegstatus == Behandlingsstegstatus.VENTER && it.venteårsak == venteårsak
+        }
+
+        fun erBehandlingISteg(
+            behandlingId: String,
+            behandlingssteg: Behandlingssteg,
+            behandlingsstegstatus: Behandlingsstegstatus
+        ): Boolean {
+            familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.forEach {
+                if (it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus) {
                     return true
                 }
-                throw Exception("Behandling $behandlingId var på vent men med årsak: ${it.venteårsak}. Forventet $venteårsak")
             }
+            return false
         }
-        return false
-    }
-
-    fun erBehandlingISteg(behandlingId: String,
-                          behandlingssteg: Behandlingssteg,
-                          behandlingsstegstatus: Behandlingsstegstatus): Boolean {
-        familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.forEach {
-            if (it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus) {
-                return true
-            }
-        }
-        return false
     }
 }
 
-class GjeldendeBehandling(
-        var fagsystem: Fagsystem?,
-        var ytelsestype: Ytelsestype?,
-        var eksternFagsakId: String?,
-        var eksternBehandlingId: String?,
-        var eksternBrukId: String?,
-        var behandlingId: String? = null,
-        var vedtakId: BigInteger? = null,
-        var kravgrunnlagId: BigInteger? = null
-)
+        class GjeldendeBehandling(
+            var fagsystem: Fagsystem?,
+            var ytelsestype: Ytelsestype?,
+            var eksternFagsakId: String?,
+            var eksternBehandlingId: String?,
+            var eksternBrukId: String?,
+            var behandlingId: String? = null,
+            var vedtakId: BigInteger? = null,
+            var kravgrunnlagId: BigInteger? = null
+        )
 

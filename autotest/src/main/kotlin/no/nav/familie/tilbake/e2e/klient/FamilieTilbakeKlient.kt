@@ -54,7 +54,6 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         val jaxbContext = JAXBContext.newInstance(DetaljertKravgrunnlagMelding::class.java)
         val jaxcMarshaller = jaxbContext.createMarshaller()
         jaxcMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
-//        jaxcMarshaller.setProperty("com.sun.xml.bind.xmlHeaders", "<?xml version=\"1.0\" encoding=\"utf-8\"?>")
         val sw = StringWriter()
         sw.use { jaxcMarshaller.marshal(kravgrunnlag, sw) }
         return sw.toString()
