@@ -7,10 +7,11 @@ import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
 import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.Venteårsak
 import no.nav.familie.tilbake.e2e.domene.steg.FaktaSteg
+import no.nav.familie.tilbake.e2e.domene.steg.Hendelsestype
+import no.nav.familie.tilbake.e2e.domene.steg.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -50,7 +51,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
     }
 
     @Test
-    fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag og SPER melding`() {
+    fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag, SPER melding, ENDR melding, behandling av Fakta`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
                 eksternFagsakId = eksternFagsakId,
@@ -67,6 +68,12 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
         saksbehandler.opprettStatusmelding(KodeStatusKrav.SPER)
         saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+        saksbehandler.opprettStatusmelding(KodeStatusKrav.ENDR)
+
+        val faktasteg: FaktaSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.FAKTA, behandlingId) as FaktaSteg
+        faktasteg.addFaktaVurdering(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+        saksbehandler.behandleSteg(faktasteg, behandlingId)
+        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
     }
 
     @Test

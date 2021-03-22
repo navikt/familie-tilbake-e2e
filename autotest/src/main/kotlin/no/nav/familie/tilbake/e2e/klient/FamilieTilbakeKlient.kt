@@ -12,6 +12,7 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import org.hibernate.validator.internal.util.Contracts.assertTrue
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.io.StringWriter
@@ -33,6 +34,8 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     private final val OPPRETT_KRAVGRUNNLAG_URI: URI = URI.create("$AUTOTEST_API/opprett/kravgrunnlag/")
     private final val OPPRETT_STATUSMELDING_URI: URI = URI.create("$AUTOTEST_API/opprett/statusmelding/")
 
+    /*OPPRETT-tjenester*/
+
     fun opprettTilbakekreving(opprettTilbakekrevingRequest: OpprettTilbakekrevingRequest): String? {
         val response: Ressurs<String> = postForEntity(BEHANDLING_URL_V1, opprettTilbakekrevingRequest)
         assertTrue(response.status == Ressurs.Status.SUKSESS,
@@ -44,14 +47,14 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         val xml = jaxbObjectToXML(kravgrunnlag, DetaljertKravgrunnlagMelding::class.java)
         val response: Ressurs<String> = postForEntity(OPPRETT_KRAVGRUNNLAG_URI, xml)
         assertTrue(response.status == Ressurs.Status.SUKSESS,
-                             "Opprett kravgrunnlag skulle hatt status 200 OK. Istedet fikk den $response")
+                             "Opprett kravgrunnlag feilet. Status ${response.status}, feilmelding: ${response.melding}")
     }
 
     fun opprettStatusmelding(statusmelding: EndringKravOgVedtakstatus) {
         val xml = jaxbObjectToXML(statusmelding, EndringKravOgVedtakstatus::class.java)
-        val response: Ressurs<Any> = postForEntity(OPPRETT_STATUSMELDING_URI, xml)
+        val response: Ressurs<String> = postForEntity(OPPRETT_STATUSMELDING_URI, xml)
         assertTrue(response.status == Ressurs.Status.SUKSESS,
-            "Opprett statusmelding skulle hatt status 200 OK. Istede fikk den $response")
+            "Opprett statusmelding feilet. Status ${response.status}, feilmelding: ${response.melding}")
     }
 
     private fun jaxbObjectToXML(melding: Any, returntype: Class<*>): String {
@@ -62,6 +65,8 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         sw.use { jaxcMarshaller.marshal(melding, sw) }
         return sw.toString()
     }
+
+    /*HENT-tjenester*/
 
     fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Fagsak? {
         val uri = URI.create("$FAGSAK_URL_V1?fagsystem=$fagsystem&fagsak=$eksternFagsakId")
@@ -79,8 +84,16 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return response.data
     }
 
-    /*HENT-metoder for stegene*/
-    private fun hentFakta(behandlingId: String): Fakta? {
+    fun hentVersjonInfo(): VersjonInfo? {
+        val uri = URI.create("$VERSION_URL")
+        val response: Ressurs<VersjonInfo> = getForEntity(uri)
+        assertTrue(response.status == Ressurs.Status.SUKSESS,
+            "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        return response.data
+    }
+
+    /*HENT-tjenester for behandlings-steg*/
+    fun hentFakta(behandlingId: String): Fakta? {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/fakta/v1")
         val response: Ressurs<Fakta> = getForEntity(uri)
         assertTrue(response.status == Ressurs.Status.SUKSESS,
@@ -89,11 +102,11 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     }
     //Mangler Foreldelse, Vilkårsvurdering, ForeslåVedtak, og FattVedtak/to-trinn
 
-    fun hentVersjonInfo(): VersjonInfo? {
-        val uri = URI.create("$VERSION_URL")
-        val response: Ressurs<VersjonInfo> = getForEntity(uri)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-                             "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
-        return response.data
+    /*BEHANDLE og SETT-tjenester*/
+    fun behandleSteg(stegdata: Any, behandlingId: String){
+        val uri = URI.create("$BEHANDLING_BASE/$behandlingId/steg/v1")
+        val response: HttpStatus = postForEntity(uri, stegdata)
+        assertTrue(response.is2xxSuccessful,
+            "Behandle steg feilet.")
     }
 }

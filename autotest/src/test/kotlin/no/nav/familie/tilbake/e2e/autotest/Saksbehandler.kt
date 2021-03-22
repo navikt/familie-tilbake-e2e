@@ -6,6 +6,8 @@ import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
 import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
 import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.Venteårsak
+import no.nav.familie.tilbake.e2e.domene.steg.FaktaSteg
+import no.nav.familie.tilbake.e2e.domene.steg.FeilutbetaltStegPeriode
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -21,6 +23,8 @@ class Saksbehandler(
     private val opprettKravgrunnlagBuilder: OpprettKravgrunnlagBuilder,
     var gjeldendeBehandling: GjeldendeBehandling? = null,
 ) {
+
+    /*OPPRETT-metoder*/
 
     fun opprettTilbakekreving(
         eksternFagsakId: String,
@@ -127,6 +131,8 @@ class Saksbehandler(
         println("Sendt inn $status statusmelding på eksternFagsakId: ${gjeldendeBehandling!!.eksternFagsakId}")
     }
 
+    /*HENT-metoder*/
+
     fun hentBehandlingId(fagsystem: Fagsystem, eksternFagsakId: String, eksternBrukId: String?): String {
         familieTilbakeKlient.hentFagsak(fagsystem, eksternFagsakId)?.behandlinger?.forEach {
             if (it.eksternBrukId.toString() == eksternBrukId) {
@@ -136,6 +142,47 @@ class Saksbehandler(
         }
         throw Exception("Fantes ikke noen behandling med eksternBrukId $eksternBrukId på kombinasjonen eksternFagsakId $eksternFagsakId og fagsystem $fagsystem")
     }
+
+    fun hentBehandlingssteg(stegtype: Behandlingssteg, behandlingId: String): Any? {
+        when (stegtype) {
+            Behandlingssteg.FAKTA -> {
+                val feilutbetaltePerioderList: MutableList<FeilutbetaltStegPeriode> = mutableListOf()
+                    familieTilbakeKlient.hentFakta(behandlingId)?.feilutbetaltePerioder?.forEach {
+                    feilutbetaltePerioderList.add(FeilutbetaltStegPeriode(periode = it.periode))
+                }
+                return FaktaSteg(feilutbetaltePerioder = feilutbetaltePerioderList)
+            }
+            Behandlingssteg.FORELDELSE -> {
+                //TODO
+                return null
+            }
+            Behandlingssteg.VILKÅRSVURDERING -> {
+                //TODO
+                return null
+            }
+            Behandlingssteg.FORESLÅ_VEDTAK -> {
+                //TODO
+                return null
+            }
+            Behandlingssteg.FATTE_VEDTAK -> {
+                //TODO
+                return null
+            }
+            Behandlingssteg.VERGE -> {
+                //TODO
+                return null
+            }
+            else -> {
+                throw Exception("Behandlingssteg $stegtype kan ikke behandles av saksbehandler")
+            }
+        }
+    }
+
+    fun behandleSteg(stegdata: Any, behandlingId: String){
+        familieTilbakeKlient.behandleSteg(stegdata, behandlingId)
+    }
+
+    /*SJEKK-metoder*/
 
     fun erBehandlingPåVent(behandlingId: String, venteårsak: Venteårsak) {
         Vent.til( {familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.any {
@@ -154,7 +201,7 @@ class Saksbehandler(
     }
 }
 
-
+/*STATE-object*/
 class GjeldendeBehandling(
     var fagsystem: Fagsystem?,
     var ytelsestype: Ytelsestype?,
