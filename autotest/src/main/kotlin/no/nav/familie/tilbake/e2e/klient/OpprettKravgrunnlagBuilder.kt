@@ -158,7 +158,7 @@ class OpprettKravgrunnlagBuilder {
         }
         val tilbakekrevingsBelopList: MutableList<DetaljertKravgrunnlagBelopDto> = mutableListOf()
         val tilbakekrevingsbelopYtel = DetaljertKravgrunnlagBelopDto()
-        tilbakekrevingsbelopYtel.kodeKlasse = ytelKodeKlasse.toString()
+        tilbakekrevingsbelopYtel.kodeKlasse = ytelKodeKlasse.name
         tilbakekrevingsbelopYtel.typeKlasse = TypeKlasseDto.YTEL
         tilbakekrevingsbelopYtel.belopOpprUtbet = beløpprmåned
         tilbakekrevingsbelopYtel.belopNy = BigDecimal(BigInteger.ZERO, 2)
@@ -168,7 +168,7 @@ class OpprettKravgrunnlagBuilder {
         tilbakekrevingsBelopList.add(tilbakekrevingsbelopYtel)
 
         val tilbakekrevingsbelopFeil = DetaljertKravgrunnlagBelopDto()
-        tilbakekrevingsbelopFeil.kodeKlasse = feilKodeKlasse.toString()
+        tilbakekrevingsbelopFeil.kodeKlasse = feilKodeKlasse.name
         tilbakekrevingsbelopFeil.typeKlasse = TypeKlasseDto.FEIL
         tilbakekrevingsbelopFeil.belopOpprUtbet = BigDecimal(BigInteger.ZERO, 2)
         tilbakekrevingsbelopFeil.belopNy = beløpprmåned

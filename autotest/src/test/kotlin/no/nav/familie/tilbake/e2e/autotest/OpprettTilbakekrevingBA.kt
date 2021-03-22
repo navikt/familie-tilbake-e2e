@@ -34,7 +34,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
     }
 
     @Test
-    fun `Tilbakekrevingsbehandling med varsel`() {
+    fun `tilbakekrevingsbehandling med varsel`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
                 eksternFagsakId = eksternFagsakId,
@@ -50,7 +50,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
     }
 
     @Test
-    fun `Tilbakekrevingsbehandling uten varsel`() {
+    fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag og SPER melding`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
                 eksternFagsakId = eksternFagsakId,
@@ -70,7 +70,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
     }
 
     @Test
-    fun `Kravgrunnlag uten at behandling opprettes først`() {
+    fun `kravgrunnlag uten at behandling opprettes først`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         saksbehandler.opprettKravgrunnlagUtenBehandling(
             status = KodeStatusKrav.NY,
@@ -81,6 +81,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             under4rettsgebyr = false,
             muligforeldelse = false
         )
+        //TODO: Fortsette å utvide testen når funk kommer i familie-tilbake
     }
 
 }

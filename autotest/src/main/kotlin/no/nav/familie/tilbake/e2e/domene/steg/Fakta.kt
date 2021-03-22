@@ -24,7 +24,7 @@ data class FaktaSteg(
 ) {
 
     fun addFaktaVurdering() {
-
+        //TODO
     }
 }
 

@@ -12,7 +12,6 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import org.hibernate.validator.internal.util.Contracts.assertTrue
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.io.StringWriter
@@ -43,15 +42,15 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
 
     fun opprettKravgrunnlag(kravgrunnlag: DetaljertKravgrunnlagMelding) {
         val xml = jaxbObjectToXML(kravgrunnlag, DetaljertKravgrunnlagMelding::class.java)
-        val response: HttpStatus = postForEntity(OPPRETT_KRAVGRUNNLAG_URI, xml)
-        assertTrue(response.is2xxSuccessful,
+        val response: Ressurs<String> = postForEntity(OPPRETT_KRAVGRUNNLAG_URI, xml)
+        assertTrue(response.status == Ressurs.Status.SUKSESS,
                              "Opprett kravgrunnlag skulle hatt status 200 OK. Istedet fikk den $response")
     }
 
     fun opprettStatusmelding(statusmelding: EndringKravOgVedtakstatus) {
         val xml = jaxbObjectToXML(statusmelding, EndringKravOgVedtakstatus::class.java)
-        val response: HttpStatus = postForEntity(OPPRETT_STATUSMELDING_URI, xml)
-        assertTrue(response.is2xxSuccessful,
+        val response: Ressurs<Any> = postForEntity(OPPRETT_STATUSMELDING_URI, xml)
+        assertTrue(response.status == Ressurs.Status.SUKSESS,
             "Opprett statusmelding skulle hatt status 200 OK. Istede fikk den $response")
     }
 
