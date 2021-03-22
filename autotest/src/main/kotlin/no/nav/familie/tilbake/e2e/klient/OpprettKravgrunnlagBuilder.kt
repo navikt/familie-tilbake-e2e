@@ -18,6 +18,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.validation.constraints.Max
 import kotlin.random.Random
 
@@ -38,7 +40,7 @@ class OpprettKravgrunnlagBuilder {
     ): DetaljertKravgrunnlagMelding {
         val finalKravgrunnlagId = kravgrunnlagId ?: Random.nextInt(100000, 999999).toBigInteger()
         val finalVedtakId = vedtakId ?: Random.nextInt(100000, 999999).toBigInteger()
-        val finalKontrollfelt = LocalDate.now().toString() + "-12-00-00-000000"
+        val finalKontrollfelt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"))
         // Kommer til å trenge å kunne sette kontrollfelt tilbake i tid for at den plukkes av auto-opprett batch (ikke laget enda)
 
         val response = DetaljertKravgrunnlagMelding()
