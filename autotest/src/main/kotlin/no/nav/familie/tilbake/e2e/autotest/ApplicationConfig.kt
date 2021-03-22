@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate
 class ApplicationConfig {
 
     companion object {
+
         const val pakkenavn = "no.nav.familie.tilbake.e2e"
     }
 
@@ -33,7 +34,8 @@ class ApplicationConfig {
         return RestTemplateBuilder(LocalINaisProxyCustomiser())
     }
 
-    class LocalINaisProxyCustomiser: INaisProxyCustomizer {
+    class LocalINaisProxyCustomiser : INaisProxyCustomizer {
+
         override fun customize(restTemplate: RestTemplate?) {
             // should do nothing!!!!!!1
         }
