@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.domene.steg
+package no.nav.familie.tilbake.e2e.domene.stegdto
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonProperty
