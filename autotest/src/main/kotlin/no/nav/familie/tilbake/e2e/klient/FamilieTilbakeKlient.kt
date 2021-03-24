@@ -7,8 +7,8 @@ import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequ
 import no.nav.familie.tilbake.e2e.domene.Behandling
 import no.nav.familie.tilbake.e2e.domene.Fagsak
 import no.nav.familie.tilbake.e2e.domene.VersjonInfo
-import no.nav.familie.tilbake.e2e.domene.stegdto.BehandlingPåVent
-import no.nav.familie.tilbake.e2e.domene.stegdto.Fakta
+import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
+import no.nav.familie.tilbake.e2e.domene.steg.dto.Fakta
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import org.hibernate.validator.internal.util.Contracts.assertTrue

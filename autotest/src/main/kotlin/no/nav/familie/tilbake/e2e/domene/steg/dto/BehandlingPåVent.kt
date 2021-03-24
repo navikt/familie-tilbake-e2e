@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.domene.stegdto
+package no.nav.familie.tilbake.e2e.domene.steg.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import no.nav.familie.tilbake.e2e.domene.Venteårsak
@@ -9,6 +9,4 @@ data class BehandlingPåVent(
     val venteårsak: Venteårsak,
     @JsonFormat(pattern = "yyyy-MM-dd")
     val tidsfrist: LocalDate
-){
-
-}
+)

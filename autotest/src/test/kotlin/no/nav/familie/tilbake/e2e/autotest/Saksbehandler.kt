@@ -6,9 +6,9 @@ import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
 import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
 import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.Venteårsak
-import no.nav.familie.tilbake.e2e.domene.stegdto.BehandlingPåVent
-import no.nav.familie.tilbake.e2e.domene.stegdto.FaktaSteg
-import no.nav.familie.tilbake.e2e.domene.stegdto.FeilutbetaltStegPeriode
+import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
+import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.FeilutbetaltStegPeriode
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
