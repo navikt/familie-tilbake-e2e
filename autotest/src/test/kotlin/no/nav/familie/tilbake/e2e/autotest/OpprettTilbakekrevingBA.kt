@@ -9,6 +9,7 @@ import no.nav.familie.tilbake.e2e.domene.Venteårsak
 import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Hendelsestype
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.domene.Behandlingsresultatstype
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -113,6 +114,40 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             muligforeldelse = false
         )
         //TODO: Fortsette å utvide testen når funk kommer i familie-tilbake
+    }
+
+    @Test
+    fun `tilbakekreving behandles så langt det er mulig før iverksetting så AVSL-melding og henleggelse`() {
+        val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
+        val eksternBrukId = saksbehandler.opprettTilbakekreving(
+            eksternFagsakId = eksternFagsakId,
+            fagsystem = fagsystem,
+            ytelsestype = Ytelsestype.BARNETRYGD,
+            varsel = true,
+            verge = false
+        )
+
+        val behandlingId = saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
+        saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+        saksbehandler.taBehandlingAvVent(behandlingId)
+        saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
+        saksbehandler.opprettKravgrunnlag(
+            status = KodeStatusKrav.NY,
+            antallPerioder = 2,
+            under4rettsgebyr = false,
+            muligforeldelse = false)
+        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+        val faktasteg: FaktaSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.FAKTA, behandlingId) as FaktaSteg
+        faktasteg.addFaktaVurdering(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+        saksbehandler.behandleSteg(faktasteg, behandlingId)
+        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+        //Todo: Legge til behandling av Vilkårsvurdering og Foreslå_Vedtak
+
+        saksbehandler.opprettStatusmelding(KodeStatusKrav.AVSL)
+        saksbehandler.erBehandlingAvsluttet(behandlingId, Behandlingsresultatstype.HENLAGT_KRAVGRUNNLAG_NULLSTILT)
     }
 
 }
