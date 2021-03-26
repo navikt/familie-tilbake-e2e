@@ -5,7 +5,7 @@ import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.domene.*
 import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
 import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
-import no.nav.familie.tilbake.e2e.domene.steg.dto.FeilutbetaltStegPeriode
+import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaFeilutbetaltStegPeriode
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Henlegg
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
@@ -166,9 +166,9 @@ class Saksbehandler(
     fun hentBehandlingssteg(stegtype: Behandlingssteg, behandlingId: String): Any? {
         when (stegtype) {
             Behandlingssteg.FAKTA -> {
-                val feilutbetaltePerioderList: MutableList<FeilutbetaltStegPeriode> = mutableListOf()
+                val feilutbetaltePerioderList: MutableList<FaktaFeilutbetaltStegPeriode> = mutableListOf()
                 familieTilbakeKlient.hentFakta(behandlingId)?.feilutbetaltePerioder?.forEach {
-                    feilutbetaltePerioderList.add(FeilutbetaltStegPeriode(periode = it.periode))
+                    feilutbetaltePerioderList.add(FaktaFeilutbetaltStegPeriode(periode = it.periode))
                 }
                 return FaktaSteg(feilutbetaltePerioder = feilutbetaltePerioderList)
             }
