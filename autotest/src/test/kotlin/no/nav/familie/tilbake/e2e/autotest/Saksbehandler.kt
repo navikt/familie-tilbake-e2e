@@ -2,13 +2,11 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
-import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
-import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
-import no.nav.familie.tilbake.e2e.domene.Venteårsak
+import no.nav.familie.tilbake.e2e.domene.*
 import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
 import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
 import no.nav.familie.tilbake.e2e.domene.steg.dto.FeilutbetaltStegPeriode
+import no.nav.familie.tilbake.e2e.domene.steg.dto.Henlegg
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -45,11 +43,13 @@ class Saksbehandler(
         val eksternBrukId = familieTilbakeKlient.opprettTilbakekreving(request)
         println("Opprettet behandling med eksternFagsakId: $eksternFagsakId og eksternBrukId: $eksternBrukId")
 
-        gjeldendeBehandling = GjeldendeBehandling(eksternFagsakId = eksternFagsakId,
+        gjeldendeBehandling = GjeldendeBehandling(
+            eksternFagsakId = eksternFagsakId,
             fagsystem = fagsystem,
             ytelsestype = ytelsestype,
             eksternBehandlingId = request.eksternId,
-            eksternBrukId = eksternBrukId)
+            eksternBrukId = eksternBrukId
+        )
         return eksternBrukId
     }
 
@@ -63,11 +63,13 @@ class Saksbehandler(
         under4rettsgebyr: Boolean,
         muligforeldelse: Boolean,
     ) {
-        gjeldendeBehandling = GjeldendeBehandling(eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
+        gjeldendeBehandling = GjeldendeBehandling(
+            eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
             fagsystem = fagsystem,
             ytelsestype = ytelsestype,
             eksternFagsakId = eksternFagsakId,
-            eksternBrukId = null)
+            eksternBrukId = null
+        )
 
         opprettKravgrunnlag(
             status = status,
@@ -84,14 +86,22 @@ class Saksbehandler(
         under4rettsgebyr: Boolean,
         muligforeldelse: Boolean,
     ) {
-        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.fagsystem != null,
-            "Fagsystem ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
-        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.ytelsestype != null,
-            "Ytelsestype ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
-        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.eksternFagsakId != null,
-            "EksternFagsakId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
-        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.eksternBehandlingId != null,
-            "EksternBehandlingId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
+        assertTrue(
+            gjeldendeBehandling != null && gjeldendeBehandling?.fagsystem != null,
+            "Fagsystem ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling"
+        )
+        assertTrue(
+            gjeldendeBehandling != null && gjeldendeBehandling?.ytelsestype != null,
+            "Ytelsestype ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling"
+        )
+        assertTrue(
+            gjeldendeBehandling != null && gjeldendeBehandling?.eksternFagsakId != null,
+            "EksternFagsakId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling"
+        )
+        assertTrue(
+            gjeldendeBehandling != null && gjeldendeBehandling?.eksternBehandlingId != null,
+            "EksternBehandlingId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling"
+        )
 
         val request = opprettKravgrunnlagBuilder.opprettKravgrunnlag(
             status = status,
@@ -113,15 +123,23 @@ class Saksbehandler(
 
     fun opprettStatusmelding(
         status: KodeStatusKrav,
-    ){
-        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.vedtakId != null,
-            "VedtakId ikke definert. Minst ett kravgrunnlag må være innsendt før Statusmelding kan sendes")
-        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.fagsystem != null,
-            "Fagsystem ikke definert. Minst ett kravgrunnlag må være innsendt før Statusmelding kan sendes")
-        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.eksternFagsakId != null,
-            "EksternFagsakId ikke definert. Minst ett kravgrunnlag må være innsendt før Statusmelding kan sendes")
-        assertTrue(gjeldendeBehandling != null && gjeldendeBehandling?.eksternBehandlingId != null,
-            "EksternBehandlingId ikke definert. Minst ett kravgrunnlag må være innsendt før Statusmelding kan sendes")
+    ) {
+        assertTrue(
+            gjeldendeBehandling != null && gjeldendeBehandling?.vedtakId != null,
+            "VedtakId ikke definert. Minst ett kravgrunnlag må være innsendt før Statusmelding kan sendes"
+        )
+        assertTrue(
+            gjeldendeBehandling != null && gjeldendeBehandling?.fagsystem != null,
+            "Fagsystem ikke definert. Minst ett kravgrunnlag må være innsendt før Statusmelding kan sendes"
+        )
+        assertTrue(
+            gjeldendeBehandling != null && gjeldendeBehandling?.eksternFagsakId != null,
+            "EksternFagsakId ikke definert. Minst ett kravgrunnlag må være innsendt før Statusmelding kan sendes"
+        )
+        assertTrue(
+            gjeldendeBehandling != null && gjeldendeBehandling?.eksternBehandlingId != null,
+            "EksternBehandlingId ikke definert. Minst ett kravgrunnlag må være innsendt før Statusmelding kan sendes"
+        )
         val request = opprettKravgrunnlagBuilder.opprettStatusmelding(
             vedtakId = gjeldendeBehandling?.vedtakId!!,
             kodeStatusKrav = status,
@@ -149,7 +167,7 @@ class Saksbehandler(
         when (stegtype) {
             Behandlingssteg.FAKTA -> {
                 val feilutbetaltePerioderList: MutableList<FeilutbetaltStegPeriode> = mutableListOf()
-                    familieTilbakeKlient.hentFakta(behandlingId)?.feilutbetaltePerioder?.forEach {
+                familieTilbakeKlient.hentFakta(behandlingId)?.feilutbetaltePerioder?.forEach {
                     feilutbetaltePerioderList.add(FeilutbetaltStegPeriode(periode = it.periode))
                 }
                 return FaktaSteg(feilutbetaltePerioder = feilutbetaltePerioderList)
@@ -182,39 +200,123 @@ class Saksbehandler(
 
     /*HANDLING-metoder*/
 
-    fun behandleSteg(stegdata: Any, behandlingId: String){
+    fun behandleSteg(stegdata: Any, behandlingId: String) {
         familieTilbakeKlient.behandleSteg(stegdata, behandlingId)
     }
 
-    fun settBehandlingPåVent(behandlingId: String, årsak: Venteårsak, frist: LocalDate){
-        familieTilbakeKlient.settBehandlingPåVent(BehandlingPåVent(
+    fun settBehandlingPåVent(behandlingId: String, årsak: Venteårsak, frist: LocalDate) {
+        familieTilbakeKlient.settBehandlingPåVent(
+            BehandlingPåVent(
+                venteårsak = årsak,
+                tidsfrist = frist
+            ),
             behandlingId = behandlingId,
-            venteårsak = årsak,
-            tidsfrist = frist
-        ))
+        )
         erBehandlingPåVent(behandlingId, årsak)
     }
 
-    fun taBehandlingAvVent(behandlingId: String){
+    fun taBehandlingAvVent(behandlingId: String) {
         familieTilbakeKlient.taBehandlingAvVent(behandlingId)
+    }
+
+    fun henleggBehandling(behandlingId: String, behandlingsresultat: Behandlingsresultatstype) {
+        /*Denne vil kun fungere i autotest for behandling opprettet med manueltOpprettet = TRUE ettersom automatisk opprettede behandlinger ikke kan henlegges manuelt før etter 6 dager.
+        Når manueltOpprettet Tilbakekreving er implementert i familie-tilbake kan denne metoden brukes i en test.
+         */
+        val data = Henlegg(
+            behandlingsresultatstype = behandlingsresultat,
+            begrunnelse = "Dette er en automatisk begrunnelse generert av autotest"
+        )
+        if (behandlingsresultat == Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_MED_BREV) {
+            data.fritekst = "Dette er en automatisk fritekst generert av autotest"
+        }
+        familieTilbakeKlient.henleggBehandling(behandlingId, data)
     }
 
     /*SJEKK-metoder*/
 
     fun erBehandlingPåVent(behandlingId: String, venteårsak: Venteårsak) {
-        Vent.til( {familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.any {
-            it.behandlingsstegstatus == Behandlingsstegstatus.VENTER && it.venteårsak == venteårsak
-        } },
-            30, "Behandling kom aldri i vent med årsak $venteårsak")
+        Vent.til(
+            {
+                familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.any {
+                    it.behandlingsstegstatus == Behandlingsstegstatus.VENTER && it.venteårsak == venteårsak
+                }
+            },
+            30, "Behandling kom aldri i vent med årsak $venteårsak"
+        )
         println("Behandling med behandlingId $behandlingId er bekreftet på vent med årsak $venteårsak")
     }
 
-    fun erBehandlingISteg(behandlingId: String, behandlingssteg: Behandlingssteg, behandlingsstegstatus: Behandlingsstegstatus) {
-        Vent.til( { familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.any {
-            it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus
-        } },
-            30, "Behandlingen kom aldri i status $behandlingsstegstatus i steg $behandlingssteg")
+    fun erBehandlingISteg(
+        behandlingId: String,
+        behandlingssteg: Behandlingssteg,
+        behandlingsstegstatus: Behandlingsstegstatus
+    ) {
+        Vent.til(
+            {
+                familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.any {
+                    it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus
+                }
+            },
+            30, "Behandlingen kom aldri i status $behandlingsstegstatus i steg $behandlingssteg"
+        )
         println("Behandling med behandlingsId $behandlingId er bekreftet i status $behandlingsstegstatus i steg $behandlingssteg")
+    }
+
+    fun erBehandlingAvsluttet(behandlingId: String, resultat: Behandlingsresultatstype) {
+        Vent.til(
+            { familieTilbakeKlient.hentBehandling(behandlingId)?.status == Behandlingsstatus.AVSLUTTET },
+            30, "Behandlingen fikk aldri status AVSLUTTET"
+        )
+        val behandling = familieTilbakeKlient.hentBehandling(behandlingId)
+        val henlagttyper = listOf(
+            Behandlingsresultatstype.HENLAGT,
+            Behandlingsresultatstype.HENLAGT_FEILOPPRETTET,
+            Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_MED_BREV,
+            Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_UTEN_BREV,
+            Behandlingsresultatstype.HENLAGT_TEKNISK_VEDLIKEHOLD,
+            Behandlingsresultatstype.HENLAGT_KRAVGRUNNLAG_NULLSTILT
+        )
+        val iverksatttyper = listOf(
+            Behandlingsresultatstype.INGEN_TILBAKEBETALING,
+            Behandlingsresultatstype.DELVIS_TILBAKEBETALING,
+            Behandlingsresultatstype.FULL_TILBAKEBETALING
+        )
+        when (resultat) {
+            in henlagttyper -> {
+                assertTrue(
+                    behandling!!.erBehandlingHenlagt,
+                    "Behandling var i status AVSLUTTET med resultat $resultat men erBehandlingHenlagt verdi var FALSE"
+                )
+                assertTrue(behandling.behandlingsstegsinfo.filter {
+                    it.behandlingssteg != Behandlingssteg.VARSEL
+                }.all {
+                    it.behandlingsstegstatus == Behandlingsstegstatus.AVBRUTT
+                },
+                    "Behandling var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke i status AVBRUTT"
+                )
+                assertTrue(
+                    behandling.resultatstype == Behandlingsresultatstype.HENLAGT,
+                    "Forventet resultat: HENLAGT, Behandlingens resultat: ${behandling.resultatstype}"
+                )
+            }
+            in iverksatttyper -> {
+                assertTrue(
+                    behandling!!.behandlingsstegsinfo.all {
+                        it.behandlingsstegstatus == Behandlingsstegstatus.UTFØRT || it.behandlingsstegstatus == Behandlingsstegstatus.AUTOUTFØRT
+                    },
+                    "Behandlingen var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke UTFØRT/AUTOUTFØRT"
+                )
+                assertTrue(
+                    behandling.resultatstype == resultat,
+                    "Forventet resultat: $resultat, Behandlingens resultat: ${behandling.resultatstype}"
+                )
+            }
+            else -> {
+                throw Exception("Behandling var i status AVSLUTTET men resultattypen angitt var ${behandling!!.resultatstype} som ikke er et gyldig resultat for en avsluttet behandling")
+            }
+        }
+        println("Behandling med behandlingsId $behandlingId er bekreftet avsluttet med resultat $resultat")
     }
 }
 
