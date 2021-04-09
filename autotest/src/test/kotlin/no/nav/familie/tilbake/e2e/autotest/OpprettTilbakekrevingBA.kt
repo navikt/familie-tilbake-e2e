@@ -26,6 +26,7 @@ import kotlin.random.Random
 class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     val fagsystem = Fagsystem.BA
+    val ytelsestype = Ytelsestype.BARNETRYGD
 
     lateinit var saksbehandler: Saksbehandler
 
@@ -42,7 +43,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
                 eksternFagsakId = eksternFagsakId,
                 fagsystem = fagsystem,
-                ytelsestype = Ytelsestype.BARNETRYGD,
+                ytelsestype = ytelsestype,
                 varsel = true,
                 verge = false
         )
@@ -71,7 +72,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
                 eksternFagsakId = eksternFagsakId,
                 fagsystem = fagsystem,
-                ytelsestype = Ytelsestype.BARNETRYGD,
+                ytelsestype = ytelsestype,
                 varsel = false,
                 verge = false
         )

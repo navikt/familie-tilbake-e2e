@@ -105,7 +105,6 @@ class Saksbehandler(
 
         val request = opprettKravgrunnlagBuilder.opprettKravgrunnlag(
             status = status,
-            fagområde = gjeldendeBehandling?.fagsystem!!,
             ytelsestype = gjeldendeBehandling?.ytelsestype!!,
             eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
             eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!,
@@ -143,7 +142,7 @@ class Saksbehandler(
         val request = opprettKravgrunnlagBuilder.opprettStatusmelding(
             vedtakId = gjeldendeBehandling?.vedtakId!!,
             kodeStatusKrav = status,
-            fagområde = gjeldendeBehandling?.fagsystem!!,
+            ytelsestype = gjeldendeBehandling?.ytelsestype!!,
             eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
             eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!
         )
