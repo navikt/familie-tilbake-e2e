@@ -70,26 +70,14 @@ class OpprettKravgrunnlagBuilder {
         return response
     }
 
-    fun utledFagområdeKode(ytelsestype: Ytelsestype): String {
-        val fagområdeKode: String;
-        when (ytelsestype) {
-            Ytelsestype.BARNETRYGD -> {
-                fagområdeKode = "BA"
-            }
-            Ytelsestype.OVERGANGSSTØNAD -> {
-                fagområdeKode = "EFOG"
-            }
-            Ytelsestype.BARNETILSYN -> {
-                fagområdeKode = "EFBT"
-            }
-            Ytelsestype.SKOLEPENGER -> {
-                fagområdeKode = "EFSP"
-            }
-            Ytelsestype.KONTANTSTØTTE -> {
-                fagområdeKode = "KS"
-            }
+    private fun utledFagområdeKode(ytelsestype: Ytelsestype): String {
+        return when (ytelsestype) {
+            Ytelsestype.BARNETRYGD -> "BA"
+            Ytelsestype.OVERGANGSSTØNAD -> "EFOG"
+            Ytelsestype.BARNETILSYN -> "EFBT"
+            Ytelsestype.SKOLEPENGER -> "EFSP"
+            Ytelsestype.KONTANTSTØTTE -> "KS"
         }
-        return fagområdeKode
     }
 
     fun opprettStatusmelding(
