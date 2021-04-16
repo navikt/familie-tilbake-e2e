@@ -3,10 +3,7 @@ package no.nav.familie.tilbake.e2e.autotest
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.domene.*
-import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
-import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
-import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaFeilutbetaltStegPeriode
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Henlegg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.*
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -173,8 +170,11 @@ class Saksbehandler(
                 return FaktaSteg(feilutbetaltePerioder = feilutbetaltePerioderList)
             }
             Behandlingssteg.FORELDELSE -> {
-                //TODO
-                return null
+                val foreldelsePerioderList: MutableList<ForeldelseFeilutbetaltStegPeriode> = mutableListOf()
+                familieTilbakeKlient.hentForeldelse(behandlingId)?.foreldetPerioder?.forEach {
+                    foreldelsePerioderList.add(ForeldelseFeilutbetaltStegPeriode(periode = it.periode))
+                }
+                return ForeldelseSteg(foreldetPerioder = foreldelsePerioderList)
             }
             Behandlingssteg.VILKÅRSVURDERING -> {
                 //TODO
