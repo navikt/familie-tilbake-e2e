@@ -17,6 +17,7 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDate
+import javax.validation.constraints.Max
 import kotlin.random.Random
 
 @SpringBootTest(classes = [ApplicationConfig::class])
@@ -57,6 +58,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             muligforeldelse = true)
 
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
         val faktasteg: FaktaSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.FAKTA, behandlingId) as FaktaSteg
         faktasteg.addFaktaVurdering(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
         saksbehandler.behandleSteg(faktasteg, behandlingId)
@@ -102,6 +104,96 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.taBehandlingAvVent(behandlingId)
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
+    }
+
+    @Test
+    fun `tilbakekreving med alle perioder foreldet`() {
+        /**
+         * Opprett behandling
+         * Sjekk at behandling settes på vent
+         */
+        val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
+        val eksternBrukId = saksbehandler.opprettTilbakekreving(
+            eksternFagsakId = eksternFagsakId,
+            fagsystem = fagsystem,
+            ytelsestype = Ytelsestype.BARNETRYGD,
+            varsel = false,
+            verge = false
+        )
+        val behandlingId = saksbehandler.hentBehandlingId(
+            fagsystem = fagsystem,
+            eksternFagsakId = eksternFagsakId,
+            eksternBrukId = eksternBrukId
+        )
+        saksbehandler.erBehandlingPåVent(
+            behandlingId = behandlingId,
+            venteårsak = Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
+        )
+
+        /**
+         * Opprett kravgrunnlag
+         * Sjekk at behandling settest til steg FAKTA = KLAR
+         */
+        saksbehandler.opprettKravgrunnlag(
+            status = KodeStatusKrav.NY,
+            antallPerioder = 2,
+            under4rettsgebyr = false,
+            muligforeldelse = true
+        )
+        saksbehandler.erBehandlingISteg(
+            behandlingId = behandlingId,
+            behandlingssteg = Behandlingssteg.FAKTA,
+            behandlingsstegstatus = Behandlingsstegstatus.KLAR
+        )
+
+        /**
+         * Behandle fakta
+         * Sjekk at behandling settes til steg FORELDELSE = KLAR
+         */
+        val faktasteg: FaktaSteg = saksbehandler.hentBehandlingssteg(
+            stegtype = Behandlingssteg.FAKTA,
+            behandlingId = behandlingId
+        ) as FaktaSteg
+        faktasteg.addFaktaVurdering(
+            hendelse = Hendelsestype.BA_ANNET,
+            underhendelse = Hendelsesundertype.ANNET_FRITEKST
+        )
+        saksbehandler.behandleSteg(
+            stegdata = faktasteg,
+            behandlingId = behandlingId
+        )
+        saksbehandler.erBehandlingISteg(
+            behandlingId = behandlingId,
+            behandlingssteg = Behandlingssteg.FORELDELSE,
+            behandlingsstegstatus = Behandlingsstegstatus.KLAR
+        )
+
+        /**
+         * Behandle foreldelse - setter alle perioder til FORELDET
+         * Sjekk at behandling hopper over steg VILKÅRSVURDERING
+         * Sjekk at behandling sette til steg FORESLÅ_VEDTAK = KLAR
+         */
+        val foreldelsesteg: ForeldelseSteg = saksbehandler.hentBehandlingssteg(
+            stegtype = Behandlingssteg.FORELDELSE,
+            behandlingId = behandlingId
+        ) as ForeldelseSteg
+        foreldelsesteg.addForeldelseVurdering(
+            beslutning = Foreldelsesvurderingstype.FORELDET
+        )
+        saksbehandler.behandleSteg(
+            stegdata = foreldelsesteg,
+            behandlingId = behandlingId
+        )
+        saksbehandler.erBehandlingISteg(
+            behandlingId = behandlingId,
+            behandlingssteg = Behandlingssteg.VILKÅRSVURDERING,
+            behandlingsstegstatus = Behandlingsstegstatus.AUTOUTFØRT
+        )
+        saksbehandler.erBehandlingISteg(
+            behandlingId = behandlingId,
+            behandlingssteg = Behandlingssteg.FORESLÅ_VEDTAK,
+            behandlingsstegstatus = Behandlingsstegstatus.KLAR
+        )
     }
 
     @Test
