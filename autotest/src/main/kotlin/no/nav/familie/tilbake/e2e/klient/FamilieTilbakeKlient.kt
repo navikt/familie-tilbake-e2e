@@ -112,7 +112,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return response.data
     }
 
-    //Mangler Foreldelse, Vilkårsvurdering, ForeslåVedtak, og FattVedtak/to-trinn
+    // Vilkårsvurdering, ForeslåVedtak, og FattVedtak/to-trinn
 
     /*BEHANDLE og SETT-tjenester*/
     fun behandleSteg(stegdata: Any, behandlingId: String){
