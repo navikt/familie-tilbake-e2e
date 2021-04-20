@@ -2,8 +2,18 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.*
-import no.nav.familie.tilbake.e2e.domene.steg.dto.*
+import no.nav.familie.tilbake.e2e.domene.Behandlingsresultatstype
+import no.nav.familie.tilbake.e2e.domene.Behandlingsstatus
+import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
+import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
+import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.domene.Venteårsak
+import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
+import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaFeilutbetaltStegPeriode
+import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.ForeldelseFeilutbetaltStegPeriode
+import no.nav.familie.tilbake.e2e.domene.steg.dto.ForeldelseSteg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.Henlegg
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -56,7 +66,7 @@ class Saksbehandler(
         ytelsestype: Ytelsestype,
         eksternFagsakId: String,
         @Max(6)
-        antallPerioder: Int,
+    antallPerioder: Int,
         under4rettsgebyr: Boolean,
         muligforeldelse: Boolean,
     ) {
@@ -265,8 +275,8 @@ class Saksbehandler(
 
     fun erBehandlingAvsluttet(behandlingId: String, resultat: Behandlingsresultatstype) {
         Vent.til(
-            { familieTilbakeKlient.hentBehandling(behandlingId)?.status == Behandlingsstatus.AVSLUTTET },
-            30, "Behandlingen fikk aldri status AVSLUTTET"
+                { familieTilbakeKlient.hentBehandling(behandlingId)?.status == Behandlingsstatus.AVSLUTTET },
+                30, "Behandlingen fikk aldri status AVSLUTTET"
         )
         val behandling = familieTilbakeKlient.hentBehandling(behandlingId)
         val henlagttyper = listOf(
