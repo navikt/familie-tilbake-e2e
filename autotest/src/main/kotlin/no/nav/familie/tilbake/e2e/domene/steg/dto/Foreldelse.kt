@@ -5,14 +5,14 @@ import no.nav.familie.tilbake.e2e.domene.Periode
 import java.time.LocalDate
 
 data class Foreldelse(
-        val foreldetPerioder: Set<ForeldelseFeilutbetaltPeriode>,
+    val foreldetPerioder: Set<ForeldelsePeriode>,
 
     )
 
 data class ForeldelseSteg(
     @JsonProperty("@type")
     val type: String = "FORELDELSE",
-    val foreldetPerioder: List<ForeldelseFeilutbetaltStegPeriode>
+    val foreldetPerioder: List<VurdertForeldelsesperiode>
 ) {
     fun addForeldelseVurdering(beslutning: Foreldelsesvurderingstype){
         this.foreldetPerioder.forEach {
@@ -31,7 +31,7 @@ data class ForeldelseSteg(
     }
 }
 
-data class ForeldelseFeilutbetaltPeriode(
+data class ForeldelsePeriode(
     val periode: Periode,
     val feilutbetaltBeløp: Int,
     var begrunnelse: String?,
@@ -40,7 +40,7 @@ data class ForeldelseFeilutbetaltPeriode(
     var oppdagelsesdato: LocalDate? = null
 )
 
-data class ForeldelseFeilutbetaltStegPeriode(
+data class VurdertForeldelsesperiode(
     val periode: Periode,
     var begrunnelse: String = "Default begrunnelse fra Autotest",
     var foreldelsesvurderingstype: Foreldelsesvurderingstype = Foreldelsesvurderingstype.IKKE_FORELDET,

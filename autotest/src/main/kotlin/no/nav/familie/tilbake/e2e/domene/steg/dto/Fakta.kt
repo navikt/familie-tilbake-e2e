@@ -19,7 +19,7 @@ data class Fakta(
 data class FaktaSteg(
     @JsonProperty("@type")
     val type: String = "FAKTA",
-    val feilutbetaltePerioder: List<FaktaFeilutbetaltStegPeriode>,
+    val feilutbetaltePerioder: List<VurdertFaktaFeilutbetaltPeriode>,
     var begrunnelse: String? = null,
 ) {
 
@@ -40,7 +40,7 @@ data class FaktaFeilutbetaltPeriode(
     var hendelsesundertype: Hendelsesundertype? = null
 )
 
-data class FaktaFeilutbetaltStegPeriode(
+data class VurdertFaktaFeilutbetaltPeriode(
     val periode: Periode,
     var hendelsestype: Hendelsestype? = null,
     var hendelsesundertype: Hendelsesundertype? = null
