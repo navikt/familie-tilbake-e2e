@@ -7,7 +7,13 @@ import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
 import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.Venteårsak
 import no.nav.familie.tilbake.e2e.domene.Behandlingsresultatstype
-import no.nav.familie.tilbake.e2e.domene.steg.dto.*
+import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.ForeldelseSteg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.domene.steg.dto.Hendelsestype
+import no.nav.familie.tilbake.e2e.domene.steg.dto.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.domene.steg.dto.VilkårsvurderingSteg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -17,7 +23,6 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDate
-import javax.validation.constraints.Max
 import kotlin.random.Random
 
 @SpringBootTest(classes = [ApplicationConfig::class])
@@ -25,6 +30,7 @@ import kotlin.random.Random
 class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     val fagsystem = Fagsystem.BA
+    val ytelsestype = Ytelsestype.BARNETRYGD
 
     lateinit var saksbehandler: Saksbehandler
 
@@ -41,7 +47,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
                 eksternFagsakId = eksternFagsakId,
                 fagsystem = fagsystem,
-                ytelsestype = Ytelsestype.BARNETRYGD,
+                ytelsestype = ytelsestype,
                 varsel = true,
                 verge = false
         )
@@ -75,15 +81,13 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 
-
-
     @Test
     fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag, SPER melding, ENDR melding, behandling av Fakta`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
                 eksternFagsakId = eksternFagsakId,
                 fagsystem = fagsystem,
-                ytelsestype = Ytelsestype.BARNETRYGD,
+                ytelsestype = ytelsestype,
                 varsel = false,
                 verge = false
         )

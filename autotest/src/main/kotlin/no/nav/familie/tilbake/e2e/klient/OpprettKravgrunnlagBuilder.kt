@@ -27,7 +27,6 @@ class OpprettKravgrunnlagBuilder {
 
     fun opprettKravgrunnlag(
         status: KodeStatusKrav,
-        fagområde: Fagsystem,
         ytelsestype: Ytelsestype,
         eksternFagsakId: String,
         eksternBehandlingId: String,
@@ -48,7 +47,7 @@ class OpprettKravgrunnlagBuilder {
         response.detaljertKravgrunnlag.kravgrunnlagId = finalKravgrunnlagId
         response.detaljertKravgrunnlag.vedtakId = finalVedtakId
         response.detaljertKravgrunnlag.kodeStatusKrav = status.toString()
-        response.detaljertKravgrunnlag.kodeFagomraade = fagområde.toString()
+        response.detaljertKravgrunnlag.kodeFagomraade = utledFagområdeKode(ytelsestype = ytelsestype)
         response.detaljertKravgrunnlag.fagsystemId = eksternFagsakId
         response.detaljertKravgrunnlag.vedtakIdOmgjort = BigInteger.ZERO
         response.detaljertKravgrunnlag.vedtakGjelderId = "12345678901"
@@ -71,10 +70,20 @@ class OpprettKravgrunnlagBuilder {
         return response
     }
 
+    private fun utledFagområdeKode(ytelsestype: Ytelsestype): String {
+        return when (ytelsestype) {
+            Ytelsestype.BARNETRYGD -> "BA"
+            Ytelsestype.OVERGANGSSTØNAD -> "EFOG"
+            Ytelsestype.BARNETILSYN -> "EFBT"
+            Ytelsestype.SKOLEPENGER -> "EFSP"
+            Ytelsestype.KONTANTSTØTTE -> "KS"
+        }
+    }
+
     fun opprettStatusmelding(
         vedtakId: BigInteger,
         kodeStatusKrav: KodeStatusKrav,
-        fagområde: Fagsystem,
+        ytelsestype: Ytelsestype,
         eksternFagsakId: String,
         eksternBehandlingId: String
     ): EndringKravOgVedtakstatus {
@@ -82,7 +91,7 @@ class OpprettKravgrunnlagBuilder {
         response.kravOgVedtakstatus = KravOgVedtakstatus()
         response.kravOgVedtakstatus.vedtakId = vedtakId
         response.kravOgVedtakstatus.kodeStatusKrav = kodeStatusKrav.toString()
-        response.kravOgVedtakstatus.kodeFagomraade = fagområde.toString()
+        response.kravOgVedtakstatus.kodeFagomraade = utledFagområdeKode(ytelsestype = ytelsestype)
         response.kravOgVedtakstatus.fagsystemId = eksternFagsakId
         response.kravOgVedtakstatus.vedtakGjelderId = "12345678901"
         response.kravOgVedtakstatus.typeGjelderId = TypeGjelderDto.PERSON

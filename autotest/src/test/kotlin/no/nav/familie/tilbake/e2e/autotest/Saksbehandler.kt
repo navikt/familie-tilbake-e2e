@@ -2,8 +2,20 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.*
-import no.nav.familie.tilbake.e2e.domene.steg.dto.*
+import no.nav.familie.tilbake.e2e.domene.Behandlingsresultatstype
+import no.nav.familie.tilbake.e2e.domene.Behandlingsstatus
+import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
+import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
+import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.domene.Venteårsak
+import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
+import no.nav.familie.tilbake.e2e.domene.steg.dto.VurdertFaktaFeilutbetaltPeriode
+import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.VurdertForeldelsesperiode
+import no.nav.familie.tilbake.e2e.domene.steg.dto.ForeldelseSteg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.Henlegg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.VilkårsvurderingSteg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.VilkårsvurderingStegPeriode
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -102,7 +114,6 @@ class Saksbehandler(
 
         val request = opprettKravgrunnlagBuilder.opprettKravgrunnlag(
             status = status,
-            fagområde = gjeldendeBehandling?.fagsystem!!,
             ytelsestype = gjeldendeBehandling?.ytelsestype!!,
             eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
             eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!,
@@ -140,7 +151,7 @@ class Saksbehandler(
         val request = opprettKravgrunnlagBuilder.opprettStatusmelding(
             vedtakId = gjeldendeBehandling?.vedtakId!!,
             kodeStatusKrav = status,
-            fagområde = gjeldendeBehandling?.fagsystem!!,
+            ytelsestype = gjeldendeBehandling?.ytelsestype!!,
             eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
             eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!
         )
@@ -163,16 +174,16 @@ class Saksbehandler(
     fun hentBehandlingssteg(stegtype: Behandlingssteg, behandlingId: String): Any? {
         when (stegtype) {
             Behandlingssteg.FAKTA -> {
-                val feilutbetaltePerioderList: MutableList<FaktaFeilutbetaltStegPeriode> = mutableListOf()
+                val feilutbetaltePerioderList: MutableList<VurdertFaktaFeilutbetaltPeriode> = mutableListOf()
                 familieTilbakeKlient.hentFakta(behandlingId)?.feilutbetaltePerioder?.forEach {
-                    feilutbetaltePerioderList.add(FaktaFeilutbetaltStegPeriode(periode = it.periode))
+                    feilutbetaltePerioderList.add(VurdertFaktaFeilutbetaltPeriode(periode = it.periode))
                 }
                 return FaktaSteg(feilutbetaltePerioder = feilutbetaltePerioderList)
             }
             Behandlingssteg.FORELDELSE -> {
-                val foreldelsePerioderList: MutableList<ForeldelseFeilutbetaltStegPeriode> = mutableListOf()
+                val foreldelsePerioderList: MutableList<VurdertForeldelsesperiode> = mutableListOf()
                 familieTilbakeKlient.hentForeldelse(behandlingId)?.foreldetPerioder?.forEach {
-                    foreldelsePerioderList.add(ForeldelseFeilutbetaltStegPeriode(periode = it.periode))
+                    foreldelsePerioderList.add(VurdertForeldelsesperiode(periode = it.periode))
                 }
                 return ForeldelseSteg(foreldetPerioder = foreldelsePerioderList)
             }
@@ -268,8 +279,8 @@ class Saksbehandler(
 
     fun erBehandlingAvsluttet(behandlingId: String, resultat: Behandlingsresultatstype) {
         Vent.til(
-            { familieTilbakeKlient.hentBehandling(behandlingId)?.status == Behandlingsstatus.AVSLUTTET },
-            30, "Behandlingen fikk aldri status AVSLUTTET"
+                { familieTilbakeKlient.hentBehandling(behandlingId)?.status == Behandlingsstatus.AVSLUTTET },
+                30, "Behandlingen fikk aldri status AVSLUTTET"
         )
         val behandling = familieTilbakeKlient.hentBehandling(behandlingId)
         val henlagttyper = listOf(

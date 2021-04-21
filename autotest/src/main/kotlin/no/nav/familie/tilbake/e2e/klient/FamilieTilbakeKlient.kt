@@ -72,7 +72,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     /*HENT-tjenester*/
 
     fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Fagsak? {
-            val uri = URI.create("$FAGSAK_URL_V1/$fagsystem/fagsak/$eksternFagsakId/v1")
+        val uri = URI.create("$FAGSAK_URL_V1/$fagsystem/fagsak/$eksternFagsakId/v1")
         val response: Ressurs<Fagsak> = getForEntity(uri)
         assertTrue(response.status == Ressurs.Status.SUKSESS,
                              "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
