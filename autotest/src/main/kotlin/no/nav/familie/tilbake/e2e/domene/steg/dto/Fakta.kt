@@ -8,7 +8,7 @@ import java.time.LocalDate
 data class Fakta(
     val varsletBeløp: Int,
     val totalFeilutbetaltPeriode: Periode,
-    val feilutbetaltePerioder: Set<FeilutbetaltPeriode>,
+    val feilutbetaltePerioder: Set<FaktaFeilutbetaltPeriode>,
     val totaltFeilutbetaltBeløp: Int,
     @JsonFormat(pattern = "yyyy-MM-dd")
     val revurderingsvedtaksdato: LocalDate,
@@ -19,7 +19,7 @@ data class Fakta(
 data class FaktaSteg(
     @JsonProperty("@type")
     val type: String = "FAKTA",
-    val feilutbetaltePerioder: List<FeilutbetaltStegPeriode>,
+    val feilutbetaltePerioder: List<VurdertFaktaFeilutbetaltPeriode>,
     var begrunnelse: String? = null,
 ) {
 
@@ -33,14 +33,14 @@ data class FaktaSteg(
 
 }
 
-data class FeilutbetaltPeriode(
+data class FaktaFeilutbetaltPeriode(
     val periode: Periode,
     val feilutbetaltBeløp: Int?,
     var hendelsestype: Hendelsestype? = null,
     var hendelsesundertype: Hendelsesundertype? = null
 )
 
-data class FeilutbetaltStegPeriode(
+data class VurdertFaktaFeilutbetaltPeriode(
     val periode: Periode,
     var hendelsestype: Hendelsestype? = null,
     var hendelsesundertype: Hendelsesundertype? = null

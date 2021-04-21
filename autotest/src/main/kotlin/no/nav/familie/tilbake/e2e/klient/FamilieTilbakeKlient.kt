@@ -9,6 +9,7 @@ import no.nav.familie.tilbake.e2e.domene.Fagsak
 import no.nav.familie.tilbake.e2e.domene.VersjonInfo
 import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Fakta
+import no.nav.familie.tilbake.e2e.domene.steg.dto.Foreldelse
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Henlegg
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
@@ -29,7 +30,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     private final val VERSION_URL: URI = URI.create("$API_URL/info")
     private final val BEHANDLING_BASE: URI = URI.create("$API_URL/behandling")
     private final val BEHANDLING_URL_V1: URI = URI.create("$BEHANDLING_BASE/v1")
-    private final val FAGSAK_URL_V1: URI = URI.create("$API_URL/fagsak/v1")
+    private final val FAGSAK_URL_V1: URI = URI.create("$API_URL/fagsystem")
 
     private final val AUTOTEST_API: URI = URI.create("$API_URL/autotest")
     private final val OPPRETT_KRAVGRUNNLAG_URI: URI = URI.create("$AUTOTEST_API/opprett/kravgrunnlag/")
@@ -70,7 +71,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     /*HENT-tjenester*/
 
     fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Fagsak? {
-        val uri = URI.create("$FAGSAK_URL_V1?fagsystem=$fagsystem&fagsak=$eksternFagsakId")
+        val uri = URI.create("$FAGSAK_URL_V1/$fagsystem/fagsak/$eksternFagsakId/v1")
         val response: Ressurs<Fagsak> = getForEntity(uri)
         assertTrue(response.status == Ressurs.Status.SUKSESS,
                              "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
@@ -101,7 +102,17 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
                              "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
         return response.data
     }
-    //Mangler Foreldelse, Vilkårsvurdering, ForeslåVedtak, og FattVedtak/to-trinn
+
+    fun hentForeldelse(behandlingId: String): Foreldelse? {
+        val uri = URI.create("$BEHANDLING_BASE/$behandlingId/foreldelse/v1")
+        val response: Ressurs<Foreldelse> = getForEntity(uri)
+        assertTrue(response.status == Ressurs.Status.SUKSESS,
+            "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+
+        return response.data
+    }
+
+    // Vilkårsvurdering, ForeslåVedtak, og FattVedtak/to-trinn
 
     /*BEHANDLE og SETT-tjenester*/
     fun behandleSteg(stegdata: Any, behandlingId: String){
