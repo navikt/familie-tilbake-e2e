@@ -177,8 +177,11 @@ class Saksbehandler(
                 return ForeldelseSteg(foreldetPerioder = foreldelsePerioderList)
             }
             Behandlingssteg.VILKÅRSVURDERING -> {
-                //TODO
-                return null
+                val vilkårsvurderingList: MutableList<VilkårsvurderingStegPeriode> = mutableListOf()
+                familieTilbakeKlient.hentVilkårsvurdering(behandlingId)?.perioder?.forEach {
+                    vilkårsvurderingList.add(VilkårsvurderingStegPeriode(periode = it.periode))
+                }
+                return VilkårsvurderingSteg(vilkårsvurderingsperioder = vilkårsvurderingList)
             }
             Behandlingssteg.FORESLÅ_VEDTAK -> {
                 //TODO

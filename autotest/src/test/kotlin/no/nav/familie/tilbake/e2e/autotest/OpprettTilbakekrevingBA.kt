@@ -68,7 +68,14 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         foreldelsesteg.addForeldelseVurdering(Foreldelsesvurderingstype.IKKE_FORELDET)
         saksbehandler.behandleSteg(foreldelsesteg, behandlingId)
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+        val vilkarsvurderingssteg: VilkårsvurderingSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.VILKÅRSVURDERING, behandlingId) as VilkårsvurderingSteg
+        vilkarsvurderingssteg.addVilkårsvurdering(Vilkårsvurderingsresultat.GOD_TRO)
+        saksbehandler.behandleSteg(vilkarsvurderingssteg, behandlingId)
+        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
     }
+
+
 
     @Test
     fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag, SPER melding, ENDR melding, behandling av Fakta`() {
