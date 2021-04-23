@@ -66,7 +66,7 @@ class Saksbehandler(
         ytelsestype: Ytelsestype,
         eksternFagsakId: String,
         @Max(6)
-    antallPerioder: Int,
+        antallPerioder: Int,
         under4rettsgebyr: Boolean,
         muligforeldelse: Boolean,
     ) {
@@ -87,11 +87,12 @@ class Saksbehandler(
     }
 
     fun opprettKravgrunnlag(
-        status: KodeStatusKrav,
-        @Max(29)
-        antallPerioder: Int,
-        under4rettsgebyr: Boolean,
-        muligforeldelse: Boolean,
+            status: KodeStatusKrav,
+            @Max(29)
+            antallPerioder: Int,
+            under4rettsgebyr: Boolean,
+            muligforeldelse: Boolean,
+            periodeLengde: Int? = 3,
     ) {
         assertTrue(
             gjeldendeBehandling != null && gjeldendeBehandling?.fagsystem != null,
@@ -119,7 +120,8 @@ class Saksbehandler(
             vedtakId = gjeldendeBehandling?.vedtakId,
             antallPerioder = antallPerioder,
             under4rettsgebyr = under4rettsgebyr,
-            muligforeldelse = muligforeldelse
+            muligforeldelse = muligforeldelse,
+            periodeLengde = periodeLengde!!,
         )
         gjeldendeBehandling!!.kravgrunnlagId = request.detaljertKravgrunnlag?.kravgrunnlagId
         gjeldendeBehandling!!.vedtakId = request.detaljertKravgrunnlag?.vedtakId
