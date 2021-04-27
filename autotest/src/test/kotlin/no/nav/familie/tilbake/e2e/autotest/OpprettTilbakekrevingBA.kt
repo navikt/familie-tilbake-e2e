@@ -7,6 +7,7 @@ import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
 import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.Venteårsak
 import no.nav.familie.tilbake.e2e.domene.Behandlingsresultatstype
+import no.nav.familie.tilbake.e2e.domene.steg.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
 import no.nav.familie.tilbake.e2e.domene.steg.dto.ForeldelseSteg
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Foreldelsesvurderingstype
@@ -76,7 +77,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
         val vilkarsvurderingssteg: VilkårsvurderingSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.VILKÅRSVURDERING, behandlingId) as VilkårsvurderingSteg
-        vilkarsvurderingssteg.addVilkårsvurdering(Vilkårsvurderingsresultat.GOD_TRO)
+        // vilkarsvurderingssteg.addVilkårsvurdering(Vilkårsvurderingsresultat.GOD_TRO)
+        vilkarsvurderingssteg.addVilkårsvurdering(Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROV_UAKTSOMHET)
         saksbehandler.behandleSteg(vilkarsvurderingssteg, behandlingId)
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
     }

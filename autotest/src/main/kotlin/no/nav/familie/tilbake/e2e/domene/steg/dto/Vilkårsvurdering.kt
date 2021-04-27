@@ -14,8 +14,13 @@ data class VilkårsvurderingSteg(
     val type: String = "VILKÅRSVURDERING",
     val vilkårsvurderingsperioder: List<VilkårsvurderingStegPeriode>
 ) {
-    fun addVilkårsvurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat, beløpTilbakekreves: BigDecimal = BigDecimal("1000")) {
+    fun addVilkårsvurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat,
+                            aktsomhet: Aktsomhet? = null,
+                            beløpTilbakekreves: BigDecimal = BigDecimal("1000")
+    ) {
         this.vilkårsvurderingsperioder.forEach {
+            it.vilkårsvurderingsresultat = vilkårvurderingsresultat
+            it.begrunnelse = "Vilkårsbegrunnelse fra autotest"
             when(vilkårvurderingsresultat) {
                 Vilkårsvurderingsresultat.GOD_TRO -> {
                     it.vilkårsvurderingsresultat = vilkårvurderingsresultat
@@ -26,7 +31,17 @@ data class VilkårsvurderingSteg(
                     )
                 }
                 else -> {
-                    // Implement version with AKTSOMHET
+                    // when(akstomhet) { Aktsomhet.GROV_UAKTSOMHET -> }
+                    it.aktsomhetDto = AktsomhetDto(
+                        begrunnelse = "Aktsomhetsbegrunnelse fra autotest",
+                        aktsomhet = aktsomhet!!,
+                        særligeGrunnerBegrunnelse = "Særlige grunner begrunnelse fra autotest",
+                        særligeGrunner = listOf(
+                            SærligGrunnDto(
+                                SærligGrunn.GRAD_AV_UAKTSOMHET
+                            )
+                        )
+                    )
                 }
             }
         }

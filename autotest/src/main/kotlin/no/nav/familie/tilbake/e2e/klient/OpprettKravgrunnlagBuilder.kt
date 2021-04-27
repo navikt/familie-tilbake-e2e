@@ -1,6 +1,5 @@
 package no.nav.familie.tilbake.e2e.klient
 
-import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.domene.KodeKlasse
 import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
@@ -10,7 +9,6 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsbelopDto
 import no.nav.tilbakekreving.typer.v1.PeriodeDto
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto
@@ -36,6 +34,7 @@ class OpprettKravgrunnlagBuilder {
         antallPerioder: Int,
         under4rettsgebyr: Boolean,
         muligforeldelse: Boolean,
+        periodeLengde: Int,
     ): DetaljertKravgrunnlagMelding {
         val finalKravgrunnlagId = kravgrunnlagId ?: Random.nextInt(100000, 999999).toBigInteger()
         val finalVedtakId = vedtakId ?: Random.nextInt(100000, 999999).toBigInteger()
@@ -61,10 +60,11 @@ class OpprettKravgrunnlagBuilder {
         response.detaljertKravgrunnlag.saksbehId = "K231B433"
         response.detaljertKravgrunnlag.referanse = eksternBehandlingId
         response.detaljertKravgrunnlag.tilbakekrevingsPeriode.addAll(tilbakekrevingsPerioder(
-            antallPerioder,
-            under4rettsgebyr,
-            muligforeldelse,
-            ytelsestype
+                antallPerioder = antallPerioder,
+                under4rettsgebyr = under4rettsgebyr,
+                muligforeldelse = muligforeldelse,
+                ytelsestype = ytelsestype,
+                periodeLengde = periodeLengde
         )
         )
         return response
@@ -100,17 +100,23 @@ class OpprettKravgrunnlagBuilder {
     }
 
     private fun tilbakekrevingsPerioder(
-        antallPerioder: Int,
-        under4rettsgebyr: Boolean,
-        muligforeldelse: Boolean,
-        ytelsestype: Ytelsestype,
+            antallPerioder: Int,
+            under4rettsgebyr: Boolean,
+            muligforeldelse: Boolean,
+            ytelsestype: Ytelsestype,
+            periodeLengde: Int,
     ): List<DetaljertKravgrunnlagPeriodeDto> {
         /*Lager alltid periodene 3 måneder lange med 1 måned mellom, så derfor gange med 4.
         Første periode starter for 3 år siden når det skal være muligforeldelse eller for 4 måneder siden gange med antall perioder*/
         var startDato = if (muligforeldelse) {
-            LocalDate.now().minusYears(3).withDayOfMonth(1)
+            val antallAarTilbakeITid = if (periodeLengde > 3) 4L else 3L
+            LocalDate.now().minusYears(antallAarTilbakeITid).withDayOfMonth(1)
         } else {
-            LocalDate.now().minusMonths(BigDecimal(4).multiply(BigDecimal(antallPerioder)).toLong()).withDayOfMonth(1)
+            val multiplierPgaPeriodeLengde = if (periodeLengde > 3) 2 else 1
+            LocalDate.now()
+                    .minusMonths(BigDecimal(4).multiply(BigDecimal((antallPerioder * multiplierPgaPeriodeLengde))).toLong())
+                    .withDayOfMonth(
+                            1)
         }
 
         /*Setter feilutbetalt beløp til 20000 kr, med mindre det skal være under4rettsgebyr, da skal det være under 4796 kr pr jan.2021*/
@@ -122,7 +128,7 @@ class OpprettKravgrunnlagBuilder {
 
         val tilbakekrevingsperiodeList: MutableList<DetaljertKravgrunnlagPeriodeDto> = mutableListOf()
         for (i in 1..antallPerioder) {
-            for (j in 1..3) {
+            for (j in 1..periodeLengde) {
                 val kravgrunnlagPeriode = DetaljertKravgrunnlagPeriodeDto()
                 kravgrunnlagPeriode.periode = PeriodeDto()
                 kravgrunnlagPeriode.periode.fom = startDato
@@ -158,11 +164,11 @@ class OpprettKravgrunnlagBuilder {
             }
             Ytelsestype.SKOLEPENGER -> {
                 ytelKodeKlasse = KodeKlasse.EFSP
-                throw Exception("Skolepenger er ikke implementert enda")
+                feilKodeKlasse = KodeKlasse.KL_KODE_FEIL_PEN
             }
             Ytelsestype.BARNETILSYN -> {
                 ytelKodeKlasse = KodeKlasse.EFBT
-                throw Exception("Barnetilsyn er ikke implementert enda")
+                feilKodeKlasse = KodeKlasse.KL_KODE_FEIL_PEN
             }
         }
         val tilbakekrevingsBelopList: MutableList<DetaljertKravgrunnlagBelopDto> = mutableListOf()
