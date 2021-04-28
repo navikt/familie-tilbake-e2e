@@ -17,8 +17,8 @@ data class VilkårsvurderingSteg(
     val vilkårsvurderingsperioder: List<VilkårsvurderingStegPeriode>
 ) {
     fun addVilkårsvurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat,
-                            aktsomhet: Aktsomhet? = null,
-                            erBeløpIBehold: Boolean = true,
+                            aktsomhet: Aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
+                            beløpErIBehold: Boolean = true,
                             redusertBeløpSomTilbakekreves: BigDecimal? = null,
                             andelSomTilbakekreves: BigDecimal? = null,
                             særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
@@ -30,11 +30,11 @@ data class VilkårsvurderingSteg(
             when (vilkårvurderingsresultat) {
                 Vilkårsvurderingsresultat.GOD_TRO -> {
                     it.aktsomhetDto = null
-                    it.godTroDto?.beløpErIBehold = erBeløpIBehold
-                    if (!erBeløpIBehold) {
+                    it.godTroDto?.beløpErIBehold = beløpErIBehold
+                    if (!beløpErIBehold) {
                         it.godTroDto?.beløpTilbakekreves = BigDecimal.ZERO
                     }
-                    if (erBeløpIBehold && redusertBeløpSomTilbakekreves != null) {
+                    if (beløpErIBehold && redusertBeløpSomTilbakekreves != null) {
                         it.godTroDto?.beløpTilbakekreves = redusertBeløpSomTilbakekreves
                     }
                 }
