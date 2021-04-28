@@ -63,7 +63,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.opprettKravgrunnlag(
             status = KodeStatusKrav.NY,
             antallPerioder = 1,
-            under4rettsgebyr = false,
+            under4rettsgebyr = true,
             muligforeldelse = true)
 
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
@@ -80,9 +80,10 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
 
         val vilkarsvurderingssteg: VilkårsvurderingSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.VILKÅRSVURDERING, behandlingId) as VilkårsvurderingSteg
         vilkarsvurderingssteg.addVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
-                                                  aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
-                                                  andelTilbakekreves = BigDecimal.valueOf(70),
-                                                  særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET))
+                                                  aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
+                                                  andelSomTilbakekreves = BigDecimal.valueOf(70),
+                                                  særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
+                                                  skalTilbakekreveSmåbeløp = false)
         saksbehandler.behandleSteg(vilkarsvurderingssteg, behandlingId)
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
     }

@@ -11,6 +11,7 @@ data class Vilkårsvurdering(
     val rettsgebyr: Long
 )
 
+@Suppress("DUPLICATE_LABEL_IN_WHEN")
 data class VilkårsvurderingSteg(
     @JsonProperty("@type")
     val type: String = "VILKÅRSVURDERING",
@@ -18,10 +19,11 @@ data class VilkårsvurderingSteg(
 ) {
     fun addVilkårsvurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat,
                             aktsomhet: Aktsomhet? = null,
-                            beløpIBehold: Boolean = true,
-                            redusertBeløpTilbakekreves: BigDecimal? = null,
-                            andelTilbakekreves: BigDecimal? = null,
-                            særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET)
+                            erBeløpIBehold: Boolean = true,
+                            redusertBeløpSomTilbakekreves: BigDecimal? = null,
+                            andelSomTilbakekreves: BigDecimal? = null,
+                            særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
+                            skalTilbakekreveSmåbeløp: Boolean? = null
     ) {
         this.vilkårsvurderingsperioder.forEach {
             it.vilkårsvurderingsresultat = vilkårvurderingsresultat
@@ -29,12 +31,12 @@ data class VilkårsvurderingSteg(
             when (vilkårvurderingsresultat) {
                 Vilkårsvurderingsresultat.GOD_TRO -> {
                     it.aktsomhetDto = null
-                    it.godTroDto?.beløpErIBehold = beløpIBehold
-                    if (!beløpIBehold) {
+                    it.godTroDto?.beløpErIBehold = erBeløpIBehold
+                    if (!erBeløpIBehold) {
                         it.godTroDto?.beløpTilbakekreves = BigDecimal.ZERO
                     }
-                    if (beløpIBehold && redusertBeløpTilbakekreves != null) {
-                        it.godTroDto?.beløpTilbakekreves = redusertBeløpTilbakekreves
+                    if (erBeløpIBehold && redusertBeløpSomTilbakekreves != null) {
+                        it.godTroDto?.beløpTilbakekreves = redusertBeløpSomTilbakekreves
                     }
                 }
                 else -> {
@@ -53,12 +55,15 @@ data class VilkårsvurderingSteg(
                                     begrunnelse = if (særligGrunn == SærligGrunn.ANNET) "Særlig grunn annet begrunnelse fra autotest" else null
                                 )
                             }
-                            if (andelTilbakekreves != null) {
+                            if (andelSomTilbakekreves != null) {
                                 it.aktsomhetDto?.beløpTilbakekreves = null
-                                it.aktsomhetDto?.andelTilbakekreves = andelTilbakekreves
+                                it.aktsomhetDto?.andelTilbakekreves = andelSomTilbakekreves
                                 it.aktsomhetDto?.særligeGrunnerTilReduksjon = true
                             }
-                            // TODO: "Implementer tilbakekreving av småbeløp"
+                            if (skalTilbakekreveSmåbeløp == false && aktsomhet == Aktsomhet.SIMPEL_UAKTSOMHET) {
+                                it.aktsomhetDto?.tilbakekrevSmåbeløp = skalTilbakekreveSmåbeløp
+                                it.aktsomhetDto?.beløpTilbakekreves = null
+                            }
                         }
                     }
                 }
