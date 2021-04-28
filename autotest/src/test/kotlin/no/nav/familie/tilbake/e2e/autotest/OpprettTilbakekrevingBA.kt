@@ -45,7 +45,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
     }
 
     @Test
-    fun `tilbakekrevingsbehandling med varsel, gjenoppta, kravgrunnlag med foreldelse`() {
+    fun `tilbakekrevingsbehandling med varsel, gjenoppta, kravgrunnlag med foreldelse, ikke foreldet, vilkårsvurdering simpel uaktsomhet delvis tilbakebetaling`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
                 eksternFagsakId = eksternFagsakId,
@@ -88,7 +88,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
     }
 
     @Test
-    fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag, SPER melding, ENDR melding, behandling av Fakta`() {
+    fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag, SPER melding, ENDR melding, behandling av Fakta, vilkårsvurdering grov uaktsomhet full tilbakekreving`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
                 eksternFagsakId = eksternFagsakId,
@@ -121,14 +121,16 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.taBehandlingAvVent(behandlingId)
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
+        val vilkarsvurderingssteg: VilkårsvurderingSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.VILKÅRSVURDERING, behandlingId) as VilkårsvurderingSteg
+        vilkarsvurderingssteg.addVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                                                  aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
+                                                  særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.ANNET))
+        saksbehandler.behandleSteg(vilkarsvurderingssteg, behandlingId)
+        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 
     @Test
     fun `tilbakekreving med alle perioder foreldet`() {
-        /**
-         * Opprett behandling
-         * Sjekk at behandling settes på vent
-         */
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
             eksternFagsakId = eksternFagsakId,
@@ -147,70 +149,24 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             venteårsak = Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
         )
 
-        /**
-         * Opprett kravgrunnlag
-         * Sjekk at behandling settest til steg FAKTA = KLAR
-         */
         saksbehandler.opprettKravgrunnlag(
             status = KodeStatusKrav.NY,
             antallPerioder = 2,
             under4rettsgebyr = false,
             muligforeldelse = true
         )
-        saksbehandler.erBehandlingISteg(
-            behandlingId = behandlingId,
-            behandlingssteg = Behandlingssteg.FAKTA,
-            behandlingsstegstatus = Behandlingsstegstatus.KLAR
-        )
+        saksbehandler.erBehandlingISteg(behandlingId = behandlingId, behandlingssteg = Behandlingssteg.FAKTA, behandlingsstegstatus = Behandlingsstegstatus.KLAR)
 
-        /**
-         * Behandle fakta
-         * Sjekk at behandling settes til steg FORELDELSE = KLAR
-         */
-        val faktasteg: FaktaSteg = saksbehandler.hentBehandlingssteg(
-            stegtype = Behandlingssteg.FAKTA,
-            behandlingId = behandlingId
-        ) as FaktaSteg
-        faktasteg.addFaktaVurdering(
-            hendelse = Hendelsestype.BA_ANNET,
-            underhendelse = Hendelsesundertype.ANNET_FRITEKST
-        )
-        saksbehandler.behandleSteg(
-            stegdata = faktasteg,
-            behandlingId = behandlingId
-        )
-        saksbehandler.erBehandlingISteg(
-            behandlingId = behandlingId,
-            behandlingssteg = Behandlingssteg.FORELDELSE,
-            behandlingsstegstatus = Behandlingsstegstatus.KLAR
-        )
+        val faktasteg: FaktaSteg = saksbehandler.hentBehandlingssteg(stegtype = Behandlingssteg.FAKTA, behandlingId = behandlingId) as FaktaSteg
+        faktasteg.addFaktaVurdering(hendelse = Hendelsestype.BA_ANNET, underhendelse = Hendelsesundertype.ANNET_FRITEKST)
+        saksbehandler.behandleSteg(stegdata = faktasteg, behandlingId = behandlingId)
+        saksbehandler.erBehandlingISteg(behandlingId = behandlingId, behandlingssteg = Behandlingssteg.FORELDELSE, behandlingsstegstatus = Behandlingsstegstatus.KLAR)
 
-        /**
-         * Behandle foreldelse - setter alle perioder til FORELDET
-         * Sjekk at behandling hopper over steg VILKÅRSVURDERING
-         * Sjekk at behandling sette til steg FORESLÅ_VEDTAK = KLAR
-         */
-        val foreldelsesteg: ForeldelseSteg = saksbehandler.hentBehandlingssteg(
-            stegtype = Behandlingssteg.FORELDELSE,
-            behandlingId = behandlingId
-        ) as ForeldelseSteg
-        foreldelsesteg.addForeldelseVurdering(
-            beslutning = Foreldelsesvurderingstype.FORELDET
-        )
-        saksbehandler.behandleSteg(
-            stegdata = foreldelsesteg,
-            behandlingId = behandlingId
-        )
-        saksbehandler.erBehandlingISteg(
-            behandlingId = behandlingId,
-            behandlingssteg = Behandlingssteg.VILKÅRSVURDERING,
-            behandlingsstegstatus = Behandlingsstegstatus.AUTOUTFØRT
-        )
-        saksbehandler.erBehandlingISteg(
-            behandlingId = behandlingId,
-            behandlingssteg = Behandlingssteg.FORESLÅ_VEDTAK,
-            behandlingsstegstatus = Behandlingsstegstatus.KLAR
-        )
+        val foreldelsesteg: ForeldelseSteg = saksbehandler.hentBehandlingssteg(stegtype = Behandlingssteg.FORELDELSE, behandlingId = behandlingId) as ForeldelseSteg
+        foreldelsesteg.addForeldelseVurdering(beslutning = Foreldelsesvurderingstype.FORELDET)
+        saksbehandler.behandleSteg(stegdata = foreldelsesteg, behandlingId = behandlingId)
+        saksbehandler.erBehandlingISteg(behandlingId = behandlingId, behandlingssteg = Behandlingssteg.VILKÅRSVURDERING, behandlingsstegstatus = Behandlingsstegstatus.AUTOUTFØRT)
+        saksbehandler.erBehandlingISteg(behandlingId = behandlingId, behandlingssteg = Behandlingssteg.FORESLÅ_VEDTAK, behandlingsstegstatus = Behandlingsstegstatus.KLAR)
     }
 
     @Test
@@ -229,7 +185,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
     }
 
     @Test
-    fun `tilbakekreving behandles så langt det er mulig før iverksetting så AVSL-melding og henleggelse`() {
+    fun `tilbakekreving behandles så langt det er mulig før iverksetting, vilkårsvurdering god tro, så AVSL-melding og henleggelse`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
             eksternFagsakId = eksternFagsakId,
@@ -256,7 +212,14 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.behandleSteg(faktasteg, behandlingId)
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-        //Todo: Legge til behandling av Vilkårsvurdering og Foreslå_Vedtak
+        val vilkarsvurderingssteg: VilkårsvurderingSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.VILKÅRSVURDERING, behandlingId) as VilkårsvurderingSteg
+        vilkarsvurderingssteg.addVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
+                                                  beløpErIBehold = true,
+                                                  redusertBeløpSomTilbakekreves = BigDecimal.valueOf(2400))
+        saksbehandler.behandleSteg(vilkarsvurderingssteg, behandlingId)
+        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+        //Todo: Legge til behandling av Foreslå_Vedtak
 
         saksbehandler.opprettStatusmelding(KodeStatusKrav.AVSL)
         saksbehandler.erBehandlingAvsluttet(behandlingId, Behandlingsresultatstype.HENLAGT_KRAVGRUNNLAG_NULLSTILT)
