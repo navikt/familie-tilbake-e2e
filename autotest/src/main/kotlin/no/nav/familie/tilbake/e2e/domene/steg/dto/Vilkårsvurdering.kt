@@ -11,7 +11,6 @@ data class Vilkårsvurdering(
     val rettsgebyr: Long
 )
 
-@Suppress("DUPLICATE_LABEL_IN_WHEN")
 data class VilkårsvurderingSteg(
     @JsonProperty("@type")
     val type: String = "VILKÅRSVURDERING",

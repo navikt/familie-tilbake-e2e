@@ -82,8 +82,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         vilkarsvurderingssteg.addVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
                                                   aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
                                                   andelSomTilbakekreves = BigDecimal.valueOf(70),
-                                                  særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
-                                                  skalTilbakekreveSmåbeløp = false)
+                                                  særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET))
         saksbehandler.behandleSteg(vilkarsvurderingssteg, behandlingId)
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
     }
