@@ -79,12 +79,10 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
         val vilkarsvurderingssteg: VilkårsvurderingSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.VILKÅRSVURDERING, behandlingId) as VilkårsvurderingSteg
-        vilkarsvurderingssteg.addVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+        vilkarsvurderingssteg.addVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
                                                   aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
-                                                  beløpIBehold = true,
-                                                  andelTilbakekreves = BigDecimal.TEN,
-                                                  særligeGrunner = listOf(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.ANNET))
-        // vilkarsvurderingssteg.addVilkårsvurdering(Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.FORSETT)
+                                                  andelTilbakekreves = BigDecimal.valueOf(70),
+                                                  særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET))
         saksbehandler.behandleSteg(vilkarsvurderingssteg, behandlingId)
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
     }

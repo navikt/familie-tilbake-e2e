@@ -40,29 +40,25 @@ data class VilkårsvurderingSteg(
                 else -> {
                     it.godTroDto = null
                     it.aktsomhetDto?.aktsomhet = aktsomhet!!
-                    it.aktsomhetDto?.særligeGrunnerBegrunnelse = "Særlige grunner begrunnelse fra autotest"
-                    it.aktsomhetDto?.særligeGrunner = særligeGrunner.map { særligGrunn ->
-                        SærligGrunnDto(
-                            særligGrunn = særligGrunn,
-                            begrunnelse = if (særligGrunn == SærligGrunn.ANNET) "Særlig grunn annet begrunnelse" else null
-                        )
-                    }
-                    if (andelTilbakekreves != null) {
-                        it.aktsomhetDto?.beløpTilbakekreves = null
-                        it.aktsomhetDto?.andelTilbakekreves = andelTilbakekreves
-                        it.aktsomhetDto?.særligeGrunnerTilReduksjon = true
-                    }
                     when (aktsomhet) {
                         Aktsomhet.FORSETT -> {
                             it.aktsomhetDto?.beløpTilbakekreves = null
-                            it.aktsomhetDto?.særligeGrunner = null
-                            it.aktsomhetDto?.særligeGrunnerBegrunnelse = null
                         }
-                        Aktsomhet.GROV_UAKTSOMHET -> {
-
-                        }
+                        Aktsomhet.GROV_UAKTSOMHET,
                         Aktsomhet.SIMPEL_UAKTSOMHET -> {
-                            TODO("Implement tilbakekreving av småbeløp")
+                            it.aktsomhetDto?.særligeGrunnerBegrunnelse = "Særlige grunner begrunnelse fra autotest"
+                            it.aktsomhetDto?.særligeGrunner = særligeGrunner.map { særligGrunn ->
+                                SærligGrunnDto(
+                                    særligGrunn = særligGrunn,
+                                    begrunnelse = if (særligGrunn == SærligGrunn.ANNET) "Særlig grunn annet begrunnelse fra autotest" else null
+                                )
+                            }
+                            if (andelTilbakekreves != null) {
+                                it.aktsomhetDto?.beløpTilbakekreves = null
+                                it.aktsomhetDto?.andelTilbakekreves = andelTilbakekreves
+                                it.aktsomhetDto?.særligeGrunnerTilReduksjon = true
+                            }
+                            // TODO: "Implementer tilbakekreving av småbeløp"
                         }
                     }
                 }
