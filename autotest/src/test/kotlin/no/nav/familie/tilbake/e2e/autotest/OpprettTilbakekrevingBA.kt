@@ -63,7 +63,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.opprettKravgrunnlag(
             status = KodeStatusKrav.NY,
             antallPerioder = 1,
-            under4rettsgebyr = true,
+            under4rettsgebyr = false,
             muligforeldelse = true)
 
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
