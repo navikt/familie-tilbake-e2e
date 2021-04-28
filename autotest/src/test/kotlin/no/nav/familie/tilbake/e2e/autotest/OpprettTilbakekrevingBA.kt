@@ -13,6 +13,7 @@ import no.nav.familie.tilbake.e2e.domene.steg.dto.ForeldelseSteg
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Foreldelsesvurderingstype
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Hendelsestype
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.domene.steg.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.steg.dto.VilkårsvurderingSteg
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.random.Random
 
@@ -77,8 +79,12 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
         val vilkarsvurderingssteg: VilkårsvurderingSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.VILKÅRSVURDERING, behandlingId) as VilkårsvurderingSteg
-        // vilkarsvurderingssteg.addVilkårsvurdering(Vilkårsvurderingsresultat.GOD_TRO)
-        vilkarsvurderingssteg.addVilkårsvurdering(Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROV_UAKTSOMHET)
+        vilkarsvurderingssteg.addVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                                                  aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
+                                                  beløpIBehold = true,
+                                                  andelTilbakekreves = BigDecimal.TEN,
+                                                  særligeGrunner = listOf(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.ANNET))
+        // vilkarsvurderingssteg.addVilkårsvurdering(Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.FORSETT)
         saksbehandler.behandleSteg(vilkarsvurderingssteg, behandlingId)
         saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
     }

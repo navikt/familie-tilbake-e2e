@@ -8,11 +8,13 @@ import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
 import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
 import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.Venteårsak
+import no.nav.familie.tilbake.e2e.domene.steg.dto.AktsomhetDto
 import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
 import no.nav.familie.tilbake.e2e.domene.steg.dto.VurdertFaktaFeilutbetaltPeriode
 import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
 import no.nav.familie.tilbake.e2e.domene.steg.dto.VurdertForeldelsesperiode
 import no.nav.familie.tilbake.e2e.domene.steg.dto.ForeldelseSteg
+import no.nav.familie.tilbake.e2e.domene.steg.dto.GodTroDto
 import no.nav.familie.tilbake.e2e.domene.steg.dto.Henlegg
 import no.nav.familie.tilbake.e2e.domene.steg.dto.VilkårsvurderingSteg
 import no.nav.familie.tilbake.e2e.domene.steg.dto.VilkårsvurderingStegPeriode
@@ -192,7 +194,9 @@ class Saksbehandler(
             Behandlingssteg.VILKÅRSVURDERING -> {
                 val vilkårsvurderingList: MutableList<VilkårsvurderingStegPeriode> = mutableListOf()
                 familieTilbakeKlient.hentVilkårsvurdering(behandlingId)?.perioder?.forEach {
-                    vilkårsvurderingList.add(VilkårsvurderingStegPeriode(periode = it.periode))
+                    vilkårsvurderingList.add(VilkårsvurderingStegPeriode(periode = it.periode,
+                                                                         godTroDto = GodTroDto(beløpTilbakekreves = it.feilutbetaltBeløp),
+                                                                         aktsomhetDto = AktsomhetDto(beløpTilbakekreves = it.feilutbetaltBeløp)))
                 }
                 return VilkårsvurderingSteg(vilkårsvurderingsperioder = vilkårsvurderingList)
             }

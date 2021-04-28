@@ -1,5 +1,7 @@
 package no.nav.familie.tilbake.e2e.domene.steg.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.tilbake.e2e.domene.Periode
 import java.math.BigDecimal
@@ -16,39 +18,59 @@ data class VilkårsvurderingSteg(
 ) {
     fun addVilkårsvurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat,
                             aktsomhet: Aktsomhet? = null,
-                            beløpTilbakekreves: BigDecimal = BigDecimal("1000")
+                            beløpIBehold: Boolean = true,
+                            redusertBeløpTilbakekreves: BigDecimal? = null,
+                            andelTilbakekreves: BigDecimal? = null,
+                            særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET)
     ) {
         this.vilkårsvurderingsperioder.forEach {
             it.vilkårsvurderingsresultat = vilkårvurderingsresultat
             it.begrunnelse = "Vilkårsbegrunnelse fra autotest"
-            when(vilkårvurderingsresultat) {
+            when (vilkårvurderingsresultat) {
                 Vilkårsvurderingsresultat.GOD_TRO -> {
-                    it.vilkårsvurderingsresultat = vilkårvurderingsresultat
-                    it.godTroDto = GodTroDto(
-                        begrunnelse = "God tro begrunnelse fra autotest",
-                        beløpErIBehold = true,
-                        beløpTilbakekreves = beløpTilbakekreves
-                    )
+                    it.aktsomhetDto = null
+                    it.godTroDto?.beløpErIBehold = beløpIBehold
+                    if (!beløpIBehold) {
+                        it.godTroDto?.beløpTilbakekreves = BigDecimal.ZERO
+                    }
+                    if (beløpIBehold && redusertBeløpTilbakekreves != null) {
+                        it.godTroDto?.beløpTilbakekreves = redusertBeløpTilbakekreves
+                    }
                 }
                 else -> {
-                    // when(akstomhet) { Aktsomhet.GROV_UAKTSOMHET -> }
-                    it.aktsomhetDto = AktsomhetDto(
-                        begrunnelse = "Aktsomhetsbegrunnelse fra autotest",
-                        aktsomhet = aktsomhet!!,
-                        særligeGrunnerBegrunnelse = "Særlige grunner begrunnelse fra autotest",
-                        særligeGrunner = listOf(
-                            SærligGrunnDto(
-                                SærligGrunn.GRAD_AV_UAKTSOMHET
-                            )
+                    it.godTroDto = null
+                    it.aktsomhetDto?.aktsomhet = aktsomhet!!
+                    it.aktsomhetDto?.særligeGrunnerBegrunnelse = "Særlige grunner begrunnelse fra autotest"
+                    it.aktsomhetDto?.særligeGrunner = særligeGrunner.map { særligGrunn ->
+                        SærligGrunnDto(
+                            særligGrunn = særligGrunn,
+                            begrunnelse = if (særligGrunn == SærligGrunn.ANNET) "Særlig grunn annet begrunnelse" else null
                         )
-                    )
+                    }
+                    if (andelTilbakekreves != null) {
+                        it.aktsomhetDto?.beløpTilbakekreves = null
+                        it.aktsomhetDto?.andelTilbakekreves = andelTilbakekreves
+                        it.aktsomhetDto?.særligeGrunnerTilReduksjon = true
+                    }
+                    when (aktsomhet) {
+                        Aktsomhet.FORSETT -> {
+                            it.aktsomhetDto?.beløpTilbakekreves = null
+                            it.aktsomhetDto?.særligeGrunner = null
+                            it.aktsomhetDto?.særligeGrunnerBegrunnelse = null
+                        }
+                        Aktsomhet.GROV_UAKTSOMHET -> {
+
+                        }
+                        Aktsomhet.SIMPEL_UAKTSOMHET -> {
+                            TODO("Implement tilbakekreving av småbeløp")
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-// DTO for hent vilkarsvurdering response
 data class VurdertVilkårsvurderingsperiodeDto(val periode: Periode,
                                               val feilutbetaltBeløp: BigDecimal,
                                               val hendelsestype: Hendelsestype,
@@ -83,7 +105,6 @@ data class RedusertBeløpDto(val trekk: Boolean, val beløp: BigDecimal)
 
 data class AktivitetDto(val aktivitet: String, val beløp: BigDecimal)
 
-// DTO for request in behandling/{id}/steg
 data class VilkårsvurderingStegPeriode(
     val periode: Periode,
     var vilkårsvurderingsresultat: Vilkårsvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
@@ -91,19 +112,20 @@ data class VilkårsvurderingStegPeriode(
     var godTroDto: GodTroDto? = null,
     var aktsomhetDto: AktsomhetDto? = null)
 
-data class GodTroDto(val beløpErIBehold: Boolean,
-                     val beløpTilbakekreves: BigDecimal? = null,
-                     val begrunnelse: String)
+data class GodTroDto(var beløpErIBehold: Boolean = true,
+                     var beløpTilbakekreves: BigDecimal? = null,
+                     val begrunnelse: String = "God tro begrunnelse fra autotest")
 
-data class AktsomhetDto(val aktsomhet: Aktsomhet,
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class AktsomhetDto(var aktsomhet: Aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
                         val ileggRenter: Boolean? = null,
-                        val andelTilbakekreves: BigDecimal? = null,
-                        val beløpTilbakekreves: BigDecimal? = null,
-                        val begrunnelse: String,
-                        val særligeGrunner: List<SærligGrunnDto>? = null,
-                        val særligeGrunnerTilReduksjon: Boolean = false,
-                        val tilbakekrevSmåbeløp: Boolean = true,
-                        val særligeGrunnerBegrunnelse: String? = null)
+                        var andelTilbakekreves: BigDecimal? = null,
+                        var beløpTilbakekreves: BigDecimal? = null,
+                        val begrunnelse: String = "Aktsomhetsbegrunnelse fra autotest",
+                        var særligeGrunner: List<SærligGrunnDto>? = null,
+                        var særligeGrunnerTilReduksjon: Boolean = false,
+                        var tilbakekrevSmåbeløp: Boolean? = null,
+                        var særligeGrunnerBegrunnelse: String? = null)
 
 
 data class SærligGrunnDto(val særligGrunn: SærligGrunn,
