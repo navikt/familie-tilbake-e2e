@@ -1,7 +1,6 @@
-package no.nav.familie.tilbake.e2e.domene.steg.dto
+package no.nav.familie.tilbake.e2e.domene.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import no.nav.familie.tilbake.e2e.domene.Venteårsak
 import java.time.LocalDate
 
 data class BehandlingPåVent(

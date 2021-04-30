@@ -1,10 +1,9 @@
-package no.nav.familie.tilbake.e2e.domene
+package no.nav.familie.tilbake.e2e.domene.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
-
 
 data class Behandling(val eksternBrukId: UUID,
                       val behandlingId: UUID,
@@ -29,8 +28,7 @@ data class Behandlingsstegsinfo(val behandlingssteg: Behandlingssteg,
                                 val behandlingsstegstatus: Behandlingsstegstatus,
                                 val venteårsak: Venteårsak?,
                                 @JsonFormat(pattern = "yyyy-MM-dd")
-                                val tidsfrist: LocalDate?
-)
+                                val tidsfrist: LocalDate?)
 
 enum class Behandlingsstatus {
     AVSLUTTET,
@@ -57,6 +55,7 @@ enum class Behandlingsresultatstype(val navn: String) {
     DELVIS_TILBAKEBETALING("Delvis tilbakebetaling"),
     FULL_TILBAKEBETALING("Tilbakebetaling");
 }
+
 enum class Venteårsak {
     VENT_PÅ_BRUKERTILBAKEMELDING,
     VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,

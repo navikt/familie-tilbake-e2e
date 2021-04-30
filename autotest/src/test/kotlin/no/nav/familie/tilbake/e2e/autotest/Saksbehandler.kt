@@ -2,18 +2,19 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.Behandlingsresultatstype
-import no.nav.familie.tilbake.e2e.domene.Behandlingsstatus
-import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
-import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
-import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
-import no.nav.familie.tilbake.e2e.domene.Venteårsak
-import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
-import no.nav.familie.tilbake.e2e.domene.steg.dto.VurdertFaktaFeilutbetaltPeriode
-import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
-import no.nav.familie.tilbake.e2e.domene.steg.dto.VurdertForeldelsesperiode
-import no.nav.familie.tilbake.e2e.domene.steg.dto.ForeldelseSteg
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Henlegg
+import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsresultatstype
+import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstatus
+import no.nav.familie.tilbake.e2e.domene.dto.Behandlingssteg
+import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstegstatus
+import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
+import no.nav.familie.tilbake.e2e.domene.builder.BehandleFaktaStegBuilder
+import no.nav.familie.tilbake.e2e.domene.builder.BehandleForeldelseStegBuilder
+import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.domene.dto.Hendelsestype
+import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVent
+import no.nav.familie.tilbake.e2e.domene.dto.Henlegg
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -170,7 +171,7 @@ class Saksbehandler(
         }
         throw Exception("Fantes ikke noen behandling med eksternBrukId $eksternBrukId på kombinasjonen eksternFagsakId $eksternFagsakId og fagsystem $fagsystem")
     }
-
+ /**
     fun hentBehandlingssteg(stegtype: Behandlingssteg, behandlingId: String): Any? {
         when (stegtype) {
             Behandlingssteg.FAKTA -> {
@@ -207,7 +208,7 @@ class Saksbehandler(
                 throw Exception("Behandlingssteg $stegtype kan ikke behandles av saksbehandler")
             }
         }
-    }
+    }*/
 
     /*HANDLING-metoder*/
 
@@ -215,19 +216,19 @@ class Saksbehandler(
         familieTilbakeKlient.behandleSteg(stegdata, behandlingId)
     }
 
-    fun settBehandlingPåVent(behandlingId: String, årsak: Venteårsak, frist: LocalDate) {
+    fun settBehandlingPåVent(årsak: Venteårsak, frist: LocalDate) {
         familieTilbakeKlient.settBehandlingPåVent(
             BehandlingPåVent(
                 venteårsak = årsak,
                 tidsfrist = frist
             ),
-            behandlingId = behandlingId,
+            behandlingId = gjeldendeBehandling?.behandlingId!!,
         )
-        erBehandlingPåVent(behandlingId, årsak)
+        erBehandlingPåVent(årsak)
     }
 
-    fun taBehandlingAvVent(behandlingId: String) {
-        familieTilbakeKlient.taBehandlingAvVent(behandlingId)
+    fun taBehandlingAvVent() {
+        familieTilbakeKlient.taBehandlingAvVent(gjeldendeBehandling?.behandlingId!!)
     }
 
     fun henleggBehandling(behandlingId: String, behandlingsresultat: Behandlingsresultatstype) {
@@ -246,32 +247,31 @@ class Saksbehandler(
 
     /*SJEKK-metoder*/
 
-    fun erBehandlingPåVent(behandlingId: String, venteårsak: Venteårsak) {
+    fun erBehandlingPåVent(venteårsak: Venteårsak) {
         Vent.til(
             {
-                familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.any {
+                familieTilbakeKlient.hentBehandling(gjeldendeBehandling?.behandlingId!!)?.behandlingsstegsinfo?.any {
                     it.behandlingsstegstatus == Behandlingsstegstatus.VENTER && it.venteårsak == venteårsak
                 }
             },
             30, "Behandling kom aldri i vent med årsak $venteårsak"
         )
-        println("Behandling med behandlingId $behandlingId er bekreftet på vent med årsak $venteårsak")
+        println("Behandling med behandlingId ${gjeldendeBehandling?.behandlingId!!} er bekreftet på vent med årsak $venteårsak")
     }
 
     fun erBehandlingISteg(
-        behandlingId: String,
         behandlingssteg: Behandlingssteg,
         behandlingsstegstatus: Behandlingsstegstatus
     ) {
         Vent.til(
             {
-                familieTilbakeKlient.hentBehandling(behandlingId)?.behandlingsstegsinfo?.any {
+                familieTilbakeKlient.hentBehandling(gjeldendeBehandling?.behandlingId!!)?.behandlingsstegsinfo?.any {
                     it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus
                 }
             },
             30, "Behandlingen kom aldri i status $behandlingsstegstatus i steg $behandlingssteg"
         )
-        println("Behandling med behandlingsId $behandlingId er bekreftet i status $behandlingsstegstatus i steg $behandlingssteg")
+        println("Behandling med behandlingsId ${gjeldendeBehandling?.behandlingId!!} er bekreftet i status $behandlingsstegstatus i steg $behandlingssteg")
     }
 
     fun erBehandlingAvsluttet(behandlingId: String, resultat: Behandlingsresultatstype) {
@@ -329,6 +329,32 @@ class Saksbehandler(
         }
         println("Behandling med behandlingsId $behandlingId er bekreftet avsluttet med resultat $resultat")
     }
+
+    /**
+     * strukturendring: Har lagt til kode herfra
+     */
+    /** fun behandleFakta */
+    fun behandleFakta(hendelsestype: Hendelsestype, hendelsesundertype: Hendelsesundertype) {
+        val hentFaktaResponse = familieTilbakeKlient.hentFakta(gjeldendeBehandling?.behandlingId!!)
+        familieTilbakeKlient.behandleSteg(
+            stegdata = BehandleFaktaStegBuilder(hentFaktaResponse!!, hendelsestype, hendelsesundertype).build(),
+            behandlingId = gjeldendeBehandling?.behandlingId!!
+        )
+    }
+
+    fun behandleForeldelse(beslutning: Foreldelsesvurderingstype) {
+        val hentForeldelseResponse = familieTilbakeKlient.hentForeldelse(gjeldendeBehandling?.behandlingId!!)
+        assertTrue(
+            hentForeldelseResponse != null,
+            "Kunne ikke hente foreldelse som skulle behandles")
+        familieTilbakeKlient.behandleSteg(
+            stegdata = BehandleForeldelseStegBuilder(hentForeldelseResponse!!, beslutning).build(),
+            behandlingId = gjeldendeBehandling?.behandlingId!!)
+    }
+
+    /** fun behandleVilkårsvurdering */
+
+    /** fun behandleForeslåVedtak */
 }
 
 /*STATE-object*/

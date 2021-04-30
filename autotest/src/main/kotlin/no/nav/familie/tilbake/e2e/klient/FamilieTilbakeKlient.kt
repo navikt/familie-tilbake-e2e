@@ -4,13 +4,13 @@ import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
-import no.nav.familie.tilbake.e2e.domene.Behandling
-import no.nav.familie.tilbake.e2e.domene.Fagsak
-import no.nav.familie.tilbake.e2e.domene.VersjonInfo
-import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Fakta
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Foreldelse
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Henlegg
+import no.nav.familie.tilbake.e2e.domene.dto.Behandling
+import no.nav.familie.tilbake.e2e.domene.dto.Fagsak
+import no.nav.familie.tilbake.e2e.domene.dto.VersjonInfo
+import no.nav.familie.tilbake.e2e.domene.dto.HentFaktaDto
+import no.nav.familie.tilbake.e2e.domene.dto.HentForeldelseDto
+import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVent
+import no.nav.familie.tilbake.e2e.domene.dto.Henlegg
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import org.hibernate.validator.internal.util.Contracts.assertTrue
@@ -95,17 +95,17 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     }
 
     /*HENT-tjenester for behandlings-steg*/
-    fun hentFakta(behandlingId: String): Fakta? {
+    fun hentFakta(behandlingId: String): HentFaktaDto? {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/fakta/v1")
-        val response: Ressurs<Fakta> = getForEntity(uri)
+        val response: Ressurs<HentFaktaDto> = getForEntity(uri)
         assertTrue(response.status == Ressurs.Status.SUKSESS,
                              "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
         return response.data
     }
 
-    fun hentForeldelse(behandlingId: String): Foreldelse? {
+    fun hentForeldelse(behandlingId: String): HentForeldelseDto? {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/foreldelse/v1")
-        val response: Ressurs<Foreldelse> = getForEntity(uri)
+        val response: Ressurs<HentForeldelseDto> = getForEntity(uri)
         assertTrue(response.status == Ressurs.Status.SUKSESS,
             "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
 
