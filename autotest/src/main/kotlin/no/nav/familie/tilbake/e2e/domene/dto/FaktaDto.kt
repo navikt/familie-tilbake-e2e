@@ -7,49 +7,40 @@ import java.time.LocalDate
 /**
  * DTO-er relatert til behandle steg
  */
-data class BehandleFaktaDto(
-    @JsonProperty("@type")
-    val type: String = "FAKTA",
-    val feilutbetaltePerioder: List<VurdertFaktaFeilutbetaltPeriode>,
-    var begrunnelse: String? = null
-)
+data class BehandleFaktaDto(@JsonProperty("@type")
+                            val type: String = "FAKTA",
+                            val feilutbetaltePerioder: List<VurdertFaktaFeilutbetaltPeriode>,
+                            var begrunnelse: String? = null)
 
-data class VurdertFaktaFeilutbetaltPeriode(
-    val periode: Periode,
-    var hendelsestype: Hendelsestype? = null,
-    var hendelsesundertype: Hendelsesundertype? = null
-)
+data class VurdertFaktaFeilutbetaltPeriode(val periode: Periode,
+                                           var hendelsestype: Hendelsestype? = null,
+                                           var hendelsesundertype: Hendelsesundertype? = null)
 
 /**
  * DTO-er relatert til hentFakta
  */
-data class HentFaktaDto(
-    val varsletBeløp: Int,
-    val totalFeilutbetaltPeriode: Periode,
-    val feilutbetaltePerioder: Set<FaktaFeilutbetaltPeriode>,
-    val totaltFeilutbetaltBeløp: Int,
-    val revurderingsvedtaksdato: LocalDate,
-    val begrunnelse: String,
-    val faktainfo: Faktainfo
-)
+data class HentFaktaDto(val varsletBeløp: Int,
+                        val totalFeilutbetaltPeriode: Periode,
+                        val feilutbetaltePerioder: Set<FaktaFeilutbetaltPeriode>,
+                        val totaltFeilutbetaltBeløp: Int,
+                        val revurderingsvedtaksdato: LocalDate,
+                        val begrunnelse: String,
+                        val faktainfo: Faktainfo)
 
-data class FaktaFeilutbetaltPeriode(
-    val periode: Periode,
-    val feilutbetaltBeløp: Int?,
-    var hendelsestype: Hendelsestype? = null,
-    var hendelsesundertype: Hendelsesundertype? = null
-)
+data class FaktaFeilutbetaltPeriode(val periode: Periode,
+                                    val feilutbetaltBeløp: Int?,
+                                    var hendelsestype: Hendelsestype? = null,
+                                    var hendelsesundertype: Hendelsesundertype? = null)
 
-data class Faktainfo(
-    val revurderingsårsak: String,
-    val revurderingsresultat: String,
-    val tilbakekrevingsvalg: Tilbakekrevingsvalg,
-    val konsekvensForYtelser: Set<String>
-)
+data class Faktainfo(val revurderingsårsak: String,
+                     val revurderingsresultat: String,
+                     val tilbakekrevingsvalg: Tilbakekrevingsvalg,
+                     val konsekvensForYtelser: Set<String>)
 
 /**
  * Felleskomponenter
  */
+
 enum class Hendelsestype {
 
     BA_ANNET,

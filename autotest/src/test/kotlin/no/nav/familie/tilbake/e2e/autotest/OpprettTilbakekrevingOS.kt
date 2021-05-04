@@ -31,23 +31,19 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
 
     @BeforeEach
     fun setup() {
-        saksbehandler = Saksbehandler(
-            familieTilbakeKlient = familieTilbakeKlient,
-            opprettTilbakekrevingBuilder = OpprettTilbakekrevingBuilder(),
-            opprettKravgrunnlagBuilder = OpprettKravgrunnlagBuilder()
-        )
+        saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient,
+                                      opprettTilbakekrevingBuilder = OpprettTilbakekrevingBuilder(),
+                                      opprettKravgrunnlagBuilder = OpprettKravgrunnlagBuilder())
     }
 
     @Test
     fun `tilbakekrevingsbehandling med varsel, gjenoppta, kravgrunnlag med foreldelse`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-        val eksternBrukId = saksbehandler.opprettTilbakekreving(
-            eksternFagsakId = eksternFagsakId,
-            fagsystem = fagsystem,
-            ytelsestype = ytelsestype,
-            varsel = true,
-            verge = false
-        )
+        val eksternBrukId = saksbehandler.opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+                                                                fagsystem = fagsystem,
+                                                                ytelsestype = ytelsestype,
+                                                                varsel = true,
+                                                                verge = false)
 
         saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
@@ -55,12 +51,11 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
         saksbehandler.opprettKravgrunnlag(
-            status = KodeStatusKrav.NY,
-            antallPerioder = 4,
-            under4rettsgebyr = false,
-            muligforeldelse = true,
-            periodeLengde = 4,
-        )
+                status = KodeStatusKrav.NY,
+                antallPerioder = 4,
+                under4rettsgebyr = false,
+                muligforeldelse = true,
+                periodeLengde = 4,)
 
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
@@ -74,23 +69,19 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
     @Test
     fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag, SPER melding, ENDR melding, behandling av Fakta`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-        val eksternBrukId = saksbehandler.opprettTilbakekreving(
-            eksternFagsakId = eksternFagsakId,
-            fagsystem = fagsystem,
-            ytelsestype = ytelsestype,
-            varsel = false,
-            verge = false
-        )
+        val eksternBrukId = saksbehandler.opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+                                                                fagsystem = fagsystem,
+                                                                ytelsestype = ytelsestype,
+                                                                varsel = false,
+                                                                verge = false)
 
         saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-        saksbehandler.opprettKravgrunnlag(
-            status = KodeStatusKrav.NY,
-            antallPerioder = 4,
-            under4rettsgebyr = false,
-            muligforeldelse = false
-        )
+        saksbehandler.opprettKravgrunnlag(status = KodeStatusKrav.NY,
+                                          antallPerioder = 4,
+                                          under4rettsgebyr = false,
+                                          muligforeldelse = false)
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
         saksbehandler.opprettStatusmelding(KodeStatusKrav.SPER)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)

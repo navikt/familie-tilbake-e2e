@@ -23,19 +23,17 @@ import kotlin.random.Random
 
 class OpprettKravgrunnlagBuilder {
 
-    fun opprettKravgrunnlag(
-        status: KodeStatusKrav,
-        ytelsestype: Ytelsestype,
-        eksternFagsakId: String,
-        eksternBehandlingId: String,
-        kravgrunnlagId: BigInteger? = null,
-        vedtakId: BigInteger? = null,
-        @Max(6)
-        antallPerioder: Int,
-        under4rettsgebyr: Boolean,
-        muligforeldelse: Boolean,
-        periodeLengde: Int,
-    ): DetaljertKravgrunnlagMelding {
+    fun opprettKravgrunnlag(status: KodeStatusKrav,
+                            ytelsestype: Ytelsestype,
+                            eksternFagsakId: String,
+                            eksternBehandlingId: String,
+                            kravgrunnlagId: BigInteger? = null,
+                            vedtakId: BigInteger? = null,
+                            @Max(6)
+                            antallPerioder: Int,
+                            under4rettsgebyr: Boolean,
+                            muligforeldelse: Boolean,
+                            periodeLengde: Int, ): DetaljertKravgrunnlagMelding {
         val finalKravgrunnlagId = kravgrunnlagId ?: Random.nextInt(100000, 999999).toBigInteger()
         val finalVedtakId = vedtakId ?: Random.nextInt(100000, 999999).toBigInteger()
         val finalKontrollfelt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"))
@@ -60,14 +58,11 @@ class OpprettKravgrunnlagBuilder {
         response.detaljertKravgrunnlag.saksbehId = "K231B433"
         response.detaljertKravgrunnlag.referanse = eksternBehandlingId
         response.detaljertKravgrunnlag.tilbakekrevingsPeriode.addAll(
-            tilbakekrevingsPerioder(
-                antallPerioder = antallPerioder,
-                under4rettsgebyr = under4rettsgebyr,
-                muligforeldelse = muligforeldelse,
-                ytelsestype = ytelsestype,
-                periodeLengde = periodeLengde
-            )
-        )
+                tilbakekrevingsPerioder(antallPerioder = antallPerioder,
+                                        under4rettsgebyr = under4rettsgebyr,
+                                        muligforeldelse = muligforeldelse,
+                                        ytelsestype = ytelsestype,
+                                        periodeLengde = periodeLengde))
         return response
     }
 
@@ -81,13 +76,11 @@ class OpprettKravgrunnlagBuilder {
         }
     }
 
-    fun opprettStatusmelding(
-        vedtakId: BigInteger,
-        kodeStatusKrav: KodeStatusKrav,
-        ytelsestype: Ytelsestype,
-        eksternFagsakId: String,
-        eksternBehandlingId: String
-    ): EndringKravOgVedtakstatus {
+    fun opprettStatusmelding(vedtakId: BigInteger,
+                             kodeStatusKrav: KodeStatusKrav,
+                             ytelsestype: Ytelsestype,
+                             eksternFagsakId: String,
+                             eksternBehandlingId: String): EndringKravOgVedtakstatus {
         val response = EndringKravOgVedtakstatus()
         response.kravOgVedtakstatus = KravOgVedtakstatus()
         response.kravOgVedtakstatus.vedtakId = vedtakId
@@ -100,13 +93,11 @@ class OpprettKravgrunnlagBuilder {
         return response
     }
 
-    private fun tilbakekrevingsPerioder(
-        antallPerioder: Int,
-        under4rettsgebyr: Boolean,
-        muligforeldelse: Boolean,
-        ytelsestype: Ytelsestype,
-        periodeLengde: Int,
-    ): List<DetaljertKravgrunnlagPeriodeDto> {
+    private fun tilbakekrevingsPerioder(antallPerioder: Int,
+                                        under4rettsgebyr: Boolean,
+                                        muligforeldelse: Boolean,
+                                        ytelsestype: Ytelsestype,
+                                        periodeLengde: Int, ): List<DetaljertKravgrunnlagPeriodeDto> {
         /*Lager alltid periodene 3 måneder lange med 1 måned mellom, så derfor gange med 4.
         Første periode starter for 3 år siden når det skal være muligforeldelse eller for 4 måneder siden gange med antall perioder*/
         var startDato = if (muligforeldelse) {
@@ -115,10 +106,8 @@ class OpprettKravgrunnlagBuilder {
         } else {
             val multiplierPgaPeriodeLengde = if (periodeLengde > 3) 2 else 1
             LocalDate.now()
-                .minusMonths(BigDecimal(4).multiply(BigDecimal((antallPerioder * multiplierPgaPeriodeLengde))).toLong())
-                .withDayOfMonth(
-                    1
-                )
+                    .minusMonths(BigDecimal(4).multiply(BigDecimal((antallPerioder * multiplierPgaPeriodeLengde))).toLong())
+                    .withDayOfMonth(1)
         }
 
         /*Setter feilutbetalt beløp til 20000 kr, med mindre det skal være under4rettsgebyr, da skal det være under 4796 kr pr jan.2021*/
@@ -146,9 +135,8 @@ class OpprettKravgrunnlagBuilder {
         return tilbakekrevingsperiodeList
     }
 
-    private fun tilbakekrevingsBelopGenerator(
-        beløpprmåned: BigDecimal,
-        ytelsestype: Ytelsestype,
+    private fun tilbakekrevingsBelopGenerator(beløpprmåned: BigDecimal,
+                                              ytelsestype: Ytelsestype,
     ): Collection<DetaljertKravgrunnlagBelopDto> {
         val ytelKodeKlasse: KodeKlasse
         val feilKodeKlasse: KodeKlasse
