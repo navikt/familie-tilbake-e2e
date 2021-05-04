@@ -7,7 +7,6 @@ import no.nav.familie.tilbake.e2e.domene.dto.Behandlingssteg
 import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstegstatus
 import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsresultatstype
 import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
 import no.nav.familie.tilbake.e2e.domene.dto.Hendelsestype
 import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype

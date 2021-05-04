@@ -1,6 +1,5 @@
 package no.nav.familie.tilbake.e2e.domene.builder
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.domene.dto.AktsomhetDto
 import no.nav.familie.tilbake.e2e.domene.dto.BehandleVilkårsvurderingDto
@@ -11,8 +10,6 @@ import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunnDto
 import no.nav.familie.tilbake.e2e.domene.dto.VilkårsvurderingsperiodeDto
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import java.math.BigDecimal
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
 
 class BehandleVilkårsvurderingStegBuilder(
     hentVilkårsvurderingResponse: HentVilkårsvurderingDto,
@@ -31,10 +28,10 @@ class BehandleVilkårsvurderingStegBuilder(
                 VilkårsvurderingsperiodeDto(
                     periode = it.periode,
                     vilkårsvurderingsresultat = vilkårvurderingsresultat,
-                    begrunnelse = "Dette er en begrunnelse fra Autotest",
+                    begrunnelse = "Dette er en automatisk begrunnelse fra Autotest",
                     godTroDto = if(vilkårvurderingsresultat == Vilkårsvurderingsresultat.GOD_TRO) {
                         GodTroDto(
-                            begrunnelse = "Dette er en begrunnelse fra Autotest",
+                            begrunnelse = "Dette er en automatisk begrunnelse fra Autotest",
                             beløpErIBehold = beløpErIBehold,
                             beløpTilbakekreves = if (beløpErIBehold) beløpTilbakekreves ?: it.feilutbetaltBeløp else BigDecimal.ZERO
                         )
@@ -45,21 +42,21 @@ class BehandleVilkårsvurderingStegBuilder(
                             andelTilbakekreves = andelTilbakekreves,
                             beløpTilbakekreves = if(andelTilbakekreves == null) beløpTilbakekreves ?: it.feilutbetaltBeløp else null,
                             ileggRenter = false,
-                            begrunnelse = "Dette er en begrunnelse fra Autotest",
+                            begrunnelse = "Dette er en automatisk begrunnelse fra Autotest",
                             særligeGrunnerTilReduksjon = (andelTilbakekreves != BigDecimal(100.0)),
                             tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
-                            særligeGrunnerBegrunnelse = "Særlige grunner begrunnelse fra Autotest",
+                            særligeGrunnerBegrunnelse = "Automatisk særlige grunner begrunnelse fra Autotest",
                             særligeGrunner = særligeGrunner.map { særligGrunn ->
                                 SærligGrunnDto(
                                     særligGrunn = særligGrunn,
-                                    begrunnelse = if (særligGrunn == SærligGrunn.ANNET) "Særlig grunn annet begrunnelse fra autotest" else null
+                                    begrunnelse = if (særligGrunn == SærligGrunn.ANNET) "Automatisk særlig grunn annet begrunnelse fra autotest" else null
                                 )
                             }
                         )
                     } else if (aktsomhet == Aktsomhet.FORSETT) {
                         AktsomhetDto(
                             aktsomhet = aktsomhet,
-                            begrunnelse = "Dette er en begrunnelse fra Autotest"
+                            begrunnelse = "Dette er en automatisk begrunnelse fra Autotest"
                         )
                     } else null
                 )

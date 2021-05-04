@@ -32,7 +32,7 @@ class OpprettTilbakekrevingBuilder {
         if (varsel) {
             tilbakekrevingsvalg = Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_MED_VARSEL
             varselinfo = Varsel(
-                    varseltekst = "Varseltekst fra Autotest",
+                    varseltekst = "Automatisk varseltekst fra Autotest",
                     sumFeilutbetaling = BigDecimal(8124),
                     perioder = arrayListOf(
                             Periode(

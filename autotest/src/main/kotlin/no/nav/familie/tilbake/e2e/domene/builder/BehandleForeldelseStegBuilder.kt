@@ -9,7 +9,7 @@ import java.time.LocalDate
 class BehandleForeldelseStegBuilder(
     hentForeldelseResponse: HentForeldelseDto,
     beslutning: Foreldelsesvurderingstype,
-    private var foreldetPerioder: MutableList<VurdertForeldelsesperiode> = mutableListOf()
+    private val foreldetPerioder: MutableList<VurdertForeldelsesperiode> = mutableListOf()
 ) {
     init {
         hentForeldelseResponse.foreldetPerioder.forEach {

@@ -47,7 +47,7 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
                 verge = false
         )
 
-        val behandlingId = saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
+        saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
         saksbehandler.taBehandlingAvVent()
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
@@ -80,7 +80,7 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
                 verge = false
         )
 
-        val behandlingId = saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
+        saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
         saksbehandler.opprettKravgrunnlag(

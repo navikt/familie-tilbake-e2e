@@ -171,8 +171,8 @@ class Saksbehandler(
         familieTilbakeKlient.hentFagsak(fagsystem, eksternFagsakId)?.behandlinger?.forEach {
             if (it.eksternBrukId.toString() == eksternBrukId) {
                 gjeldendeBehandling?.behandlingId = it.behandlingId.toString()
-                return
                 // return it.behandlingId.toString()
+                return
             }
         }
         throw Exception("Fantes ikke noen behandling med eksternBrukId $eksternBrukId på kombinasjonen eksternFagsakId $eksternFagsakId og fagsystem $fagsystem")
@@ -352,13 +352,14 @@ class Saksbehandler(
     }
 }
 
-/** STATE-object */
+/* STATE-object */
 
-class GjeldendeBehandling(var fagsystem: Fagsystem?,
-                          var ytelsestype: Ytelsestype?,
-                          var eksternFagsakId: String?,
-                          var eksternBehandlingId: String?,
-                          var eksternBrukId: String?,
-                          var behandlingId: String? = null,
-                          var vedtakId: BigInteger? = null,
-                          var kravgrunnlagId: BigInteger? = null)
+class GjeldendeBehandling(
+    var fagsystem: Fagsystem?,
+    var ytelsestype: Ytelsestype?,
+    var eksternFagsakId: String?,
+    var eksternBehandlingId: String?,
+    var eksternBrukId: String?,
+    var behandlingId: String? = null,
+    var vedtakId: BigInteger? = null,
+    var kravgrunnlagId: BigInteger? = null)

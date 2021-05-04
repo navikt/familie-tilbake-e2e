@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.tilbake.e2e.domene.dto.felles.Periode
 import java.time.LocalDate
 
+/**
+ * DTO-er relatert til behandle steg
+ */
 data class BehandleFaktaDto(@JsonProperty("@type")
                             val type: String = "FAKTA",
                             val feilutbetaltePerioder: List<VurdertFaktaFeilutbetaltPeriode>,
@@ -13,6 +16,9 @@ data class VurdertFaktaFeilutbetaltPeriode(val periode: Periode,
                                            var hendelsestype: Hendelsestype? = null,
                                            var hendelsesundertype: Hendelsesundertype? = null)
 
+/**
+ * DTO-er relatert til hentFakta
+ */
 data class HentFaktaDto(val varsletBeløp: Int,
                         val totalFeilutbetaltPeriode: Periode,
                         val feilutbetaltePerioder: Set<FaktaFeilutbetaltPeriode>,
@@ -31,7 +37,9 @@ data class Faktainfo(val revurderingsårsak: String,
                      val tilbakekrevingsvalg: Tilbakekrevingsvalg,
                      val konsekvensForYtelser: Set<String>)
 
-
+/**
+ * Felleskomponenter
+ */
 enum class Hendelsestype {
     BA_ANNET,
     EF_ANNET,
