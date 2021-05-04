@@ -218,7 +218,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
-        saksbehandler.behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
+        saksbehandler.behandleForeldelse(Foreldelsesvurderingstype.TILLEGGSFRIST)
         saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
         saksbehandler.behandleVilkårsvurdering(Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,

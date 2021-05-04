@@ -12,21 +12,22 @@ class BehandleForeldelseStegBuilder(
     private var foreldetPerioder: MutableList<VurdertForeldelsesperiode> = mutableListOf()
 ) {
     init {
-        hentForeldelseResponse.foreldetPerioder?.forEach {
-            foreldetPerioder.add(VurdertForeldelsesperiode(periode = it.periode))
-        }
-        this.foreldetPerioder.forEach {
-            it.foreldelsesvurderingstype = beslutning
-            it.begrunnelse = "Dette er en automatisk begrunnelse fra Autotest"
-            when (beslutning){
-                Foreldelsesvurderingstype.FORELDET -> {
-                    it.foreldelsesfrist = LocalDate.now().minusMonths(31)
-                }
-                Foreldelsesvurderingstype.TILLEGGSFRIST -> {
-                    it.foreldelsesfrist = LocalDate.now().minusMonths(31)
-                    it.oppdagelsesdato = LocalDate.now().minusMonths(15)
-                }
-            }
+        hentForeldelseResponse.foreldetPerioder.forEach {
+            foreldetPerioder.add(
+                VurdertForeldelsesperiode(
+                    periode = it.periode,
+                    foreldelsesvurderingstype = beslutning,
+                    begrunnelse = "Dette er en automatisk begrunnelse fra Autotest",
+                    foreldelsesfrist = when (beslutning) {
+                        Foreldelsesvurderingstype.FORELDET,
+                        Foreldelsesvurderingstype.TILLEGGSFRIST -> LocalDate.now().minusMonths(31)
+                        else -> null
+                    },
+                    oppdagelsesdato = when (beslutning) {
+                        Foreldelsesvurderingstype.TILLEGGSFRIST -> LocalDate.now().minusMonths(15)
+                        else -> null
+                    }
+                ))
         }
     }
 
