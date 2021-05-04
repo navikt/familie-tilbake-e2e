@@ -2,7 +2,7 @@ package no.nav.familie.tilbake.e2e.domene.builder
 
 import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.domene.dto.AktsomhetDto
-import no.nav.familie.tilbake.e2e.domene.dto.BehandleVilkårsvurderingDto
+import no.nav.familie.tilbake.e2e.domene.dto.VilkårsvurderingDto
 import no.nav.familie.tilbake.e2e.domene.dto.GodTroDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentVilkårsvurderingDto
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
@@ -21,44 +21,78 @@ class BehandleVilkårsvurderingStegBuilder(hentVilkårsvurderingResponse: HentVi
                                           tilbakekrevSmåbeløp: Boolean?) {
 
     private val vilkårsvurderingsperioder: MutableList<VilkårsvurderingsperiodeDto> = mutableListOf()
+    private val BEGRUNNELSE = "Dette er en automatisk begrunnelse fra Autotest"
 
     init {
         hentVilkårsvurderingResponse.perioder.forEach {
             vilkårsvurderingsperioder.add(
                     VilkårsvurderingsperiodeDto(periode = it.periode,
                                                 vilkårsvurderingsresultat = vilkårvurderingsresultat,
-                                                begrunnelse = "Dette er en automatisk begrunnelse fra Autotest",
-                                                godTroDto = if (vilkårvurderingsresultat == Vilkårsvurderingsresultat.GOD_TRO) {
-                                                    GodTroDto(begrunnelse = "Dette er en automatisk begrunnelse fra Autotest",
-                                                              beløpErIBehold = beløpErIBehold,
-                                                              beløpTilbakekreves = if (beløpErIBehold) beløpTilbakekreves
-                                                                                                       ?: it.feilutbetaltBeløp else BigDecimal.ZERO
-                                                    )
-                                                } else null,
-                                                aktsomhetDto = if (vilkårvurderingsresultat != Vilkårsvurderingsresultat.GOD_TRO && aktsomhet != Aktsomhet.FORSETT) {
-                                                    AktsomhetDto(aktsomhet = aktsomhet!!,
-                                                                 andelTilbakekreves = andelTilbakekreves,
-                                                                 beløpTilbakekreves = if (andelTilbakekreves == null) beløpTilbakekreves
-                                                                                                                      ?: it.feilutbetaltBeløp else null,
-                                                                 ileggRenter = false,
-                                                                 begrunnelse = "Dette er en automatisk begrunnelse fra Autotest",
-                                                                 særligeGrunnerTilReduksjon = (andelTilbakekreves != BigDecimal(
-                                                                         100.0)),
-                                                                 tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
-                                                                 særligeGrunner = særligeGrunner.map { særligGrunn ->
-                                                                     SærligGrunnDto(
-                                                                             særligGrunn = særligGrunn,
-                                                                             begrunnelse = if (særligGrunn == SærligGrunn.ANNET) "Automatisk særlig grunn annet begrunnelse fra autotest" else null)
-                                                                 },
-                                                                 særligeGrunnerBegrunnelse = "Automatisk særlige grunner begrunnelse fra Autotest")
-                                                } else if (aktsomhet == Aktsomhet.FORSETT) {
-                                                    AktsomhetDto(aktsomhet = aktsomhet,
-                                                                 begrunnelse = "Dette er en automatisk begrunnelse fra Autotest")
-                                                } else null))
+                                                begrunnelse = BEGRUNNELSE,
+                                                godTroDto = when (vilkårvurderingsresultat) {
+                                                    Vilkårsvurderingsresultat.GOD_TRO -> godTroGenerator(beløpErIBehold = beløpErIBehold,
+                                                                                                         beløpTilbakekreves = beløpTilbakekreves,
+                                                                                                         feilutbetaltBeløp = it.feilutbetaltBeløp)
+                                                    else -> null
+                                                },
+                                                aktsomhetDto = when (vilkårvurderingsresultat) {
+                                                    Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                                                    Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                                                    Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER -> aktsomhetGenerator(
+                                                            aktsomhet = aktsomhet,
+                                                            andelTilbakekreves = andelTilbakekreves,
+                                                            beløpTilbakekreves = beløpTilbakekreves,
+                                                            tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
+                                                            særligeGrunner = særligeGrunner,
+                                                            feilutbetaltBeløp = it.feilutbetaltBeløp)
+                                                    else -> null
+                                                }))
         }
     }
 
-    fun build(): BehandleVilkårsvurderingDto {
-        return BehandleVilkårsvurderingDto(vilkårsvurderingsperioder = vilkårsvurderingsperioder.toList())
+    private fun godTroGenerator(beløpErIBehold: Boolean,
+                                beløpTilbakekreves: BigDecimal?,
+                                feilutbetaltBeløp: BigDecimal): GodTroDto {
+        return GodTroDto(begrunnelse = BEGRUNNELSE,
+                         beløpErIBehold = beløpErIBehold,
+                         beløpTilbakekreves = if (beløpErIBehold) beløpTilbakekreves
+                                                                  ?: feilutbetaltBeløp else BigDecimal.ZERO)
+    }
+
+
+    private fun aktsomhetGenerator(aktsomhet: Aktsomhet?,
+                                   andelTilbakekreves: BigDecimal?,
+                                   beløpTilbakekreves: BigDecimal?,
+                                   tilbakekrevSmåbeløp: Boolean?,
+                                   særligeGrunner: List<SærligGrunn>,
+                                   feilutbetaltBeløp: BigDecimal): AktsomhetDto? {
+        return when (aktsomhet) {
+            Aktsomhet.FORSETT -> AktsomhetDto(aktsomhet = aktsomhet,
+                                              begrunnelse = BEGRUNNELSE)
+            Aktsomhet.GROV_UAKTSOMHET,
+            Aktsomhet.SIMPEL_UAKTSOMHET -> AktsomhetDto(aktsomhet = aktsomhet,
+                                                        andelTilbakekreves = andelTilbakekreves,
+                                                        beløpTilbakekreves = if (andelTilbakekreves == null) beløpTilbakekreves
+                                                                                                             ?: feilutbetaltBeløp else null,
+                                                        ileggRenter = false,
+                                                        begrunnelse = BEGRUNNELSE,
+                                                        særligeGrunnerTilReduksjon = (andelTilbakekreves != BigDecimal(
+                                                                100.0)),
+                                                        tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
+                                                        særligeGrunner = utledSærligeGrunner(særligeGrunner),
+                                                        særligeGrunnerBegrunnelse = BEGRUNNELSE)
+            else -> null
+        }
+    }
+
+    private fun utledSærligeGrunner(særligeGrunner: List<SærligGrunn>): List<SærligGrunnDto> {
+        return særligeGrunner.map {
+            SærligGrunnDto(særligGrunn = it,
+                           begrunnelse = if (it == SærligGrunn.ANNET) BEGRUNNELSE else null)
+        }
+    }
+
+    fun build(): VilkårsvurderingDto {
+        return VilkårsvurderingDto(vilkårsvurderingsperioder = vilkårsvurderingsperioder.toList())
     }
 }

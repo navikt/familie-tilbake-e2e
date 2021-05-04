@@ -8,9 +8,9 @@ import java.math.BigDecimal
 /**
  * DTO-er relatert til behandle steg
  */
-data class BehandleVilkårsvurderingDto(@JsonProperty("@type")
-                                       val type: String = "VILKÅRSVURDERING",
-                                       val vilkårsvurderingsperioder: List<VilkårsvurderingsperiodeDto>)
+data class VilkårsvurderingDto(@JsonProperty("@type")
+                               val type: String = "VILKÅRSVURDERING",
+                               val vilkårsvurderingsperioder: List<VilkårsvurderingsperiodeDto>)
 
 data class VilkårsvurderingsperiodeDto(val periode: PeriodeDto,
                                        val vilkårsvurderingsresultat: Vilkårsvurderingsresultat,

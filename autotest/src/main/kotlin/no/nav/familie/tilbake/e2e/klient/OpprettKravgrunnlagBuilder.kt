@@ -136,8 +136,7 @@ class OpprettKravgrunnlagBuilder {
     }
 
     private fun tilbakekrevingsBelopGenerator(beløpprmåned: BigDecimal,
-                                              ytelsestype: Ytelsestype,
-    ): Collection<DetaljertKravgrunnlagBelopDto> {
+                                              ytelsestype: Ytelsestype): Collection<DetaljertKravgrunnlagBelopDto> {
         val ytelKodeKlasse: KodeKlasse
         val feilKodeKlasse: KodeKlasse
         when (ytelsestype) {

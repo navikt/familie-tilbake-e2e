@@ -15,8 +15,8 @@ import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
 import no.nav.familie.tilbake.e2e.domene.dto.Hendelsestype
 import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
-import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVent
-import no.nav.familie.tilbake.e2e.domene.dto.Henlegg
+import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVentDto
+import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
@@ -199,8 +199,8 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
     }
 
     fun settBehandlingPåVent(årsak: Venteårsak, frist: LocalDate) {
-        familieTilbakeKlient.settBehandlingPåVent(BehandlingPåVent(venteårsak = årsak,
-                                                                   tidsfrist = frist),
+        familieTilbakeKlient.settBehandlingPåVent(BehandlingPåVentDto(venteårsak = årsak,
+                                                                      tidsfrist = frist),
                                                   behandlingId = gjeldendeBehandling?.behandlingId!!)
         erBehandlingPåVent(årsak)
     }
@@ -213,8 +213,8 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         /*Denne vil kun fungere i autotest for behandling opprettet med manueltOpprettet = TRUE ettersom automatisk opprettede behandlinger ikke kan henlegges manuelt før etter 6 dager.
         Når manueltOpprettet Tilbakekreving er implementert i familie-tilbake kan denne metoden brukes i en test.
          */
-        val data = Henlegg(behandlingsresultatstype = behandlingsresultat,
-                           begrunnelse = "Dette er en automatisk begrunnelse generert av autotest")
+        val data = HenleggDto(behandlingsresultatstype = behandlingsresultat,
+                              begrunnelse = "Dette er en automatisk begrunnelse generert av autotest")
         if (behandlingsresultat == Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_MED_BREV) {
             data.fritekst = "Dette er en automatisk fritekst generert av autotest"
         }

@@ -4,13 +4,13 @@ import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
-import no.nav.familie.tilbake.e2e.domene.dto.Behandling
-import no.nav.familie.tilbake.e2e.domene.dto.Fagsak
-import no.nav.familie.tilbake.e2e.domene.dto.VersjonInfo
+import no.nav.familie.tilbake.e2e.domene.dto.BehandlingDto
+import no.nav.familie.tilbake.e2e.domene.dto.FagsakDto
+import no.nav.familie.tilbake.e2e.domene.dto.VersjonInfoDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentFaktaDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentForeldelseDto
-import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVent
-import no.nav.familie.tilbake.e2e.domene.dto.Henlegg
+import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVentDto
+import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentVilkårsvurderingDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
@@ -74,27 +74,27 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
 
     /*HENT-tjenester*/
 
-    fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Fagsak? {
+    fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): FagsakDto? {
         val uri = URI.create("$FAGSAK_URL_V1/$fagsystem/fagsak/$eksternFagsakId/v1")
-        val response: Ressurs<Fagsak> = getForEntity(uri)
+        val response: Ressurs<FagsakDto> = getForEntity(uri)
         assertTrue(
                 response.status == Ressurs.Status.SUKSESS,
                 "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
         return response.data
     }
 
-    fun hentBehandling(behandlingId: String): Behandling? {
+    fun hentBehandling(behandlingId: String): BehandlingDto? {
         val uri = URI.create("$BEHANDLING_URL_V1/$behandlingId")
-        val response: Ressurs<Behandling> = getForEntity(uri)
+        val response: Ressurs<BehandlingDto> = getForEntity(uri)
         assertTrue(
                 response.status == Ressurs.Status.SUKSESS,
                 "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
         return response.data
     }
 
-    fun hentVersjonInfo(): VersjonInfo? {
+    fun hentVersjonInfo(): VersjonInfoDto? {
         val uri = URI.create("$VERSION_URL")
-        val response: Ressurs<VersjonInfo> = getForEntity(uri)
+        val response: Ressurs<VersjonInfoDto> = getForEntity(uri)
         assertTrue(
                 response.status == Ressurs.Status.SUKSESS,
                 "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
@@ -140,7 +140,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
                 "Behandle steg feilet.")
     }
 
-    fun settBehandlingPåVent(data: BehandlingPåVent, behandlingId: String) {
+    fun settBehandlingPåVent(data: BehandlingPåVentDto, behandlingId: String) {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/vent/v1")
         val response: Ressurs<String> = putForEntity(uri, data)
         assertTrue(
@@ -156,7 +156,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
                 "PUT feilet. Status ${response.status}, feilmelding: ${response.melding}")
     }
 
-    fun henleggBehandling(behandlingId: String, data: Henlegg) {
+    fun henleggBehandling(behandlingId: String, data: HenleggDto) {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/henlegg/v1")
         val response: Ressurs<String> = putForEntity(uri, data)
         assertTrue(

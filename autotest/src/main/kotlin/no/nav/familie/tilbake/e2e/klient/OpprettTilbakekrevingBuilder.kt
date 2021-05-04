@@ -22,8 +22,7 @@ class OpprettTilbakekrevingBuilder {
                                      fagsystem: Fagsystem,
                                      ytelsestype: Ytelsestype,
                                      varsel: Boolean,
-                                     verge: Boolean
-    ): OpprettTilbakekrevingRequest {
+                                     verge: Boolean): OpprettTilbakekrevingRequest {
         val finalEksternBehandlingId = eksternBehandlingId ?: Random.nextInt(1000000, 9999999).toString()
 
         var tilbakekrevingsvalg: Tilbakekrevingsvalg = Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_UTEN_VARSEL
