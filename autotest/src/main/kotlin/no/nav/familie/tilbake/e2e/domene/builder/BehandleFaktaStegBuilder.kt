@@ -12,6 +12,7 @@ class BehandleFaktaStegBuilder(
     hendelsesundertype: Hendelsesundertype,
     private val feilutbetaltePerioder: MutableList<VurdertFaktaFeilutbetaltPeriode> = mutableListOf()
 ) {
+
     init {
         hentFaktaResponse.feilutbetaltePerioder.forEach {
             feilutbetaltePerioder.add(

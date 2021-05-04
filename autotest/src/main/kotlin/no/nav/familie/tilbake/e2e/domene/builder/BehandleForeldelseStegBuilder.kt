@@ -11,6 +11,7 @@ class BehandleForeldelseStegBuilder(
     beslutning: Foreldelsesvurderingstype,
     private val foreldetPerioder: MutableList<VurdertForeldelsesperiode> = mutableListOf()
 ) {
+
     init {
         hentForeldelseResponse.foreldetPerioder.forEach {
             foreldetPerioder.add(
@@ -27,11 +28,12 @@ class BehandleForeldelseStegBuilder(
                         Foreldelsesvurderingstype.TILLEGGSFRIST -> LocalDate.now().minusMonths(15)
                         else -> null
                     }
-                ))
+                )
+            )
         }
     }
 
-    fun build() : ForeldelseStegDto {
+    fun build(): ForeldelseStegDto {
         return ForeldelseStegDto(
             foreldetPerioder = foreldetPerioder
         )

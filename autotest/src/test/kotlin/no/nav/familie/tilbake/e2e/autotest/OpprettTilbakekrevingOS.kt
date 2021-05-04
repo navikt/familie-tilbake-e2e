@@ -31,20 +31,22 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
 
     @BeforeEach
     fun setup() {
-        saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient,
-                                      opprettTilbakekrevingBuilder = OpprettTilbakekrevingBuilder(),
-                                      opprettKravgrunnlagBuilder = OpprettKravgrunnlagBuilder())
+        saksbehandler = Saksbehandler(
+            familieTilbakeKlient = familieTilbakeKlient,
+            opprettTilbakekrevingBuilder = OpprettTilbakekrevingBuilder(),
+            opprettKravgrunnlagBuilder = OpprettKravgrunnlagBuilder()
+        )
     }
 
     @Test
     fun `tilbakekrevingsbehandling med varsel, gjenoppta, kravgrunnlag med foreldelse`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
-                eksternFagsakId = eksternFagsakId,
-                fagsystem = fagsystem,
-                ytelsestype = ytelsestype,
-                varsel = true,
-                verge = false
+            eksternFagsakId = eksternFagsakId,
+            fagsystem = fagsystem,
+            ytelsestype = ytelsestype,
+            varsel = true,
+            verge = false
         )
 
         saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
@@ -73,11 +75,11 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
     fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag, SPER melding, ENDR melding, behandling av Fakta`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
-                eksternFagsakId = eksternFagsakId,
-                fagsystem = fagsystem,
-                ytelsestype = ytelsestype,
-                varsel = false,
-                verge = false
+            eksternFagsakId = eksternFagsakId,
+            fagsystem = fagsystem,
+            ytelsestype = ytelsestype,
+            varsel = false,
+            verge = false
         )
 
         saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
@@ -87,7 +89,8 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
             status = KodeStatusKrav.NY,
             antallPerioder = 4,
             under4rettsgebyr = false,
-            muligforeldelse = false)
+            muligforeldelse = false
+        )
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
         saksbehandler.opprettStatusmelding(KodeStatusKrav.SPER)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)

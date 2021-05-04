@@ -35,20 +35,23 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
 
     @BeforeEach
     fun setup() {
-        saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient,
-                                      opprettTilbakekrevingBuilder = OpprettTilbakekrevingBuilder(),
-                                      opprettKravgrunnlagBuilder = OpprettKravgrunnlagBuilder())
+        saksbehandler = Saksbehandler(
+            familieTilbakeKlient = familieTilbakeKlient,
+            opprettTilbakekrevingBuilder = OpprettTilbakekrevingBuilder(),
+            opprettKravgrunnlagBuilder = OpprettKravgrunnlagBuilder()
+        )
     }
 
     @Test
     fun `tilbakekrevingsbehandling med varsel, gjenoppta, kravgrunnlag med foreldelse, ikke foreldet, vilkårsvurdering simpel uaktsomhet delvis tilbakebetaling småbeløp`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
-                eksternFagsakId = eksternFagsakId,
-                fagsystem = fagsystem,
-                ytelsestype = ytelsestype,
-                varsel = true,
-                verge = false)
+            eksternFagsakId = eksternFagsakId,
+            fagsystem = fagsystem,
+            ytelsestype = ytelsestype,
+            varsel = true,
+            verge = false
+        )
         saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
@@ -59,7 +62,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             status = KodeStatusKrav.NY,
             antallPerioder = 1,
             under4rettsgebyr = false,
-            muligforeldelse = true)
+            muligforeldelse = true
+        )
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
         saksbehandler.behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
@@ -68,11 +72,13 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
         saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-        saksbehandler.behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
-                                               aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
-                                               særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.ANNET),
-                                               andelTilbakekreves = BigDecimal(40),
-                                               tilbakekrevSmåbeløp = true)
+        saksbehandler.behandleVilkårsvurdering(
+            vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
+            aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
+            særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.ANNET),
+            andelTilbakekreves = BigDecimal(40),
+            tilbakekrevSmåbeløp = true
+        )
         saksbehandler.erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 
@@ -80,11 +86,12 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
     fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag, SPER melding, ENDR melding, behandling av Fakta, vilkårsvurdering grov uaktsomhet full tilbakekreving`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(
-                eksternFagsakId = eksternFagsakId,
-                fagsystem = fagsystem,
-                ytelsestype = ytelsestype,
-                varsel = false,
-                verge = false)
+            eksternFagsakId = eksternFagsakId,
+            fagsystem = fagsystem,
+            ytelsestype = ytelsestype,
+            varsel = false,
+            verge = false
+        )
         saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
@@ -92,7 +99,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             status = KodeStatusKrav.NY,
             antallPerioder = 2,
             under4rettsgebyr = false,
-            muligforeldelse = false)
+            muligforeldelse = false
+        )
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
         saksbehandler.opprettStatusmelding(KodeStatusKrav.SPER)
@@ -112,10 +120,12 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
         saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-        saksbehandler.behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
-                                               aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
-                                               andelTilbakekreves = BigDecimal(45),
-                                               særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.STØRRELSE_BELØP, SærligGrunn.ANNET))
+        saksbehandler.behandleVilkårsvurdering(
+            vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+            aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
+            andelTilbakekreves = BigDecimal(45),
+            særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.STØRRELSE_BELØP, SærligGrunn.ANNET)
+        )
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 
@@ -127,7 +137,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             fagsystem = fagsystem,
             ytelsestype = Ytelsestype.BARNETRYGD,
             varsel = false,
-            verge = false)
+            verge = false
+        )
         saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
@@ -135,7 +146,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             status = KodeStatusKrav.NY,
             antallPerioder = 2,
             under4rettsgebyr = false,
-            muligforeldelse = true)
+            muligforeldelse = true
+        )
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
         saksbehandler.behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
@@ -156,7 +168,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             eksternFagsakId = eksternFagsakId,
             antallPerioder = 1,
             under4rettsgebyr = false,
-            muligforeldelse = false)
+            muligforeldelse = false
+        )
         //TODO: Fortsette å utvide testen når funk kommer i familie-tilbake
     }
 
@@ -168,7 +181,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             fagsystem = fagsystem,
             ytelsestype = Ytelsestype.BARNETRYGD,
             varsel = true,
-            verge = false)
+            verge = false
+        )
         saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
@@ -179,14 +193,17 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             status = KodeStatusKrav.NY,
             antallPerioder = 2,
             under4rettsgebyr = false,
-            muligforeldelse = false)
+            muligforeldelse = false
+        )
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
         saksbehandler.behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
         saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-        saksbehandler.behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
-                                               beløpTilbakekreves = BigDecimal(4500.0))
+        saksbehandler.behandleVilkårsvurdering(
+            vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
+            beløpTilbakekreves = BigDecimal(4500.0)
+        )
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
         //Todo: Legge til behandling av  Foreslå_Vedtak
@@ -203,7 +220,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             fagsystem = fagsystem,
             ytelsestype = ytelsestype,
             varsel = false,
-            verge = false)
+            verge = false
+        )
         saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
@@ -211,7 +229,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
             status = KodeStatusKrav.NY,
             antallPerioder = 1,
             under4rettsgebyr = false,
-            muligforeldelse = true)
+            muligforeldelse = true
+        )
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
         saksbehandler.behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
@@ -220,8 +239,10 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.behandleForeldelse(Foreldelsesvurderingstype.TILLEGGSFRIST)
         saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-        saksbehandler.behandleVilkårsvurdering(Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
-                                               Aktsomhet.FORSETT)
+        saksbehandler.behandleVilkårsvurdering(
+            Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+            Aktsomhet.FORSETT
+        )
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 }

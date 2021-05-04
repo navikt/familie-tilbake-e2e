@@ -6,23 +6,29 @@ import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import java.time.LocalDate
 import java.util.UUID
 
-data class Fagsak(val eksternFagsakId: String,
-                  val status: Fagsaksstatus?,
-                  val ytelsestype: Ytelsestype,
-                  val fagsystem: Fagsystem,
-                  val språkkode: Språkkode,
-                  val bruker: Bruker,
-                  val behandlinger: Set<Behandlingsoppsummering>)
+data class Fagsak(
+    val eksternFagsakId: String,
+    val status: Fagsaksstatus?,
+    val ytelsestype: Ytelsestype,
+    val fagsystem: Fagsystem,
+    val språkkode: Språkkode,
+    val bruker: Bruker,
+    val behandlinger: Set<Behandlingsoppsummering>
+)
 
-data class Bruker(val personIdent: String,
-                  val navn: String,
-                  val fødselsdato: LocalDate,
-                  val kjønn: Kjønn)
+data class Bruker(
+    val personIdent: String,
+    val navn: String,
+    val fødselsdato: LocalDate,
+    val kjønn: Kjønn
+)
 
-data class Behandlingsoppsummering(val behandlingId: UUID,
-                                   val eksternBrukId: UUID,
-                                   val type: Behandlingstype,
-                                   val status: Behandlingsstatus)
+data class Behandlingsoppsummering(
+    val behandlingId: UUID,
+    val eksternBrukId: UUID,
+    val type: Behandlingstype,
+    val status: Behandlingsstatus
+)
 
 enum class Fagsaksstatus {
     OPPRETTET,
@@ -31,5 +37,7 @@ enum class Fagsaksstatus {
 }
 
 enum class Kjønn {
-    MANN, KVINNE, UKJENT
+    MANN,
+    KVINNE,
+    UKJENT
 }

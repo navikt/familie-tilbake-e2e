@@ -22,6 +22,7 @@ class BehandleVilkårsvurderingStegBuilder(
     tilbakekrevSmåbeløp: Boolean?,
     private val vilkårsvurderingsperioder: MutableList<VilkårsvurderingsperiodeDto> = mutableListOf()
 ) {
+
     init {
         hentVilkårsvurderingResponse.perioder.forEach {
             vilkårsvurderingsperioder.add(
@@ -29,18 +30,20 @@ class BehandleVilkårsvurderingStegBuilder(
                     periode = it.periode,
                     vilkårsvurderingsresultat = vilkårvurderingsresultat,
                     begrunnelse = "Dette er en automatisk begrunnelse fra Autotest",
-                    godTroDto = if(vilkårvurderingsresultat == Vilkårsvurderingsresultat.GOD_TRO) {
+                    godTroDto = if (vilkårvurderingsresultat == Vilkårsvurderingsresultat.GOD_TRO) {
                         GodTroDto(
                             begrunnelse = "Dette er en automatisk begrunnelse fra Autotest",
                             beløpErIBehold = beløpErIBehold,
-                            beløpTilbakekreves = if (beløpErIBehold) beløpTilbakekreves ?: it.feilutbetaltBeløp else BigDecimal.ZERO
+                            beløpTilbakekreves = if (beløpErIBehold) beløpTilbakekreves
+                                ?: it.feilutbetaltBeløp else BigDecimal.ZERO
                         )
                     } else null,
-                    aktsomhetDto = if(vilkårvurderingsresultat != Vilkårsvurderingsresultat.GOD_TRO && aktsomhet != Aktsomhet.FORSETT) {
+                    aktsomhetDto = if (vilkårvurderingsresultat != Vilkårsvurderingsresultat.GOD_TRO && aktsomhet != Aktsomhet.FORSETT) {
                         AktsomhetDto(
                             aktsomhet = aktsomhet!!,
                             andelTilbakekreves = andelTilbakekreves,
-                            beløpTilbakekreves = if(andelTilbakekreves == null) beløpTilbakekreves ?: it.feilutbetaltBeløp else null,
+                            beløpTilbakekreves = if (andelTilbakekreves == null) beløpTilbakekreves
+                                ?: it.feilutbetaltBeløp else null,
                             ileggRenter = false,
                             begrunnelse = "Dette er en automatisk begrunnelse fra Autotest",
                             særligeGrunnerTilReduksjon = (andelTilbakekreves != BigDecimal(100.0)),

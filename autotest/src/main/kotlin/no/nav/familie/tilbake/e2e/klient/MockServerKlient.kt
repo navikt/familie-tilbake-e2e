@@ -8,5 +8,6 @@ import org.springframework.stereotype.Service
 class MockServerKlient {
 
     val restOperations = RestTemplateBuilder().additionalInterceptors(
-            MdcValuesPropagatingClientInterceptor()).build()
+        MdcValuesPropagatingClientInterceptor()
+    ).build()
 }

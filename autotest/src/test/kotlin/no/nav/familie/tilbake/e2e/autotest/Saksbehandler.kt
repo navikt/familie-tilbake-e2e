@@ -93,12 +93,12 @@ class Saksbehandler(
     }
 
     fun opprettKravgrunnlag(
-            status: KodeStatusKrav,
-            @Max(29)
-            antallPerioder: Int,
-            under4rettsgebyr: Boolean,
-            muligforeldelse: Boolean,
-            periodeLengde: Int? = 3,
+        status: KodeStatusKrav,
+        @Max(29)
+        antallPerioder: Int,
+        under4rettsgebyr: Boolean,
+        muligforeldelse: Boolean,
+        periodeLengde: Int? = 3,
     ) {
         assertTrue(
             gjeldendeBehandling != null && gjeldendeBehandling?.fagsystem != null,
@@ -196,27 +196,31 @@ class Saksbehandler(
         val hentForeldelseResponse = familieTilbakeKlient.hentForeldelse(gjeldendeBehandling?.behandlingId!!)
         assertTrue(
             hentForeldelseResponse != null,
-            "Kunne ikke hente foreldelse som skulle behandles")
+            "Kunne ikke hente foreldelse som skulle behandles"
+        )
         familieTilbakeKlient.behandleSteg(
             stegdata = BehandleForeldelseStegBuilder(
                 hentForeldelseResponse = hentForeldelseResponse!!,
                 beslutning = beslutning
             ).build(),
-            behandlingId = gjeldendeBehandling?.behandlingId!!)
+            behandlingId = gjeldendeBehandling?.behandlingId!!
+        )
     }
 
-    fun behandleVilkårsvurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat,
-                                 aktsomhet: Aktsomhet? = null,
-                                 særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
-                                 beløpErIBehold: Boolean = true,
-                                 andelTilbakekreves: BigDecimal? = null,
-                                 beløpTilbakekreves: BigDecimal? = null,
-                                 tilbakekrevSmåbeløp: Boolean? = null,
+    fun behandleVilkårsvurdering(
+        vilkårvurderingsresultat: Vilkårsvurderingsresultat,
+        aktsomhet: Aktsomhet? = null,
+        særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
+        beløpErIBehold: Boolean = true,
+        andelTilbakekreves: BigDecimal? = null,
+        beløpTilbakekreves: BigDecimal? = null,
+        tilbakekrevSmåbeløp: Boolean? = null,
     ) {
         val hentVilkårsvurderingResponse = familieTilbakeKlient.hentVilkårsvurdering(gjeldendeBehandling?.behandlingId!!)
         assertTrue(
             hentVilkårsvurderingResponse != null,
-            "Kunne ikke hente vilkårsvurdering som skulle behandles")
+            "Kunne ikke hente vilkårsvurdering som skulle behandles"
+        )
         familieTilbakeKlient.behandleSteg(
             stegdata = BehandleVilkårsvurderingStegBuilder(
                 hentVilkårsvurderingResponse = hentVilkårsvurderingResponse!!,
@@ -228,7 +232,8 @@ class Saksbehandler(
                 beløpTilbakekreves = beløpTilbakekreves,
                 tilbakekrevSmåbeløp = tilbakekrevSmåbeløp
             ).build(),
-            behandlingId = gjeldendeBehandling?.behandlingId!!)
+            behandlingId = gjeldendeBehandling?.behandlingId!!
+        )
     }
 
     /** fun behandleForeslåVedtak */
@@ -297,8 +302,8 @@ class Saksbehandler(
 
     fun erBehandlingAvsluttet(behandlingId: String, resultat: Behandlingsresultatstype) {
         Vent.til(
-                { familieTilbakeKlient.hentBehandling(behandlingId)?.status == Behandlingsstatus.AVSLUTTET },
-                30, "Behandlingen fikk aldri status AVSLUTTET"
+            { familieTilbakeKlient.hentBehandling(behandlingId)?.status == Behandlingsstatus.AVSLUTTET },
+            30, "Behandlingen fikk aldri status AVSLUTTET"
         )
         val behandling = familieTilbakeKlient.hentBehandling(behandlingId)
         val henlagttyper = listOf(
@@ -325,7 +330,7 @@ class Saksbehandler(
                 }.all {
                     it.behandlingsstegstatus == Behandlingsstegstatus.AVBRUTT
                 },
-                    "Behandling var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke i status AVBRUTT"
+                           "Behandling var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke i status AVBRUTT"
                 )
                 assertTrue(
                     behandling.resultatstype == Behandlingsresultatstype.HENLAGT,
@@ -362,4 +367,5 @@ class GjeldendeBehandling(
     var eksternBrukId: String?,
     var behandlingId: String? = null,
     var vedtakId: BigInteger? = null,
-    var kravgrunnlagId: BigInteger? = null)
+    var kravgrunnlagId: BigInteger? = null
+)
