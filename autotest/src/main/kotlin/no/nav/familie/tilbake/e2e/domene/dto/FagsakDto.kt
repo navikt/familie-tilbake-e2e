@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 data class Fagsak(val eksternFagsakId: String,
-                  val status: Fagsaksstatus,
+                  val status: Fagsaksstatus?,
                   val ytelsestype: Ytelsestype,
                   val fagsystem: Fagsystem,
                   val språkkode: Språkkode,

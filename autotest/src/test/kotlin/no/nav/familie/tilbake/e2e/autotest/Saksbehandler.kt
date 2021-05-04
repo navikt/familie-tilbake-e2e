@@ -10,16 +10,21 @@ import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
 import no.nav.familie.tilbake.e2e.domene.builder.BehandleFaktaStegBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.BehandleForeldelseStegBuilder
+import no.nav.familie.tilbake.e2e.domene.builder.BehandleVilkårsvurderingStegBuilder
+import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
 import no.nav.familie.tilbake.e2e.domene.dto.Hendelsestype
 import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVent
 import no.nav.familie.tilbake.e2e.domene.dto.Henlegg
+import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
+import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
 import no.nav.familie.tilbake.e2e.klient.Vent
 import org.junit.jupiter.api.Assertions.assertTrue
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
 import javax.validation.constraints.Max
@@ -162,55 +167,71 @@ class Saksbehandler(
 
     /*HENT-metoder*/
 
-    fun hentBehandlingId(fagsystem: Fagsystem, eksternFagsakId: String, eksternBrukId: String?): String {
+    fun hentBehandlingId(fagsystem: Fagsystem, eksternFagsakId: String, eksternBrukId: String?) {
         familieTilbakeKlient.hentFagsak(fagsystem, eksternFagsakId)?.behandlinger?.forEach {
             if (it.eksternBrukId.toString() == eksternBrukId) {
                 gjeldendeBehandling?.behandlingId = it.behandlingId.toString()
-                return it.behandlingId.toString()
+                return
+                // return it.behandlingId.toString()
             }
         }
         throw Exception("Fantes ikke noen behandling med eksternBrukId $eksternBrukId på kombinasjonen eksternFagsakId $eksternFagsakId og fagsystem $fagsystem")
     }
- /**
-    fun hentBehandlingssteg(stegtype: Behandlingssteg, behandlingId: String): Any? {
-        when (stegtype) {
-            Behandlingssteg.FAKTA -> {
-                val feilutbetaltePerioderList: MutableList<VurdertFaktaFeilutbetaltPeriode> = mutableListOf()
-                familieTilbakeKlient.hentFakta(behandlingId)?.feilutbetaltePerioder?.forEach {
-                    feilutbetaltePerioderList.add(VurdertFaktaFeilutbetaltPeriode(periode = it.periode))
-                }
-                return FaktaSteg(feilutbetaltePerioder = feilutbetaltePerioderList)
-            }
-            Behandlingssteg.FORELDELSE -> {
-                val foreldelsePerioderList: MutableList<VurdertForeldelsesperiode> = mutableListOf()
-                familieTilbakeKlient.hentForeldelse(behandlingId)?.foreldetPerioder?.forEach {
-                    foreldelsePerioderList.add(VurdertForeldelsesperiode(periode = it.periode))
-                }
-                return ForeldelseSteg(foreldetPerioder = foreldelsePerioderList)
-            }
-            Behandlingssteg.VILKÅRSVURDERING -> {
-                //TODO
-                return null
-            }
-            Behandlingssteg.FORESLÅ_VEDTAK -> {
-                //TODO
-                return null
-            }
-            Behandlingssteg.FATTE_VEDTAK -> {
-                //TODO
-                return null
-            }
-            Behandlingssteg.VERGE -> {
-                //TODO
-                return null
-            }
-            else -> {
-                throw Exception("Behandlingssteg $stegtype kan ikke behandles av saksbehandler")
-            }
-        }
-    }*/
 
     /*HANDLING-metoder*/
+
+    fun behandleFakta(hendelsestype: Hendelsestype, hendelsesundertype: Hendelsesundertype) {
+        val hentFaktaResponse = familieTilbakeKlient.hentFakta(gjeldendeBehandling?.behandlingId!!)
+        familieTilbakeKlient.behandleSteg(
+            stegdata = BehandleFaktaStegBuilder(
+                hentFaktaResponse = hentFaktaResponse!!,
+                hendelsestype = hendelsestype,
+                hendelsesundertype = hendelsesundertype
+            ).build(),
+            behandlingId = gjeldendeBehandling?.behandlingId!!
+        )
+    }
+
+    fun behandleForeldelse(beslutning: Foreldelsesvurderingstype) {
+        val hentForeldelseResponse = familieTilbakeKlient.hentForeldelse(gjeldendeBehandling?.behandlingId!!)
+        assertTrue(
+            hentForeldelseResponse != null,
+            "Kunne ikke hente foreldelse som skulle behandles")
+        familieTilbakeKlient.behandleSteg(
+            stegdata = BehandleForeldelseStegBuilder(
+                hentForeldelseResponse = hentForeldelseResponse!!,
+                beslutning = beslutning
+            ).build(),
+            behandlingId = gjeldendeBehandling?.behandlingId!!)
+    }
+
+    fun behandleVilkårsvurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat,
+                                 aktsomhet: Aktsomhet? = null,
+                                 særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
+                                 beløpErIBehold: Boolean = true,
+                                 andelTilbakekreves: BigDecimal? = null,
+                                 beløpTilbakekreves: BigDecimal? = null,
+                                 tilbakekrevSmåbeløp: Boolean? = null,
+    ) {
+        val hentVilkårsvurderingResponse = familieTilbakeKlient.hentVilkårsvurdering(gjeldendeBehandling?.behandlingId!!)
+        assertTrue(
+            hentVilkårsvurderingResponse != null,
+            "Kunne ikke hente vilkårsvurdering som skulle behandles")
+        familieTilbakeKlient.behandleSteg(
+            stegdata = BehandleVilkårsvurderingStegBuilder(
+                hentVilkårsvurderingResponse = hentVilkårsvurderingResponse!!,
+                vilkårvurderingsresultat = vilkårvurderingsresultat,
+                aktsomhet = aktsomhet,
+                særligeGrunner = særligeGrunner,
+                beløpErIBehold = beløpErIBehold,
+                andelTilbakekreves = andelTilbakekreves,
+                beløpTilbakekreves = beløpTilbakekreves,
+                tilbakekrevSmåbeløp = tilbakekrevSmåbeløp
+            ).build(),
+            behandlingId = gjeldendeBehandling?.behandlingId!!)
+    }
+
+    /** fun behandleForeslåVedtak */
 
     fun behandleSteg(stegdata: Any, behandlingId: String) {
         familieTilbakeKlient.behandleSteg(stegdata, behandlingId)
@@ -329,43 +350,15 @@ class Saksbehandler(
         }
         println("Behandling med behandlingsId $behandlingId er bekreftet avsluttet med resultat $resultat")
     }
-
-    /**
-     * strukturendring: Har lagt til kode herfra
-     */
-    /** fun behandleFakta */
-    fun behandleFakta(hendelsestype: Hendelsestype, hendelsesundertype: Hendelsesundertype) {
-        val hentFaktaResponse = familieTilbakeKlient.hentFakta(gjeldendeBehandling?.behandlingId!!)
-        familieTilbakeKlient.behandleSteg(
-            stegdata = BehandleFaktaStegBuilder(hentFaktaResponse!!, hendelsestype, hendelsesundertype).build(),
-            behandlingId = gjeldendeBehandling?.behandlingId!!
-        )
-    }
-
-    fun behandleForeldelse(beslutning: Foreldelsesvurderingstype) {
-        val hentForeldelseResponse = familieTilbakeKlient.hentForeldelse(gjeldendeBehandling?.behandlingId!!)
-        assertTrue(
-            hentForeldelseResponse != null,
-            "Kunne ikke hente foreldelse som skulle behandles")
-        familieTilbakeKlient.behandleSteg(
-            stegdata = BehandleForeldelseStegBuilder(hentForeldelseResponse!!, beslutning).build(),
-            behandlingId = gjeldendeBehandling?.behandlingId!!)
-    }
-
-    /** fun behandleVilkårsvurdering */
-
-    /** fun behandleForeslåVedtak */
 }
 
-/*STATE-object*/
-class GjeldendeBehandling(
-    var fagsystem: Fagsystem?,
-    var ytelsestype: Ytelsestype?,
-    var eksternFagsakId: String?,
-    var eksternBehandlingId: String?,
-    var eksternBrukId: String?,
-    var behandlingId: String? = null,
-    var vedtakId: BigInteger? = null,
-    var kravgrunnlagId: BigInteger? = null,
-)
+/** STATE-object */
 
+class GjeldendeBehandling(var fagsystem: Fagsystem?,
+                          var ytelsestype: Ytelsestype?,
+                          var eksternFagsakId: String?,
+                          var eksternBehandlingId: String?,
+                          var eksternBrukId: String?,
+                          var behandlingId: String? = null,
+                          var vedtakId: BigInteger? = null,
+                          var kravgrunnlagId: BigInteger? = null)

@@ -11,6 +11,7 @@ import no.nav.familie.tilbake.e2e.domene.dto.HentFaktaDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentForeldelseDto
 import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVent
 import no.nav.familie.tilbake.e2e.domene.dto.Henlegg
+import no.nav.familie.tilbake.e2e.domene.dto.HentVilkårsvurderingDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import org.hibernate.validator.internal.util.Contracts.assertTrue
@@ -112,7 +113,16 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return response.data
     }
 
-    // Vilkårsvurdering, ForeslåVedtak, og FattVedtak/to-trinn
+    fun hentVilkårsvurdering(behandlingId: String): HentVilkårsvurderingDto? {
+        val uri = URI.create("$BEHANDLING_BASE/$behandlingId/vilkarsvurdering/v1")
+        val response: Ressurs<HentVilkårsvurderingDto> = getForEntity(uri)
+        assertTrue(response.status == Ressurs.Status.SUKSESS,
+                   "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+
+        return response.data
+    }
+
+    // ForeslåVedtak, og FattVedtak/to-trinn
 
     /*BEHANDLE og SETT-tjenester*/
     fun behandleSteg(stegdata: Any, behandlingId: String){

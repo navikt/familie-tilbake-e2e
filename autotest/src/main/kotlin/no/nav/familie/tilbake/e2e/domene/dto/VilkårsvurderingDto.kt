@@ -2,24 +2,33 @@ package no.nav.familie.tilbake.e2e.domene.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import no.nav.familie.tilbake.e2e.domene.dto.felles.Periode
+import no.nav.tilbakekreving.typer.v1.PeriodeDto
 import java.math.BigDecimal
 
-data class VilkårsvurderingStegDto(@JsonProperty("@type")
-                                   val type: String = "VILKÅRSVURDERING",
-                                   val vilkårsvurderingsperioder: List<VilkårsvurderingStegPeriode>)
+/**
+ * DTO-er relatert til behandle steg
+ */
+data class BehandleVilkårsvurderingDto(@JsonProperty("@type")
+                                       val type: String = "VILKÅRSVURDERING",
+                                       val vilkårsvurderingsperioder: List<VilkårsvurderingsperiodeDto>)
 
-data class HentVilkårsvurderingDto(val periode: Periode,
-                                   val vilkårsvurderingsresultat: Vilkårsvurderingsresultat,
-                                   val begrunnelse: String,
-                                   val godTroDto: GodTroDto? = null,
-                                   val aktsomhetDto: AktsomhetDto? = null)
+data class VilkårsvurderingsperiodeDto(val periode: PeriodeDto,
+                                       val vilkårsvurderingsresultat: Vilkårsvurderingsresultat,
+                                       val begrunnelse: String,
+                                       var godTroDto: GodTroDto? = null,
+                                       var aktsomhetDto: AktsomhetDto? = null)
 
-data class VurdertVilkårsvurderingsperiodeDto(val periode: Periode,
+/**
+ * DTO-er relatert til hentVilkårsvurdering
+ */
+data class HentVilkårsvurderingDto(val perioder: List<VurdertVilkårsvurderingsperiodeDto>,
+                                   val rettsgebyr: Long)
+
+data class VurdertVilkårsvurderingsperiodeDto(val periode: PeriodeDto,
                                               val feilutbetaltBeløp: BigDecimal,
                                               val hendelsestype: Hendelsestype,
-                                              val reduserteBeløper: List<RedusertBeløpDto>?,
-                                              val aktiviteter: List<AktivitetDto>,
+                                              val reduserteBeløper: List<RedusertBeløpDto> = listOf(),
+                                              val aktiviteter: List<AktivitetDto> = listOf(),
                                               val vilkårsvurderingsresultatInfo: VurdertVilkårsvurderingsresultatDto? = null,
                                               val begrunnelse: String? = null,
                                               val foreldet: Boolean)
@@ -51,28 +60,24 @@ data class RedusertBeløpDto(val trekk: Boolean,
 data class AktivitetDto(val aktivitet: String,
                         val beløp: BigDecimal)
 
-data class VilkårsvurderingStegPeriode(val periode: Periode,
-                                       var vilkårsvurderingsresultat: Vilkårsvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
-                                       var begrunnelse: String = "Begrunnelse fra autotest",
-                                       var godTroDto: GodTroDto? = null,
-                                       var aktsomhetDto: AktsomhetDto? = null)
-
 data class GodTroDto(var beløpErIBehold: Boolean = true,
                      var beløpTilbakekreves: BigDecimal? = null,
-                     val begrunnelse: String = "God tro begrunnelse fra autotest")
+                     val begrunnelse: String)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class AktsomhetDto(var aktsomhet: Aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
+data class AktsomhetDto(val aktsomhet: Aktsomhet,
                         val ileggRenter: Boolean? = null,
-                        var andelTilbakekreves: BigDecimal? = null,
-                        var beløpTilbakekreves: BigDecimal? = null,
-                        val begrunnelse: String = "Aktsomhetsbegrunnelse fra autotest",
-                        var særligeGrunner: List<SærligGrunnDto>? = null,
-                        var særligeGrunnerTilReduksjon: Boolean = false,
-                        var tilbakekrevSmåbeløp: Boolean? = null,
-                        var særligeGrunnerBegrunnelse: String? = null)
+                        val andelTilbakekreves: BigDecimal? = null,
+                        val beløpTilbakekreves: BigDecimal? = null,
+                        val begrunnelse: String,
+                        val særligeGrunner: List<SærligGrunnDto>? = null,
+                        val særligeGrunnerTilReduksjon: Boolean? = null,
+                        val tilbakekrevSmåbeløp: Boolean? = null,
+                        val særligeGrunnerBegrunnelse: String? = null)
 
-
+/**
+ * Felleskomponenter
+ */
 data class SærligGrunnDto(val særligGrunn: SærligGrunn,
                           val begrunnelse: String? = null)
 
