@@ -59,7 +59,6 @@ class BehandleVilkårsvurderingStegBuilder(hentVilkårsvurderingResponse: HentVi
                                                                   ?: feilutbetaltBeløp else BigDecimal.ZERO)
     }
 
-
     private fun aktsomhetGenerator(aktsomhet: Aktsomhet?,
                                    andelTilbakekreves: BigDecimal?,
                                    beløpTilbakekreves: BigDecimal?,

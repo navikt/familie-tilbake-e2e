@@ -189,7 +189,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
     }
 
     @Test
-    fun `tilbakekrevingsbehandling uten varsel, ikke foreldet, uaktsomhet forsett`() {
+    fun `tilbakekrevingsbehandling uten varsel, tilleggsfrist for foreldelse, uaktsomhet forsett`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         val eksternBrukId = saksbehandler.opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
                                                                 fagsystem = fagsystem,

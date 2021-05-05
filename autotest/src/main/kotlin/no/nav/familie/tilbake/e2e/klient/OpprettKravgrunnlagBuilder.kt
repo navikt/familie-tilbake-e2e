@@ -33,7 +33,7 @@ class OpprettKravgrunnlagBuilder {
                             antallPerioder: Int,
                             under4rettsgebyr: Boolean,
                             muligforeldelse: Boolean,
-                            periodeLengde: Int, ): DetaljertKravgrunnlagMelding {
+                            periodeLengde: Int): DetaljertKravgrunnlagMelding {
         val finalKravgrunnlagId = kravgrunnlagId ?: Random.nextInt(100000, 999999).toBigInteger()
         val finalVedtakId = vedtakId ?: Random.nextInt(100000, 999999).toBigInteger()
         val finalKontrollfelt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"))
@@ -125,7 +125,7 @@ class OpprettKravgrunnlagBuilder {
                 kravgrunnlagPeriode.periode.fom = startDato
                 kravgrunnlagPeriode.periode.tom = startDato.withDayOfMonth(startDato.lengthOfMonth())
                 kravgrunnlagPeriode.belopSkattMnd = BigDecimal(BigInteger.ZERO, 2)
-                kravgrunnlagPeriode.tilbakekrevingsBelop.addAll(tilbakekrevingsBelopGenerator(beløpprmåned, ytelsestype))
+                kravgrunnlagPeriode.tilbakekrevingsBelop.addAll(tilbakekrevingsbelopGenerator(beløpprmåned, ytelsestype))
                 tilbakekrevingsperiodeList.add(kravgrunnlagPeriode)
 
                 startDato = startDato.plusMonths(1)
@@ -135,7 +135,7 @@ class OpprettKravgrunnlagBuilder {
         return tilbakekrevingsperiodeList
     }
 
-    private fun tilbakekrevingsBelopGenerator(beløpprmåned: BigDecimal,
+    private fun tilbakekrevingsbelopGenerator(beløpprmåned: BigDecimal,
                                               ytelsestype: Ytelsestype): Collection<DetaljertKravgrunnlagBelopDto> {
         val ytelKodeKlasse: KodeKlasse
         val feilKodeKlasse: KodeKlasse
