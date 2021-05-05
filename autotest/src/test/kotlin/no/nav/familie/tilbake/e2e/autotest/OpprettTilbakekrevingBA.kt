@@ -72,6 +72,9 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
                                                andelTilbakekreves = BigDecimal(40),
                                                tilbakekrevSmåbeløp = true)
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+        saksbehandler.behandleForeslåVedtak(genererValgfriTekst = false)
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 
     @Test

@@ -4,6 +4,7 @@ import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
+import no.nav.familie.tilbake.e2e.domene.dto.AvsnittDto
 import no.nav.familie.tilbake.e2e.domene.dto.BehandlingDto
 import no.nav.familie.tilbake.e2e.domene.dto.FagsakDto
 import no.nav.familie.tilbake.e2e.domene.dto.VersjonInfoDto
@@ -129,7 +130,16 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return response.data
     }
 
-    // ForeslåVedtak, og FattVedtak/to-trinn
+    fun hentVedtaksbrevtekst(behandlingId: String): List<AvsnittDto>? {
+        val uri = URI.create("$API_URL/dokument/vedtaksbrevtekst/$behandlingId")
+        val response: Ressurs<List<AvsnittDto>> = getForEntity(uri)
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        return response.data
+    }
+
+    // FattVedtak/to-trinn
 
     /*BEHANDLE og SETT-tjenester*/
     fun behandleSteg(stegdata: Any, behandlingId: String) {

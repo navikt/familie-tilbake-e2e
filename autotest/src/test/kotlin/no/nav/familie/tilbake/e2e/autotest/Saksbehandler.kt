@@ -10,6 +10,7 @@ import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
 import no.nav.familie.tilbake.e2e.domene.builder.BehandleFaktaStegBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.BehandleForeldelseStegBuilder
+import no.nav.familie.tilbake.e2e.domene.builder.BehandleForeslåVedtakBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.BehandleVilkårsvurderingStegBuilder
 import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
@@ -192,7 +193,15 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                                           behandlingId = gjeldendeBehandling?.behandlingId!!)
     }
 
-    /** fun behandleForeslåVedtak */
+    fun behandleForeslåVedtak(genererValgfriTekst: Boolean) {
+        val hentVedtakbrevtekstResponse = familieTilbakeKlient.hentVedtaksbrevtekst(gjeldendeBehandling?.behandlingId!!)
+        assertTrue(
+                hentVedtakbrevtekstResponse != null,
+                "Kunne ikke hente vedtaksbrevtekst som skulle behandles")
+        familieTilbakeKlient.behandleSteg(stegdata = BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse = hentVedtakbrevtekstResponse!!,
+                                                                                  genererValgfriTekst = genererValgfriTekst).build(),
+                                          behandlingId = gjeldendeBehandling?.behandlingId!!)
+    }
 
     fun behandleSteg(stegdata: Any, behandlingId: String) {
         familieTilbakeKlient.behandleSteg(stegdata, behandlingId)
