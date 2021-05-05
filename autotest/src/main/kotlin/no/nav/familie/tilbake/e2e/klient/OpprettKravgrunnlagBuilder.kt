@@ -1,8 +1,8 @@
 package no.nav.familie.tilbake.e2e.klient
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.KodeKlasse
-import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.domene.dto.KodeKlasse
+import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
@@ -23,19 +23,17 @@ import kotlin.random.Random
 
 class OpprettKravgrunnlagBuilder {
 
-    fun opprettKravgrunnlag(
-        status: KodeStatusKrav,
-        ytelsestype: Ytelsestype,
-        eksternFagsakId: String,
-        eksternBehandlingId: String,
-        kravgrunnlagId: BigInteger? = null,
-        vedtakId: BigInteger? = null,
-        @Max(6)
-        antallPerioder: Int,
-        under4rettsgebyr: Boolean,
-        muligforeldelse: Boolean,
-        periodeLengde: Int,
-    ): DetaljertKravgrunnlagMelding {
+    fun opprettKravgrunnlag(status: KodeStatusKrav,
+                            ytelsestype: Ytelsestype,
+                            eksternFagsakId: String,
+                            eksternBehandlingId: String,
+                            kravgrunnlagId: BigInteger? = null,
+                            vedtakId: BigInteger? = null,
+                            @Max(6)
+                            antallPerioder: Int,
+                            under4rettsgebyr: Boolean,
+                            muligforeldelse: Boolean,
+                            periodeLengde: Int): DetaljertKravgrunnlagMelding {
         val finalKravgrunnlagId = kravgrunnlagId ?: Random.nextInt(100000, 999999).toBigInteger()
         val finalVedtakId = vedtakId ?: Random.nextInt(100000, 999999).toBigInteger()
         val finalKontrollfelt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"))
@@ -59,14 +57,12 @@ class OpprettKravgrunnlagBuilder {
         response.detaljertKravgrunnlag.kontrollfelt = finalKontrollfelt
         response.detaljertKravgrunnlag.saksbehId = "K231B433"
         response.detaljertKravgrunnlag.referanse = eksternBehandlingId
-        response.detaljertKravgrunnlag.tilbakekrevingsPeriode.addAll(tilbakekrevingsPerioder(
-                antallPerioder = antallPerioder,
-                under4rettsgebyr = under4rettsgebyr,
-                muligforeldelse = muligforeldelse,
-                ytelsestype = ytelsestype,
-                periodeLengde = periodeLengde
-        )
-        )
+        response.detaljertKravgrunnlag.tilbakekrevingsPeriode.addAll(
+                tilbakekrevingsPerioder(antallPerioder = antallPerioder,
+                                        under4rettsgebyr = under4rettsgebyr,
+                                        muligforeldelse = muligforeldelse,
+                                        ytelsestype = ytelsestype,
+                                        periodeLengde = periodeLengde))
         return response
     }
 
@@ -80,13 +76,11 @@ class OpprettKravgrunnlagBuilder {
         }
     }
 
-    fun opprettStatusmelding(
-        vedtakId: BigInteger,
-        kodeStatusKrav: KodeStatusKrav,
-        ytelsestype: Ytelsestype,
-        eksternFagsakId: String,
-        eksternBehandlingId: String
-    ): EndringKravOgVedtakstatus {
+    fun opprettStatusmelding(vedtakId: BigInteger,
+                             kodeStatusKrav: KodeStatusKrav,
+                             ytelsestype: Ytelsestype,
+                             eksternFagsakId: String,
+                             eksternBehandlingId: String): EndringKravOgVedtakstatus {
         val response = EndringKravOgVedtakstatus()
         response.kravOgVedtakstatus = KravOgVedtakstatus()
         response.kravOgVedtakstatus.vedtakId = vedtakId
@@ -99,13 +93,11 @@ class OpprettKravgrunnlagBuilder {
         return response
     }
 
-    private fun tilbakekrevingsPerioder(
-            antallPerioder: Int,
-            under4rettsgebyr: Boolean,
-            muligforeldelse: Boolean,
-            ytelsestype: Ytelsestype,
-            periodeLengde: Int,
-    ): List<DetaljertKravgrunnlagPeriodeDto> {
+    private fun tilbakekrevingsPerioder(antallPerioder: Int,
+                                        under4rettsgebyr: Boolean,
+                                        muligforeldelse: Boolean,
+                                        ytelsestype: Ytelsestype,
+                                        periodeLengde: Int, ): List<DetaljertKravgrunnlagPeriodeDto> {
         /*Lager alltid periodene 3 måneder lange med 1 måned mellom, så derfor gange med 4.
         Første periode starter for 3 år siden når det skal være muligforeldelse eller for 4 måneder siden gange med antall perioder*/
         var startDato = if (muligforeldelse) {
@@ -115,8 +107,7 @@ class OpprettKravgrunnlagBuilder {
             val multiplierPgaPeriodeLengde = if (periodeLengde > 3) 2 else 1
             LocalDate.now()
                     .minusMonths(BigDecimal(4).multiply(BigDecimal((antallPerioder * multiplierPgaPeriodeLengde))).toLong())
-                    .withDayOfMonth(
-                            1)
+                    .withDayOfMonth(1)
         }
 
         /*Setter feilutbetalt beløp til 20000 kr, med mindre det skal være under4rettsgebyr, da skal det være under 4796 kr pr jan.2021*/
@@ -134,7 +125,7 @@ class OpprettKravgrunnlagBuilder {
                 kravgrunnlagPeriode.periode.fom = startDato
                 kravgrunnlagPeriode.periode.tom = startDato.withDayOfMonth(startDato.lengthOfMonth())
                 kravgrunnlagPeriode.belopSkattMnd = BigDecimal(BigInteger.ZERO, 2)
-                kravgrunnlagPeriode.tilbakekrevingsBelop.addAll(tilbakekrevingsBelopGenerator(beløpprmåned, ytelsestype))
+                kravgrunnlagPeriode.tilbakekrevingsBelop.addAll(tilbakekrevingsbelopGenerator(beløpprmåned, ytelsestype))
                 tilbakekrevingsperiodeList.add(kravgrunnlagPeriode)
 
                 startDato = startDato.plusMonths(1)
@@ -144,10 +135,8 @@ class OpprettKravgrunnlagBuilder {
         return tilbakekrevingsperiodeList
     }
 
-    private fun tilbakekrevingsBelopGenerator(
-        beløpprmåned: BigDecimal,
-        ytelsestype: Ytelsestype,
-    ): Collection<DetaljertKravgrunnlagBelopDto> {
+    private fun tilbakekrevingsbelopGenerator(beløpprmåned: BigDecimal,
+                                              ytelsestype: Ytelsestype): Collection<DetaljertKravgrunnlagBelopDto> {
         val ytelKodeKlasse: KodeKlasse
         val feilKodeKlasse: KodeKlasse
         when (ytelsestype) {

@@ -2,15 +2,13 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.Behandlingssteg
-import no.nav.familie.tilbake.e2e.domene.Behandlingsstegstatus
-import no.nav.familie.tilbake.e2e.domene.KodeStatusKrav
-import no.nav.familie.tilbake.e2e.domene.Venteårsak
-import no.nav.familie.tilbake.e2e.domene.steg.dto.FaktaSteg
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Hendelsestype
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Hendelsesundertype
-import no.nav.familie.tilbake.e2e.domene.steg.dto.ForeldelseSteg
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.domene.dto.Behandlingssteg
+import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstegstatus
+import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.domene.dto.Hendelsestype
+import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -41,74 +39,65 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
     @Test
     fun `tilbakekrevingsbehandling med varsel, gjenoppta, kravgrunnlag med foreldelse`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-        val eksternBrukId = saksbehandler.opprettTilbakekreving(
-                eksternFagsakId = eksternFagsakId,
-                fagsystem = fagsystem,
-                ytelsestype = ytelsestype,
-                varsel = true,
-                verge = false
-        )
+        val eksternBrukId = saksbehandler.opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+                                                                fagsystem = fagsystem,
+                                                                ytelsestype = ytelsestype,
+                                                                varsel = true,
+                                                                verge = false)
 
-        val behandlingId = saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
-        saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
-        saksbehandler.taBehandlingAvVent(behandlingId)
-        saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+        saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
+        saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+        saksbehandler.taBehandlingAvVent()
+        saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
         saksbehandler.opprettKravgrunnlag(
-            status = KodeStatusKrav.NY,
-            antallPerioder = 4,
-            under4rettsgebyr = false,
-            muligforeldelse = true,
-            periodeLengde = 4,
-        )
+                status = KodeStatusKrav.NY,
+                antallPerioder = 4,
+                under4rettsgebyr = false,
+                muligforeldelse = true,
+                periodeLengde = 4,)
 
-        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-        val faktasteg: FaktaSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.FAKTA, behandlingId) as FaktaSteg
-        faktasteg.addFaktaVurdering(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
-        saksbehandler.behandleSteg(faktasteg, behandlingId)
-        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
+        saksbehandler.behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
-        val foreldelsesteg: ForeldelseSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.FORELDELSE, behandlingId) as ForeldelseSteg
-        foreldelsesteg.addForeldelseVurdering(Foreldelsesvurderingstype.IKKE_FORELDET)
-        saksbehandler.behandleSteg(foreldelsesteg, behandlingId)
-        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+        saksbehandler.behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
+        saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
     }
 
     @Test
     fun `tilbakekrevingsbehandling uten varsel med NY kravgrunnlag, SPER melding, ENDR melding, behandling av Fakta`() {
         val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-        val eksternBrukId = saksbehandler.opprettTilbakekreving(
-                eksternFagsakId = eksternFagsakId,
-                fagsystem = fagsystem,
-                ytelsestype = ytelsestype,
-                varsel = false,
-                verge = false
-        )
+        val eksternBrukId = saksbehandler.opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+                                                                fagsystem = fagsystem,
+                                                                ytelsestype = ytelsestype,
+                                                                varsel = false,
+                                                                verge = false)
 
-        val behandlingId = saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
-        saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+        saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
+        saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-        saksbehandler.opprettKravgrunnlag(
-            status = KodeStatusKrav.NY,
-            antallPerioder = 4,
-            under4rettsgebyr = false,
-            muligforeldelse = false)
-        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+        saksbehandler.opprettKravgrunnlag(status = KodeStatusKrav.NY,
+                                          antallPerioder = 4,
+                                          under4rettsgebyr = false,
+                                          muligforeldelse = false)
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
         saksbehandler.opprettStatusmelding(KodeStatusKrav.SPER)
-        saksbehandler.erBehandlingPåVent(behandlingId, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+        saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
         saksbehandler.opprettStatusmelding(KodeStatusKrav.ENDR)
-        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-        val faktasteg: FaktaSteg = saksbehandler.hentBehandlingssteg(Behandlingssteg.FAKTA, behandlingId) as FaktaSteg
-        faktasteg.addFaktaVurdering(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
-        saksbehandler.behandleSteg(faktasteg, behandlingId)
-        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+        saksbehandler.behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
-        saksbehandler.settBehandlingPåVent(behandlingId, Venteårsak.AVVENTER_DOKUMENTASJON, LocalDate.now().plusWeeks(3))
-        saksbehandler.taBehandlingAvVent(behandlingId)
-        saksbehandler.erBehandlingISteg(behandlingId, Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+        saksbehandler.behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
 
+        saksbehandler.settBehandlingPåVent(Venteårsak.AVVENTER_DOKUMENTASJON, LocalDate.now().plusWeeks(3))
+        // TODO: saksbehandler.erBehandlingPåVent()
+
+        saksbehandler.taBehandlingAvVent()
+        saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
     }
 
 }

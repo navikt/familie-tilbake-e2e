@@ -4,13 +4,14 @@ import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
-import no.nav.familie.tilbake.e2e.domene.Behandling
-import no.nav.familie.tilbake.e2e.domene.Fagsak
-import no.nav.familie.tilbake.e2e.domene.VersjonInfo
-import no.nav.familie.tilbake.e2e.domene.steg.dto.BehandlingPåVent
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Fakta
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Foreldelse
-import no.nav.familie.tilbake.e2e.domene.steg.dto.Henlegg
+import no.nav.familie.tilbake.e2e.domene.dto.BehandlingDto
+import no.nav.familie.tilbake.e2e.domene.dto.FagsakDto
+import no.nav.familie.tilbake.e2e.domene.dto.VersjonInfoDto
+import no.nav.familie.tilbake.e2e.domene.dto.HentFaktaDto
+import no.nav.familie.tilbake.e2e.domene.dto.HentForeldelseDto
+import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVentDto
+import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
+import no.nav.familie.tilbake.e2e.domene.dto.HentVilkårsvurderingDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import org.hibernate.validator.internal.util.Contracts.assertTrue
@@ -40,23 +41,26 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
 
     fun opprettTilbakekreving(opprettTilbakekrevingRequest: OpprettTilbakekrevingRequest): String? {
         val response: Ressurs<String> = postForEntity(BEHANDLING_URL_V1, opprettTilbakekrevingRequest)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-                             "Opprett behandling skulle hatt status SUKSESS. Istedet fikk den ${response.status} med melding ${response.melding}")
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "Opprett behandling skulle hatt status SUKSESS. Istedet fikk den ${response.status} med melding ${response.melding}")
         return response.data
     }
 
     fun opprettKravgrunnlag(kravgrunnlag: DetaljertKravgrunnlagMelding) {
         val xml = jaxbObjectToXML(kravgrunnlag, DetaljertKravgrunnlagMelding::class.java)
         val response: Ressurs<String> = postForEntity(OPPRETT_KRAVGRUNNLAG_URI, xml)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-                             "Opprett kravgrunnlag feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "Opprett kravgrunnlag feilet. Status ${response.status}, feilmelding: ${response.melding}")
     }
 
     fun opprettStatusmelding(statusmelding: EndringKravOgVedtakstatus) {
         val xml = jaxbObjectToXML(statusmelding, EndringKravOgVedtakstatus::class.java)
         val response: Ressurs<String> = postForEntity(OPPRETT_STATUSMELDING_URI, xml)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-            "Opprett statusmelding feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "Opprett statusmelding feilet. Status ${response.status}, feilmelding: ${response.melding}")
     }
 
     private fun jaxbObjectToXML(melding: Any, returntype: Class<*>): String {
@@ -70,76 +74,93 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
 
     /*HENT-tjenester*/
 
-    fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Fagsak? {
+    fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): FagsakDto? {
         val uri = URI.create("$FAGSAK_URL_V1/$fagsystem/fagsak/$eksternFagsakId/v1")
-        val response: Ressurs<Fagsak> = getForEntity(uri)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-                             "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        val response: Ressurs<FagsakDto> = getForEntity(uri)
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
         return response.data
     }
 
-    fun hentBehandling(behandlingId: String): Behandling? {
+    fun hentBehandling(behandlingId: String): BehandlingDto? {
         val uri = URI.create("$BEHANDLING_URL_V1/$behandlingId")
-        val response: Ressurs<Behandling> = getForEntity(uri)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-                             "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        val response: Ressurs<BehandlingDto> = getForEntity(uri)
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
         return response.data
     }
 
-    fun hentVersjonInfo(): VersjonInfo? {
+    fun hentVersjonInfo(): VersjonInfoDto? {
         val uri = URI.create("$VERSION_URL")
-        val response: Ressurs<VersjonInfo> = getForEntity(uri)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-            "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        val response: Ressurs<VersjonInfoDto> = getForEntity(uri)
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
         return response.data
     }
 
     /*HENT-tjenester for behandlings-steg*/
-    fun hentFakta(behandlingId: String): Fakta? {
+    fun hentFakta(behandlingId: String): HentFaktaDto? {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/fakta/v1")
-        val response: Ressurs<Fakta> = getForEntity(uri)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-                             "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        val response: Ressurs<HentFaktaDto> = getForEntity(uri)
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
         return response.data
     }
 
-    fun hentForeldelse(behandlingId: String): Foreldelse? {
+    fun hentForeldelse(behandlingId: String): HentForeldelseDto? {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/foreldelse/v1")
-        val response: Ressurs<Foreldelse> = getForEntity(uri)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-            "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
-
+        val response: Ressurs<HentForeldelseDto> = getForEntity(uri)
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
         return response.data
     }
 
-    // Vilkårsvurdering, ForeslåVedtak, og FattVedtak/to-trinn
+    fun hentVilkårsvurdering(behandlingId: String): HentVilkårsvurderingDto? {
+        val uri = URI.create("$BEHANDLING_BASE/$behandlingId/vilkarsvurdering/v1")
+        val response: Ressurs<HentVilkårsvurderingDto> = getForEntity(uri)
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        return response.data
+    }
+
+    // ForeslåVedtak, og FattVedtak/to-trinn
 
     /*BEHANDLE og SETT-tjenester*/
-    fun behandleSteg(stegdata: Any, behandlingId: String){
+    fun behandleSteg(stegdata: Any, behandlingId: String) {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/steg/v1")
         val response: Ressurs<String> = postForEntity(uri, stegdata)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-            "Behandle steg feilet.")
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "Behandle steg feilet.")
     }
 
-    fun settBehandlingPåVent(data: BehandlingPåVent, behandlingId: String){
+    fun settBehandlingPåVent(data: BehandlingPåVentDto, behandlingId: String) {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/vent/v1")
         val response: Ressurs<String> = putForEntity(uri, data)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-            "PUT feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "PUT feilet. Status ${response.status}, feilmelding: ${response.melding}")
     }
 
-    fun taBehandlingAvVent(behandlingId: String){
+    fun taBehandlingAvVent(behandlingId: String) {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/gjenoppta/v1")
-        val response: Ressurs<String> = putForEntity(uri,"")
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-            "PUT feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        val response: Ressurs<String> = putForEntity(uri, "")
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "PUT feilet. Status ${response.status}, feilmelding: ${response.melding}")
     }
 
-    fun henleggBehandling(behandlingId: String, data: Henlegg){
+    fun henleggBehandling(behandlingId: String, data: HenleggDto) {
         val uri = URI.create("$BEHANDLING_BASE/$behandlingId/henlegg/v1")
         val response: Ressurs<String> = putForEntity(uri, data)
-        assertTrue(response.status == Ressurs.Status.SUKSESS,
-            "PUT feilet. Status ${response.status}, feilmelding: ${response.melding}")
+        assertTrue(
+                response.status == Ressurs.Status.SUKSESS,
+                "PUT feilet. Status ${response.status}, feilmelding: ${response.melding}")
     }
 }
