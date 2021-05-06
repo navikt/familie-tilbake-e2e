@@ -32,13 +32,13 @@ class BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse: List<AvsnittDto
         return if (underavsnittsliste
                         .filter { it.fritekstTillatt }
                         .any { it.underavsnittstype == underavsnittstype }) {
-                            "Dette er en automatisk vurdering fra Autotest for avsnitt $underavsnittstype"
+                            "Dette er en automatisk vurdering fra Autotest for underavsnitt $underavsnittstype."
         } else null
     }
 
     fun build(): ForeslåVedtakDto {
         return ForeslåVedtakDto(fritekstavsnitt = FritekstavsnittDto(
-                oppsummeringstekst = "Oppsummeringstekst fra Autotest",
+                oppsummeringstekst = "Dette er en automatisk oppsummeringstekst fra Autotest.",
                 perioderMedTekst = perioderMedTekst.toList()))
     }
 }
