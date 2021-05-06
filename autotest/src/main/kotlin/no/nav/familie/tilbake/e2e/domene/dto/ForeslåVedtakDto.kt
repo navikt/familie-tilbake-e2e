@@ -14,8 +14,8 @@ data class ForeslåVedtakDto(@JsonProperty("@type")
                             val type: String = "FORESLÅ_VEDTAK",
                             val fritekstavsnitt: FritekstavsnittDto)
 
-data class FritekstavsnittDto(var oppsummeringstekst: String? = null,
-                              var perioderMedTekst: List<PeriodeMedTekstDto>)
+data class FritekstavsnittDto(val oppsummeringstekst: String? = null,
+                              val perioderMedTekst: List<PeriodeMedTekstDto>)
 
 data class PeriodeMedTekstDto(val periode: PeriodeDto,
                               val faktaAvsnitt: String? = null,

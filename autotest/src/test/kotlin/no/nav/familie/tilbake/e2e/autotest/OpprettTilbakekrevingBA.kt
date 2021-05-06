@@ -73,7 +73,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
                                                tilbakekrevSmåbeløp = true)
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
-        saksbehandler.behandleForeslåVedtak(genererValgfriTekst = false)
+        saksbehandler.behandleForeslåVedtak()
         saksbehandler.erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 
@@ -118,6 +118,9 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
                                                                        SærligGrunn.STØRRELSE_BELØP,
                                                                        SærligGrunn.ANNET))
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+        saksbehandler.behandleForeslåVedtak()
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 
     @Test
@@ -143,6 +146,9 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.behandleForeldelse(Foreldelsesvurderingstype.FORELDET)
         saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.AUTOUTFØRT)
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+        saksbehandler.behandleForeslåVedtak()
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 
     @Test
@@ -185,7 +191,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
                                                beløpTilbakekreves = BigDecimal(4400.0))
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
-        //Todo: Legge til behandling av  Foreslå_Vedtak
+        saksbehandler.behandleForeslåVedtak()
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
         saksbehandler.opprettStatusmelding(KodeStatusKrav.AVSL)
         // saksbehandler.erBehandlingAvsluttet(behandlingId, Behandlingsresultatstype.HENLAGT_KRAVGRUNNLAG_NULLSTILT)
@@ -217,5 +224,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
         saksbehandler.behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
                                                aktsomhet = Aktsomhet.FORSETT)
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+        saksbehandler.behandleForeslåVedtak()
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 }

@@ -193,13 +193,12 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                                           behandlingId = gjeldendeBehandling?.behandlingId!!)
     }
 
-    fun behandleForeslåVedtak(genererValgfriTekst: Boolean) {
+    fun behandleForeslåVedtak() {
         val hentVedtakbrevtekstResponse = familieTilbakeKlient.hentVedtaksbrevtekst(gjeldendeBehandling?.behandlingId!!)
         assertTrue(
                 hentVedtakbrevtekstResponse != null,
                 "Kunne ikke hente vedtaksbrevtekst som skulle behandles")
-        familieTilbakeKlient.behandleSteg(stegdata = BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse = hentVedtakbrevtekstResponse!!,
-                                                                                  genererValgfriTekst = genererValgfriTekst).build(),
+        familieTilbakeKlient.behandleSteg(stegdata = BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse = hentVedtakbrevtekstResponse!!).build(),
                                           behandlingId = gjeldendeBehandling?.behandlingId!!)
     }
 

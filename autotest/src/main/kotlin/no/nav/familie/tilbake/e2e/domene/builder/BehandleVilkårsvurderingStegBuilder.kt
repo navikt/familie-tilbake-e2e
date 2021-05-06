@@ -24,6 +24,8 @@ class BehandleVilkårsvurderingStegBuilder(hentVilkårsvurderingResponse: HentVi
     private val BEGRUNNELSE = "Dette er en automatisk begrunnelse fra Autotest"
 
     init {
+        require(!(andelTilbakekreves != null && beløpTilbakekreves != null))
+        { "Kan ikke sette både andelTilbakekreves og beløpTilbakekreves" }
         hentVilkårsvurderingResponse.perioder.forEach {
             vilkårsvurderingsperioder.add(
                     VilkårsvurderingsperiodeDto(periode = it.periode,

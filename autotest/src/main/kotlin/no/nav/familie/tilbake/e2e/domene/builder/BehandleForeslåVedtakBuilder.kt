@@ -9,40 +9,30 @@ import no.nav.familie.tilbake.e2e.domene.dto.UnderavsnittDto
 import no.nav.familie.tilbake.e2e.domene.dto.Underavsnittstype
 import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
 
-class BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse: List<AvsnittDto>,
-                                   genererValgfriTekst: Boolean? = false) {
+class BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse: List<AvsnittDto>) {
 
     private val perioderMedTekst: MutableList<PeriodeMedTekstDto> = mutableListOf()
-    private val VURDERINGSTEKST: String = "Dette er en automatisk vurdering fra Autotest for avsnitt"
 
     init {
-
         hentVedtakbrevtekstResponse.filter { it.avsnittstype == Avsnittstype.PERIODE }.forEach {
             perioderMedTekst.add(
                     PeriodeMedTekstDto(
                             periode = PeriodeDto(fom = it.fom!!,
                                                  tom = it.tom!!),
-                            faktaAvsnitt = utledAvsnitt(it.underavsnittsliste, Underavsnittstype.FAKTA, genererValgfriTekst),
-                            foreldelseAvsnitt = utledAvsnitt(it.underavsnittsliste, Underavsnittstype.FORELDELSE, genererValgfriTekst),
-                            vilkårAvsnitt = utledAvsnitt(it.underavsnittsliste, Underavsnittstype.VILKÅR, genererValgfriTekst),
-                            særligeGrunnerAvsnitt = utledAvsnitt(it.underavsnittsliste, Underavsnittstype.SÆRLIGEGRUNNER, genererValgfriTekst),
-                            særligeGrunnerAnnetAvsnitt = utledAvsnitt(it.underavsnittsliste, Underavsnittstype.SÆRLIGEGRUNNER_ANNET, genererValgfriTekst)))
+                            faktaAvsnitt = utledAvsnitt(it.underavsnittsliste, Underavsnittstype.FAKTA),
+                            foreldelseAvsnitt = utledAvsnitt(it.underavsnittsliste, Underavsnittstype.FORELDELSE),
+                            vilkårAvsnitt = utledAvsnitt(it.underavsnittsliste, Underavsnittstype.VILKÅR),
+                            særligeGrunnerAvsnitt = utledAvsnitt(it.underavsnittsliste, Underavsnittstype.SÆRLIGEGRUNNER),
+                            særligeGrunnerAnnetAvsnitt = utledAvsnitt(it.underavsnittsliste, Underavsnittstype.SÆRLIGEGRUNNER_ANNET)))
         }
     }
 
-    private fun harAvsnittUnderavsnittstype(underavsnittsliste: List<UnderavsnittDto>,
-                                            underavsnittstype: Underavsnittstype): Boolean {
-        return underavsnittsliste.any { it.underavsnittstype == underavsnittstype }
-    }
-
     private fun utledAvsnitt(underavsnittsliste: List<UnderavsnittDto>,
-                             underavsnittstype: Underavsnittstype,
-                             genererValgfriTekst: Boolean?): String? {
-        return if (underavsnittsliste.filter{
-                    it.fritekstTillatt &&
-                    it.fritekstPåkrevet != genererValgfriTekst }
+                             underavsnittstype: Underavsnittstype): String? {
+        return if (underavsnittsliste
+                        .filter { it.fritekstTillatt }
                         .any { it.underavsnittstype == underavsnittstype }) {
-            "$VURDERINGSTEKST $underavsnittstype"
+                            "Dette er en automatisk vurdering fra Autotest for avsnitt $underavsnittstype"
         } else null
     }
 
