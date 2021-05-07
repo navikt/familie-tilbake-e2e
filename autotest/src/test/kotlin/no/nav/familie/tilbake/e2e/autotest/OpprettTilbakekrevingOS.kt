@@ -2,13 +2,16 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
+import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.domene.dto.Behandlingssteg
 import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstegstatus
 import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
 import no.nav.familie.tilbake.e2e.domene.dto.Hendelsestype
 import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
+import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.random.Random
 
@@ -55,15 +59,23 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
                 antallPerioder = 4,
                 under4rettsgebyr = false,
                 muligforeldelse = true,
-                periodeLengde = 4,)
-
+                periodeLengde = 4)
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-        saksbehandler.behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+        saksbehandler.behandleFakta(Hendelsestype.EF_ANNET, Hendelsesundertype.ANNET_FRITEKST)
         saksbehandler.erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
         saksbehandler.behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
         saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+        saksbehandler.behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
+                                               aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
+                                               særligeGrunner = listOf(SærligGrunn.STØRRELSE_BELØP, SærligGrunn.ANNET),
+                                               andelTilbakekreves = BigDecimal.valueOf(60.0))
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+        saksbehandler.behandleForeslåVedtak()
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 
     @Test
@@ -83,21 +95,30 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
                                           under4rettsgebyr = false,
                                           muligforeldelse = false)
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
         saksbehandler.opprettStatusmelding(KodeStatusKrav.SPER)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
         saksbehandler.opprettStatusmelding(KodeStatusKrav.ENDR)
         saksbehandler.erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-        saksbehandler.behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
-        saksbehandler.erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
-
-        saksbehandler.behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
+        saksbehandler.behandleFakta(Hendelsestype.EF_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+        saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
         saksbehandler.settBehandlingPåVent(Venteårsak.AVVENTER_DOKUMENTASJON, LocalDate.now().plusWeeks(3))
-        // TODO: saksbehandler.erBehandlingPåVent()
+        saksbehandler.erBehandlingPåVent(Venteårsak.AVVENTER_DOKUMENTASJON)
 
         saksbehandler.taBehandlingAvVent()
         saksbehandler.erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+        saksbehandler.behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
+                                               beløpErIBehold = true,
+                                               beløpTilbakekreves = BigDecimal.valueOf(2400))
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+        saksbehandler.behandleForeslåVedtak()
+        saksbehandler.erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
     }
 
 }

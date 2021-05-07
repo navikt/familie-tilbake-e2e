@@ -155,6 +155,9 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun behandleFakta(hendelsestype: Hendelsestype, hendelsesundertype: Hendelsesundertype) {
         val hentFaktaResponse = familieTilbakeKlient.hentFakta(gjeldendeBehandling?.behandlingId!!)
+        assertTrue(
+                hentFaktaResponse != null,
+                "Kunne ikke hente fakta som skulle behandles")
         familieTilbakeKlient.behandleSteg(stegdata = BehandleFaktaStegBuilder(hentFaktaResponse = hentFaktaResponse!!,
                                                                               hendelsestype = hendelsestype,
                                                                               hendelsesundertype = hendelsesundertype).build(),
