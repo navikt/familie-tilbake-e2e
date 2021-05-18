@@ -1,6 +1,6 @@
 package no.nav.familie.tilbake.e2e.autotest
 
-import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
+import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsresultatstype
 import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstatus
@@ -47,8 +47,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                                                                                 fagsystem = fagsystem,
                                                                                 ytelsestype = ytelsestype,
                                                                                 varsel = varsel,
-                                                                                verge = verge
-        )
+                                                                                verge = verge)
         val eksternBrukId = familieTilbakeKlient.opprettTilbakekreving(request)
         println("Opprettet behandling med eksternFagsakId: $eksternFagsakId og eksternBrukId: $eksternBrukId")
 

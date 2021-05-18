@@ -1,7 +1,7 @@
 package no.nav.familie.tilbake.e2e.domene.dto
 
-import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
-import no.nav.familie.kontrakter.felles.tilbakekreving.Språkkode
+import no.nav.familie.kontrakter.felles.Fagsystem
+import no.nav.familie.kontrakter.felles.Språkkode
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import java.time.LocalDate
 import java.util.UUID

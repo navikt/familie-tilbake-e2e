@@ -14,7 +14,8 @@ class BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse: List<AvsnittDto
     private val perioderMedTekst: MutableList<PeriodeMedTekstDto> = mutableListOf()
 
     init {
-        hentVedtakbrevtekstResponse.filter { it.avsnittstype == Avsnittstype.PERIODE }.forEach {
+        hentVedtakbrevtekstResponse.filter { it.avsnittstype == Avsnittstype.PERIODE &&
+                                             it.fom != null && it.tom != null }.forEach {
             perioderMedTekst.add(
                     PeriodeMedTekstDto(
                             periode = PeriodeDto(fom = it.fom!!,
@@ -29,10 +30,8 @@ class BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse: List<AvsnittDto
 
     private fun utledAvsnitt(underavsnittsliste: List<UnderavsnittDto>,
                              underavsnittstype: Underavsnittstype): String? {
-        return if (underavsnittsliste
-                        .filter { it.fritekstTillatt }
-                        .any { it.underavsnittstype == underavsnittstype }) {
-                            "Dette er en automatisk vurdering fra Autotest for underavsnitt $underavsnittstype."
+        return if (underavsnittsliste.any { it.fritekstTillatt && it.underavsnittstype == underavsnittstype }) {
+            "Dette er en automatisk vurdering fra Autotest for underavsnitt $underavsnittstype."
         } else null
     }
 

@@ -1,6 +1,6 @@
 package no.nav.familie.tilbake.e2e.autotest
 
-import no.nav.familie.kontrakter.felles.tilbakekreving.Fagsystem
+import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.domene.dto.Behandlingssteg
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -113,7 +114,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
 
         saksbehandler.behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
                                                aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
-                                               andelTilbakekreves = BigDecimal(45),
+                                               andelTilbakekreves = BigDecimal(0),
                                                særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET,
                                                                        SærligGrunn.STØRRELSE_BELØP,
                                                                        SærligGrunn.ANNET))
