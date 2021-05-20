@@ -38,11 +38,13 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     /*OPPRETT-metoder*/
 
-    fun opprettTilbakekreving(eksternFagsakId: String,
-                              fagsystem: Fagsystem,
-                              ytelsestype: Ytelsestype,
-                              varsel: Boolean,
-                              verge: Boolean, ): String? {
+    fun opprettTilbakekreving(
+            eksternFagsakId: String,
+            fagsystem: Fagsystem,
+            ytelsestype: Ytelsestype,
+            varsel: Boolean,
+            verge: Boolean,
+    ): String {
         val request = opprettTilbakekrevingBuilder.opprettTilbakekrevingRequest(eksternFagsakId = eksternFagsakId,
                                                                                 fagsystem = fagsystem,
                                                                                 ytelsestype = ytelsestype,
@@ -140,7 +142,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
     /*HENT-metoder*/
 
     fun hentBehandlingId(fagsystem: Fagsystem, eksternFagsakId: String, eksternBrukId: String?) {
-        familieTilbakeKlient.hentFagsak(fagsystem, eksternFagsakId)?.behandlinger?.forEach {
+        familieTilbakeKlient.hentFagsak(fagsystem, eksternFagsakId).behandlinger.forEach {
             if (it.eksternBrukId.toString() == eksternBrukId) {
                 gjeldendeBehandling?.behandlingId = it.behandlingId.toString()
                 // return it.behandlingId.toString()
@@ -154,10 +156,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun behandleFakta(hendelsestype: Hendelsestype, hendelsesundertype: Hendelsesundertype) {
         val hentFaktaResponse = familieTilbakeKlient.hentFakta(gjeldendeBehandling?.behandlingId!!)
-        assertTrue(
-                hentFaktaResponse != null,
-                "Kunne ikke hente fakta som skulle behandles")
-        familieTilbakeKlient.behandleSteg(stegdata = BehandleFaktaStegBuilder(hentFaktaResponse = hentFaktaResponse!!,
+        familieTilbakeKlient.behandleSteg(stegdata = BehandleFaktaStegBuilder(hentFaktaResponse = hentFaktaResponse,
                                                                               hendelsestype = hendelsestype,
                                                                               hendelsesundertype = hendelsesundertype).build(),
                                           behandlingId = gjeldendeBehandling?.behandlingId!!)
@@ -165,10 +164,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun behandleForeldelse(beslutning: Foreldelsesvurderingstype) {
         val hentForeldelseResponse = familieTilbakeKlient.hentForeldelse(gjeldendeBehandling?.behandlingId!!)
-        assertTrue(
-                hentForeldelseResponse != null,
-                "Kunne ikke hente foreldelse som skulle behandles")
-        familieTilbakeKlient.behandleSteg(stegdata = BehandleForeldelseStegBuilder(hentForeldelseResponse = hentForeldelseResponse!!,
+        familieTilbakeKlient.behandleSteg(stegdata = BehandleForeldelseStegBuilder(hentForeldelseResponse = hentForeldelseResponse,
                                                                                    beslutning = beslutning).build(),
                                           behandlingId = gjeldendeBehandling?.behandlingId!!)
     }
@@ -181,9 +177,6 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                                  beløpTilbakekreves: BigDecimal? = null,
                                  tilbakekrevSmåbeløp: Boolean? = null) {
         val hentVilkårsvurderingResponse = familieTilbakeKlient.hentVilkårsvurdering(gjeldendeBehandling?.behandlingId!!)
-        assertTrue(
-                hentVilkårsvurderingResponse != null,
-                "Kunne ikke hente vilkårsvurdering som skulle behandles")
         familieTilbakeKlient.behandleSteg(stegdata = BehandleVilkårsvurderingStegBuilder(hentVilkårsvurderingResponse = hentVilkårsvurderingResponse!!,
                                                                                          vilkårvurderingsresultat = vilkårvurderingsresultat,
                                                                                          aktsomhet = aktsomhet,
@@ -197,9 +190,6 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun behandleForeslåVedtak() {
         val hentVedtakbrevtekstResponse = familieTilbakeKlient.hentVedtaksbrevtekst(gjeldendeBehandling?.behandlingId!!)
-        assertTrue(
-                hentVedtakbrevtekstResponse != null,
-                "Kunne ikke hente vedtaksbrevtekst som skulle behandles")
         familieTilbakeKlient.behandleSteg(stegdata = BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse = hentVedtakbrevtekstResponse!!).build(),
                                           behandlingId = gjeldendeBehandling?.behandlingId!!)
     }
@@ -236,7 +226,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
     fun erBehandlingPåVent(venteårsak: Venteårsak) {
         Vent.til(
                 {
-                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling?.behandlingId!!)?.behandlingsstegsinfo?.any {
+                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling?.behandlingId!!).behandlingsstegsinfo.any {
                         it.behandlingsstegstatus == Behandlingsstegstatus.VENTER && it.venteårsak == venteårsak
                     }
                 },
@@ -248,7 +238,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                           behandlingsstegstatus: Behandlingsstegstatus) {
         Vent.til(
                 {
-                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling?.behandlingId!!)?.behandlingsstegsinfo?.any {
+                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling?.behandlingId!!).behandlingsstegsinfo.any {
                         it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus
                     }
                 },
@@ -258,7 +248,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun erBehandlingAvsluttet(behandlingId: String, resultat: Behandlingsresultatstype) {
         Vent.til(
-                { familieTilbakeKlient.hentBehandling(behandlingId)?.status == Behandlingsstatus.AVSLUTTET },
+                { familieTilbakeKlient.hentBehandling(behandlingId).status == Behandlingsstatus.AVSLUTTET },
                 30, "Behandlingen fikk aldri status AVSLUTTET")
         val behandling = familieTilbakeKlient.hentBehandling(behandlingId)
         val henlagttyper = listOf(Behandlingsresultatstype.HENLAGT,
@@ -273,7 +263,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         when (resultat) {
             in henlagttyper -> {
                 assertTrue(
-                        behandling!!.erBehandlingHenlagt,
+                        behandling.erBehandlingHenlagt,
                         "Behandling var i status AVSLUTTET med resultat $resultat men erBehandlingHenlagt verdi var FALSE")
                 assertTrue(behandling.behandlingsstegsinfo.filter {
                     it.behandlingssteg != Behandlingssteg.VARSEL
