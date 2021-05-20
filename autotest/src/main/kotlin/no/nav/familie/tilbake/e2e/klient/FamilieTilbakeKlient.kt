@@ -83,7 +83,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         assertTrue(
                 response.status == Ressurs.Status.SUKSESS,
                 "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
-        return response.data!!
+        return requireNotNull(response.data)
     }
 
     fun hentBehandling(behandlingId: String): BehandlingDto {
@@ -92,7 +92,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         assertTrue(
                 response.status == Ressurs.Status.SUKSESS,
                 "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
-        return response.data!!
+        return requireNotNull(response.data)
     }
 
     fun hentVersjonInfo(): VersjonInfoDto {
@@ -101,7 +101,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         assertTrue(
                 response.status == Ressurs.Status.SUKSESS,
                 "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
-        return response.data!!
+        return requireNotNull(response.data)
     }
 
     /*HENT-tjenester for behandlings-steg*/
@@ -111,7 +111,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         assertTrue(
                 response.status == Ressurs.Status.SUKSESS,
                 "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
-        return response.data!!
+        return requireNotNull(response.data)
     }
 
     fun hentForeldelse(behandlingId: String): HentForeldelseDto {
@@ -120,7 +120,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         assertTrue(
                 response.status == Ressurs.Status.SUKSESS,
                 "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
-        return response.data!!
+        return requireNotNull(response.data)
     }
 
     fun hentVilkårsvurdering(behandlingId: String): HentVilkårsvurderingDto {
@@ -129,7 +129,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         assertTrue(
                 response.status == Ressurs.Status.SUKSESS,
                 "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
-        return response.data!!
+        return requireNotNull(response.data)
     }
 
     fun hentVedtaksbrevtekst(behandlingId: String): List<AvsnittDto> {
@@ -138,7 +138,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         assertTrue(
                 response.status == Ressurs.Status.SUKSESS,
                 "GET feilet. Status ${response.status}, feilmelding: ${response.melding}")
-        return response.data!!
+        return requireNotNull(response.data)
     }
 
     // FattVedtak/to-trinn
