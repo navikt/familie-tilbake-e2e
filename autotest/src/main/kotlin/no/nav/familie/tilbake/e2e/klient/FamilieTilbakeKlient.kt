@@ -27,8 +27,8 @@ import javax.xml.bind.Marshaller
 
 @Service
 class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val familieTilbakeApiUrl: String,
-                           @Qualifier("azure") private val restOperations: RestOperations) :
-        AbstractRestClient(restOperations, "familie-tilbake") {
+                           @Qualifier("azure") private val restOperations: RestOperations
+) : AbstractRestClient(restOperations, "familie-tilbake") {
 
     private val API_URL: String = "$familieTilbakeApiUrl/api"
     private val VERSION_URL: URI = URI.create("$API_URL/info")

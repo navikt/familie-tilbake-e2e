@@ -21,8 +21,9 @@ import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
-import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
-import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
+import no.nav.familie.tilbake.e2e.domene.builder.OpprettKravgrunnlagBuilder
+import no.nav.familie.tilbake.e2e.domene.builder.OpprettStatusmeldingBuilder
+import no.nav.familie.tilbake.e2e.domene.builder.OpprettTilbakekrevingBuilder
 import no.nav.familie.tilbake.e2e.klient.Vent
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.math.BigDecimal
@@ -32,24 +33,20 @@ import javax.validation.constraints.Max
 import kotlin.random.Random
 
 class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
-                    private val opprettTilbakekrevingBuilder: OpprettTilbakekrevingBuilder,
-                    private val opprettKravgrunnlagBuilder: OpprettKravgrunnlagBuilder,
                     var gjeldendeBehandling: GjeldendeBehandling? = null) {
 
     /*OPPRETT-metoder*/
 
-    fun opprettTilbakekreving(
-            eksternFagsakId: String,
-            fagsystem: Fagsystem,
-            ytelsestype: Ytelsestype,
-            varsel: Boolean,
-            verge: Boolean,
-    ): String {
-        val request = opprettTilbakekrevingBuilder.opprettTilbakekrevingRequest(eksternFagsakId = eksternFagsakId,
-                                                                                fagsystem = fagsystem,
-                                                                                ytelsestype = ytelsestype,
-                                                                                varsel = varsel,
-                                                                                verge = verge)
+    fun opprettTilbakekreving(eksternFagsakId: String,
+                              fagsystem: Fagsystem,
+                              ytelsestype: Ytelsestype,
+                              varsel: Boolean,
+                              verge: Boolean): String {
+        val request = OpprettTilbakekrevingBuilder(eksternFagsakId = eksternFagsakId,
+                                                   fagsystem = fagsystem,
+                                                   ytelsestype = ytelsestype,
+                                                   varsel = varsel,
+                                                   verge = verge).build()
         val eksternBrukId = familieTilbakeKlient.opprettTilbakekreving(request)
         println("Opprettet behandling med eksternFagsakId: $eksternFagsakId og eksternBrukId: $eksternBrukId")
 
@@ -100,24 +97,23 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                 gjeldendeBehandling != null && gjeldendeBehandling?.eksternBehandlingId != null,
                 "EksternBehandlingId ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagUtenBehandling")
 
-        val request = opprettKravgrunnlagBuilder.opprettKravgrunnlag(status = status,
-                                                                     ytelsestype = gjeldendeBehandling?.ytelsestype!!,
-                                                                     eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
-                                                                     eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!,
-                                                                     kravgrunnlagId = gjeldendeBehandling?.kravgrunnlagId,
-                                                                     vedtakId = gjeldendeBehandling?.vedtakId,
-                                                                     antallPerioder = antallPerioder,
-                                                                     under4rettsgebyr = under4rettsgebyr,
-                                                                     muligforeldelse = muligforeldelse,
-                                                                     periodeLengde = periodeLengde!!)
+        val request = OpprettKravgrunnlagBuilder(status = status,
+                                                 ytelsestype = gjeldendeBehandling?.ytelsestype!!,
+                                                 eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
+                                                 eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!,
+                                                 kravgrunnlagId = gjeldendeBehandling?.kravgrunnlagId,
+                                                 vedtakId = gjeldendeBehandling?.vedtakId,
+                                                 antallPerioder = antallPerioder,
+                                                 under4rettsgebyr = under4rettsgebyr,
+                                                 muligforeldelse = muligforeldelse,
+                                                 periodeLengde = periodeLengde!!).build()
         gjeldendeBehandling!!.kravgrunnlagId = request.detaljertKravgrunnlag?.kravgrunnlagId
         gjeldendeBehandling!!.vedtakId = request.detaljertKravgrunnlag?.vedtakId
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = request)
         println("Sendt inn $status kravgrunnlag med eksternFagsakId: ${gjeldendeBehandling!!.eksternFagsakId}, på ytelsestype: ${gjeldendeBehandling!!.fagsystem}")
     }
 
-    fun opprettStatusmelding(
-            status: KodeStatusKrav) {
+    fun opprettStatusmelding(status: KodeStatusKrav) {
         assertTrue(
                 gjeldendeBehandling != null && gjeldendeBehandling?.vedtakId != null,
                 "VedtakId ikke definert. Minst ett kravgrunnlag må være innsendt før Statusmelding kan sendes")
@@ -130,11 +126,11 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         assertTrue(
                 gjeldendeBehandling != null && gjeldendeBehandling?.eksternBehandlingId != null,
                 "EksternBehandlingId ikke definert. Minst ett kravgrunnlag må være innsendt før Statusmelding kan sendes")
-        val request = opprettKravgrunnlagBuilder.opprettStatusmelding(vedtakId = gjeldendeBehandling?.vedtakId!!,
-                                                                      kodeStatusKrav = status,
-                                                                      ytelsestype = gjeldendeBehandling?.ytelsestype!!,
-                                                                      eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
-                                                                      eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!)
+        val request = OpprettStatusmeldingBuilder(vedtakId = gjeldendeBehandling?.vedtakId!!,
+                                                  kodeStatusKrav = status,
+                                                  ytelsestype = gjeldendeBehandling?.ytelsestype!!,
+                                                  eksternFagsakId = gjeldendeBehandling?.eksternFagsakId!!,
+                                                  eksternBehandlingId = gjeldendeBehandling?.eksternBehandlingId!!).build()
         familieTilbakeKlient.opprettStatusmelding(statusmelding = request)
         println("Sendt inn $status statusmelding på eksternFagsakId: ${gjeldendeBehandling!!.eksternFagsakId}")
     }

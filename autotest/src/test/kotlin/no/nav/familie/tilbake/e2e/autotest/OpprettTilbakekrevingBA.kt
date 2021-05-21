@@ -13,13 +13,12 @@ import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
-import no.nav.familie.tilbake.e2e.klient.OpprettKravgrunnlagBuilder
-import no.nav.familie.tilbake.e2e.klient.OpprettTilbakekrevingBuilder
+import no.nav.familie.tilbake.e2e.domene.builder.OpprettKravgrunnlagBuilder
+import no.nav.familie.tilbake.e2e.domene.builder.OpprettTilbakekrevingBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -36,9 +35,7 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
 
     @BeforeEach
     fun setup() {
-        saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient,
-                                      opprettTilbakekrevingBuilder = OpprettTilbakekrevingBuilder(),
-                                      opprettKravgrunnlagBuilder = OpprettKravgrunnlagBuilder())
+        saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient)
     }
 
     @Test
