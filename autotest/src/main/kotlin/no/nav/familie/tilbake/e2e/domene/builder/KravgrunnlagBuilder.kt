@@ -19,17 +19,17 @@ import java.time.format.DateTimeFormatter
 import javax.validation.constraints.Max
 import kotlin.random.Random
 
-class OpprettKravgrunnlagBuilder(status: KodeStatusKrav,
-                                 ytelsestype: Ytelsestype,
-                                 eksternFagsakId: String,
-                                 eksternBehandlingId: String,
-                                 kravgrunnlagId: BigInteger? = null,
-                                 vedtakId: BigInteger? = null,
-                                 @Max(6)
+class KravgrunnlagBuilder(status: KodeStatusKrav,
+                          ytelsestype: Ytelsestype,
+                          eksternFagsakId: String,
+                          eksternBehandlingId: String,
+                          kravgrunnlagId: BigInteger? = null,
+                          vedtakId: BigInteger? = null,
+                          @Max(6)
                                  antallPerioder: Int,
-                                 under4rettsgebyr: Boolean,
-                                 muligforeldelse: Boolean,
-                                 periodeLengde: Int) {
+                          under4rettsgebyr: Boolean,
+                          muligforeldelse: Boolean,
+                          periodeLengde: Int) {
 
     // Kommer til å trenge å kunne sette kontrollfelt tilbake i tid for at den plukkes av auto-opprett batch (ikke laget enda)
     private val finalKontrollfelt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"))

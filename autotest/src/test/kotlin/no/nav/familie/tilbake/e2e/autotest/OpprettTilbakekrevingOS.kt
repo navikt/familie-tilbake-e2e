@@ -13,8 +13,6 @@ import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
-import no.nav.familie.tilbake.e2e.domene.builder.OpprettKravgrunnlagBuilder
-import no.nav.familie.tilbake.e2e.domene.builder.OpprettTilbakekrevingBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

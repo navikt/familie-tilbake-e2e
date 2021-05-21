@@ -13,8 +13,6 @@ import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
-import no.nav.familie.tilbake.e2e.domene.builder.OpprettKravgrunnlagBuilder
-import no.nav.familie.tilbake.e2e.domene.builder.OpprettTilbakekrevingBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -46,7 +44,8 @@ class OpprettTilbakekrevingBA(@Autowired val familieTilbakeKlient: FamilieTilbak
                                                                 ytelsestype = ytelsestype,
                                                                 varsel = true,
                                                                 verge = false)
-        saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
+        saksbehandler.opprettStatusmelding(KodeStatusKrav.SPER)
+        // saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
         saksbehandler.erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
         saksbehandler.taBehandlingAvVent()

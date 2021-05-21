@@ -7,11 +7,11 @@ import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto
 import java.math.BigInteger
 
-class OpprettStatusmeldingBuilder(vedtakId: BigInteger,
-                                  kodeStatusKrav: KodeStatusKrav,
-                                  ytelsestype: Ytelsestype,
-                                  eksternFagsakId: String,
-                                  eksternBehandlingId: String) {
+class StatusmeldingBuilder(vedtakId: BigInteger,
+                           kodeStatusKrav: KodeStatusKrav,
+                           ytelsestype: Ytelsestype,
+                           eksternFagsakId: String,
+                           eksternBehandlingId: String) {
 
     private val request = EndringKravOgVedtakstatus().also { endringKravOgVedtakstatus ->
         endringKravOgVedtakstatus.kravOgVedtakstatus = KravOgVedtakstatus().apply {

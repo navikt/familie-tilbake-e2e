@@ -15,12 +15,12 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.random.Random
 
-class OpprettTilbakekrevingBuilder(eksternFagsakId: String,
-                                   eksternBehandlingId: String? = null,
-                                   fagsystem: Fagsystem,
-                                   ytelsestype: Ytelsestype,
-                                   varsel: Boolean,
-                                   verge: Boolean) {
+class TilbakekrevingBuilder(eksternFagsakId: String,
+                            eksternBehandlingId: String? = null,
+                            fagsystem: Fagsystem,
+                            ytelsestype: Ytelsestype,
+                            varsel: Boolean,
+                            verge: Boolean) {
 
     private val request = OpprettTilbakekrevingRequest(fagsystem = fagsystem,
                                                        ytelsestype = ytelsestype,
