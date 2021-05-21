@@ -24,6 +24,16 @@ class BehandleVilkårsvurderingStegBuilder(hentVilkårsvurderingResponse: HentVi
     private val BEGRUNNELSE = "Dette er en automatisk begrunnelse fra Autotest"
 
     init {
+        require(!(andelTilbakekreves != null && beløpTilbakekreves != null))
+        { "Kan ikke sette både andelTilbakekreves og beløpTilbakekreves" }
+        require(!(vilkårvurderingsresultat in listOf(Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                                                     Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                                                     Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER) && aktsomhet == null))
+        {
+            "Må oppgi grad av uaktsomhet når vilkårsvurdering ikke er ${Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT}, " +
+            "${Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER} eller ${Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER}"
+        }
+
         hentVilkårsvurderingResponse.perioder.forEach {
             vilkårsvurderingsperioder.add(
                     VilkårsvurderingsperiodeDto(periode = it.periode,
