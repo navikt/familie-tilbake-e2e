@@ -24,10 +24,12 @@ class BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse: List<AvsnittDto
                                                                                              Underavsnittstype.FORELDELSE),
                                                             vilkårAvsnitt = utledAvsnitt(avsnitt.underavsnittsliste,
                                                                                          Underavsnittstype.VILKÅR),
-                                                            særligeGrunnerAvsnitt = utledAvsnitt(avsnitt.underavsnittsliste,
-                                                                                                 Underavsnittstype.SÆRLIGEGRUNNER),
-                                                            særligeGrunnerAnnetAvsnitt = utledAvsnitt(avsnitt.underavsnittsliste,
-                                                                                                      Underavsnittstype.SÆRLIGEGRUNNER_ANNET)))
+                                                            særligeGrunnerAvsnitt =
+                                                            utledAvsnitt(avsnitt.underavsnittsliste,
+                                                                         Underavsnittstype.SÆRLIGEGRUNNER),
+                                                            særligeGrunnerAnnetAvsnitt =
+                                                            utledAvsnitt(avsnitt.underavsnittsliste,
+                                                                         Underavsnittstype.SÆRLIGEGRUNNER_ANNET)))
                 }
     }
 
