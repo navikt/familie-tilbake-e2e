@@ -140,7 +140,8 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                 return it.behandlingId.toString()
             }
         }
-        throw Exception("Fantes ikke noen behandling med eksternBrukId $eksternBrukId på kombinasjonen eksternFagsakId $eksternFagsakId og fagsystem $fagsystem")
+        throw Exception("Fantes ikke noen behandling med eksternBrukId $eksternBrukId på kombinasjonen eksternFagsakId" +
+                                " $eksternFagsakId og fagsystem $fagsystem")
     }
 
     /*HANDLING-metoder*/
@@ -154,12 +155,12 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
     }
 
     fun behandleForeldelse(beslutning: Foreldelsesvurderingstype) {
-        val hentForeldelseResponse = familieTilbakeKlient.hentForeldelse(gjeldendeBehandling?.behandlingId!!)
+        val hentForeldelseResponse = familieTilbakeKlient.hentForeldelse(gjeldendeBehandling.behandlingId!!)
         familieTilbakeKlient
                 .behandleSteg(stegdata = BehandleForeldelseStegBuilder(hentForeldelseResponse = requireNotNull(
                         hentForeldelseResponse.data),
                                                                        beslutning = beslutning).build(),
-                              behandlingId = gjeldendeBehandling?.behandlingId!!)
+                              behandlingId = gjeldendeBehandling.behandlingId!!)
     }
 
     fun behandleVilkårsvurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat,
@@ -169,7 +170,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                  andelTilbakekreves: BigDecimal? = null,
                                  beløpTilbakekreves: BigDecimal? = null,
                                  tilbakekrevSmåbeløp: Boolean? = null) {
-        val hentVilkårsvurderingResponse = familieTilbakeKlient.hentVilkårsvurdering(gjeldendeBehandling?.behandlingId!!)
+        val hentVilkårsvurderingResponse = familieTilbakeKlient.hentVilkårsvurdering(gjeldendeBehandling.behandlingId!!)
         familieTilbakeKlient
                 .behandleSteg(stegdata = BehandleVilkårsvurderingStegBuilder(hentVilkårsvurderingResponse = requireNotNull(
                         hentVilkårsvurderingResponse.data),
@@ -180,15 +181,15 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                                                              andelTilbakekreves = andelTilbakekreves,
                                                                              beløpTilbakekreves = beløpTilbakekreves,
                                                                              tilbakekrevSmåbeløp = tilbakekrevSmåbeløp).build(),
-                              behandlingId = gjeldendeBehandling?.behandlingId!!)
+                              behandlingId = gjeldendeBehandling.behandlingId!!)
     }
 
     fun behandleForeslåVedtak() {
-        val hentVedtakbrevtekstResponse = familieTilbakeKlient.hentVedtaksbrevtekst(gjeldendeBehandling?.behandlingId!!)
+        val hentVedtakbrevtekstResponse = familieTilbakeKlient.hentVedtaksbrevtekst(gjeldendeBehandling.behandlingId!!)
         familieTilbakeKlient
                 .behandleSteg(stegdata = BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse = requireNotNull(
                         hentVedtakbrevtekstResponse.data)).build(),
-                              behandlingId = gjeldendeBehandling?.behandlingId!!)
+                              behandlingId = gjeldendeBehandling.behandlingId!!)
     }
 
     fun behandleSteg(stegdata: Any, behandlingId: String) {
@@ -198,17 +199,18 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
     fun settBehandlingPåVent(årsak: Venteårsak, frist: LocalDate) {
         familieTilbakeKlient.settBehandlingPåVent(BehandlingPåVentDto(venteårsak = årsak,
                                                                       tidsfrist = frist),
-                                                  behandlingId = gjeldendeBehandling?.behandlingId!!)
+                                                  behandlingId = gjeldendeBehandling.behandlingId!!)
         erBehandlingPåVent(årsak)
     }
 
     fun taBehandlingAvVent() {
-        familieTilbakeKlient.taBehandlingAvVent(gjeldendeBehandling?.behandlingId!!)
+        familieTilbakeKlient.taBehandlingAvVent(gjeldendeBehandling.behandlingId!!)
     }
 
     fun henleggBehandling(behandlingId: String, behandlingsresultat: Behandlingsresultatstype) {
-        /*Denne vil kun fungere i autotest for behandling opprettet med manueltOpprettet = TRUE ettersom automatisk opprettede behandlinger ikke kan henlegges manuelt før etter 6 dager.
-        Når manueltOpprettet Tilbakekreving er implementert i familie-tilbake kan denne metoden brukes i en test.
+        /* Denne vil kun fungere i autotest for behandling opprettet med manueltOpprettet = TRUE ettersom automatisk opprettede
+         behandlinger ikke kan henlegges manuelt før etter 6 dager.
+         Når manueltOpprettet Tilbakekreving er implementert i familie-tilbake kan denne metoden brukes i en test.
          */
         val data = HenleggDto(behandlingsresultatstype = behandlingsresultat,
                               begrunnelse = "Dette er en automatisk begrunnelse generert av autotest")
@@ -223,31 +225,32 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
     fun erBehandlingPåVent(venteårsak: Venteårsak) {
         Vent.til(
                 {
-                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling?.behandlingId!!).data?.behandlingsstegsinfo?.any {
+                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId!!).data?.behandlingsstegsinfo?.any {
                         it.behandlingsstegstatus == Behandlingsstegstatus.VENTER && it.venteårsak == venteårsak
                     }
                 },
                 30, "Behandling kom aldri i vent med årsak $venteårsak")
-        println("Behandling med behandlingId ${gjeldendeBehandling?.behandlingId!!} er bekreftet på vent med årsak $venteårsak")
+        println("Behandling med behandlingId ${gjeldendeBehandling.behandlingId!!} er bekreftet på vent med årsak $venteårsak")
     }
 
     fun erBehandlingISteg(behandlingssteg: Behandlingssteg,
                           behandlingsstegstatus: Behandlingsstegstatus) {
         Vent.til(
                 {
-                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling?.behandlingId!!).data?.behandlingsstegsinfo?.any {
+                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId!!).data?.behandlingsstegsinfo?.any {
                         it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus
                     }
                 },
                 30, "Behandlingen kom aldri i status $behandlingsstegstatus i steg $behandlingssteg")
-        println("Behandling med behandlingsId ${gjeldendeBehandling?.behandlingId!!} er bekreftet i status $behandlingsstegstatus i steg $behandlingssteg")
+        println("Behandling med behandlingsId ${gjeldendeBehandling.behandlingId!!} er bekreftet i status" +
+                        " $behandlingsstegstatus i steg $behandlingssteg")
     }
 
-    fun erBehandlingAvsluttet(behandlingId: String, resultat: Behandlingsresultatstype) {
+    fun erBehandlingAvsluttet(resultat: Behandlingsresultatstype) {
         Vent.til(
-                { familieTilbakeKlient.hentBehandling(behandlingId).data?.status == Behandlingsstatus.AVSLUTTET },
+                { familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId!!).data?.status == Behandlingsstatus.AVSLUTTET },
                 30, "Behandlingen fikk aldri status AVSLUTTET")
-        val behandling = requireNotNull(familieTilbakeKlient.hentBehandling(behandlingId).data)
+        val behandling = requireNotNull(familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId!!).data)
         val henlagttyper = listOf(Behandlingsresultatstype.HENLAGT,
                                   Behandlingsresultatstype.HENLAGT_FEILOPPRETTET,
                                   Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_MED_BREV,
@@ -274,7 +277,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
             }
             in iverksatttyper -> {
                 assertTrue(
-                        behandling!!.behandlingsstegsinfo.all {
+                        behandling.behandlingsstegsinfo.all {
                             it.behandlingsstegstatus == Behandlingsstegstatus.UTFØRT || it.behandlingsstegstatus == Behandlingsstegstatus.AUTOUTFØRT
                         },
                         "Behandlingen var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke UTFØRT/AUTOUTFØRT")
@@ -283,10 +286,11 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                         "Forventet resultat: $resultat, Behandlingens resultat: ${behandling.resultatstype}")
             }
             else -> {
-                throw Exception("Behandling var i status AVSLUTTET men resultattypen angitt var ${behandling.resultatstype} som ikke er et gyldig resultat for en avsluttet behandling")
+                throw Exception("Behandling var i status AVSLUTTET men resultattypen angitt var ${behandling.resultatstype}" +
+                                        " som ikke er et gyldig resultat for en avsluttet behandling")
             }
         }
-        println("Behandling med behandlingsId $behandlingId er bekreftet avsluttet med resultat $resultat")
+        println("Behandling med behandlingsId ${gjeldendeBehandling.behandlingId} er bekreftet avsluttet med resultat $resultat")
     }
 }
 
