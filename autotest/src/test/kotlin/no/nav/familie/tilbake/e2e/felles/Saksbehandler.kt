@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.autotest
+package no.nav.familie.tilbake.e2e.felles
 
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
@@ -20,12 +20,11 @@ import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVentDto
 import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
-import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.domene.builder.KravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.StatusmeldingBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.TilbakekrevingBuilder
-import no.nav.familie.tilbake.e2e.klient.GjeldendeBehandling
-import no.nav.familie.tilbake.e2e.klient.Vent
+import no.nav.familie.tilbake.e2e.felles.utils.Vent
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.math.BigDecimal
 import java.time.LocalDate

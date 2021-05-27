@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.klient
+package no.nav.familie.tilbake.e2e.felles
 
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype

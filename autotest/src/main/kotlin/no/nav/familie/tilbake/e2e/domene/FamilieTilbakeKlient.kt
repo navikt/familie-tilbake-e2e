@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.klient
+package no.nav.familie.tilbake.e2e.domene
 
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs

@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.klient
+package no.nav.familie.tilbake.e2e.mockserver
 
 import no.nav.familie.http.interceptor.MdcValuesPropagatingClientInterceptor
 import org.springframework.boot.web.client.RestTemplateBuilder

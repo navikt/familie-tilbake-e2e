@@ -12,7 +12,8 @@ import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
-import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.felles.Saksbehandler
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -24,7 +25,7 @@ import kotlin.random.Random
 
 @SpringBootTest(classes = [ApplicationConfig::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
+class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     val fagsystem = Fagsystem.EF
     val ytelsestype = Ytelsestype.OVERGANGSSTØNAD
@@ -38,9 +39,8 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
 
     @Test
     fun `Tilbakekreving med varsel, gjenoppta, kravgrunnlag med foreldelse, vilkårsvurdering simpel uaktsomhet delvis tilbakebetaling`() {
-        val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
         with(saksbehandler) {
-
+            val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
             val eksternBrukId = saksbehandler.opprettTilbakekreving(
                 eksternFagsakId = eksternFagsakId,
                 fagsystem = fagsystem,
@@ -80,9 +80,8 @@ class OpprettTilbakekrevingOS(@Autowired val familieTilbakeKlient: FamilieTilbak
 
     @Test
     fun `Tilbakekreving uten varsel, SPER melding, ENDR melding, vilkårsvurdering god tro`() {
-        val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-
         with(saksbehandler) {
+            val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
             val eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
                                                       fagsystem = fagsystem,
                                                       ytelsestype = ytelsestype,
