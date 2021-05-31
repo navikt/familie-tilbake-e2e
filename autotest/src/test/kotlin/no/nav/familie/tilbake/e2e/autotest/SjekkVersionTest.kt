@@ -1,9 +1,6 @@
 package no.nav.familie.tilbake.e2e.autotest
 
-import net.bytebuddy.implementation.bytecode.Throw
-import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.tilbake.e2e.klient.FamilieTilbakeKlient
-import org.junit.jupiter.api.Assertions.assertTrue
+import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest(classes = [ApplicationConfig::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SjekkVersion(@Autowired private val familieTilbakeKlient: FamilieTilbakeKlient) {
+class SjekkVersionTest(@Autowired private val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     @Test
     fun `hentVersjonInfo skal hente versjon og dermed teste om familie-tilbake er oppe`() {

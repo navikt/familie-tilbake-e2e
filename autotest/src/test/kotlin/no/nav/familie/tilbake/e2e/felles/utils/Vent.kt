@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.klient
+package no.nav.familie.tilbake.e2e.felles.utils
 
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
