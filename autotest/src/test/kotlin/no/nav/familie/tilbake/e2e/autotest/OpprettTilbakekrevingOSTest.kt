@@ -41,16 +41,13 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
     fun `Tilbakekreving med varsel, gjenoppta, kravgrunnlag med foreldelse, vilkårsvurdering simpel uaktsomhet delvis tilbakebetaling`() {
         with(saksbehandler) {
             val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            val eksternBrukId = saksbehandler.opprettTilbakekreving(
-                eksternFagsakId = eksternFagsakId,
-                fagsystem = fagsystem,
-                ytelsestype = ytelsestype,
-                varsel = true,
-                verge = false
-            )
-
-            hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
+            val eksternBrukId = saksbehandler.opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+                                                                    fagsystem = fagsystem,
+                                                                    ytelsestype = ytelsestype,
+                                                                    varsel = true,
+                                                                    verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
             taBehandlingAvVent()
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
@@ -87,8 +84,6 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
                                                       ytelsestype = ytelsestype,
                                                       varsel = false,
                                                       verge = false)
-
-            hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,

@@ -9,8 +9,8 @@ data class GjeldendeBehandling(val fagsystem: Fagsystem,
                                val ytelsestype: Ytelsestype,
                                val eksternFagsakId: String,
                                val eksternBehandlingId: String,
-                               var eksternBrukId: String?,
-                               val behandlingId: String?,
-                               var vedtakId: BigInteger?,
-                               var kravgrunnlagId: BigInteger?,
-                               var perioder: List<PeriodeDto>?)
+                               var eksternBrukId: String? = null,
+                               val behandlingId: String? = null,
+                               var vedtakId: BigInteger? = null,
+                               var kravgrunnlagId: BigInteger? = null,
+                               var perioder: List<PeriodeDto>? = null)

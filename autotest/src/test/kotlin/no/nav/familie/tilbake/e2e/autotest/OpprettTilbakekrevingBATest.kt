@@ -14,6 +14,7 @@ import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.domene.dto.Dokumentmalstype
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,7 +48,6 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                                       ytelsestype = ytelsestype,
                                                       varsel = true,
                                                       verge = false)
-            // saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             taBehandlingAvVent()
@@ -72,6 +72,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                      tilbakekrevSmåbeløp = true)
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
+            forhåndsvisVedtaksbrev()
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
         }
@@ -86,7 +87,6 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                                       ytelsestype = ytelsestype,
                                                       varsel = false,
                                                       verge = false)
-            // hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
@@ -135,8 +135,6 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                                       ytelsestype = Ytelsestype.BARNETRYGD,
                                                       varsel = false,
                                                       verge = false)
-
-            // hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
@@ -182,8 +180,6 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                                       ytelsestype = Ytelsestype.BARNETRYGD,
                                                       varsel = true,
                                                       verge = false)
-
-            // hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             taBehandlingAvVent()
@@ -219,7 +215,6 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                                       ytelsestype = ytelsestype,
                                                       varsel = false,
                                                       verge = false)
-            // hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
@@ -244,7 +239,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
-    fun `Tilbakekreving med verge, send brev innhent dokumentasjon`() {
+    fun `Tilbakekreving med verge`() {
         with(saksbehandler) {
             val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
             val eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
@@ -260,11 +255,41 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                 muligforeldelse = true)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-            // TODO: Implementer send brev
-            // sendBrev(Brevtype.INNHENT_INFORMASJON)
 
-            // TODO: Fortsett test
+            // TODO: Fortsett implementasjon av test
         }
 
     }
+
+    @Test
+    fun `Manuell bestilling av brev`() {
+        with(saksbehandler) {
+            val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
+            val eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+                                                      fagsystem = fagsystem,
+                                                      ytelsestype = ytelsestype,
+                                                      varsel = false,
+                                                      verge = false)
+
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
+            opprettKravgrunnlag(status = KodeStatusKrav.NY,
+                                antallPerioder = 1,
+                                under4rettsgebyr = false,
+                                muligforeldelse = true)
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            bestillBrev(Dokumentmalstype.INNHENT_DOKUMENTASJON)
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
+            taBehandlingAvVent()
+            bestillBrev(Dokumentmalstype.VARSEL)
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
+            taBehandlingAvVent()
+            bestillBrev(Dokumentmalstype.KORRIGERT_VARSEL)
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+        }
+    }
+
 }
