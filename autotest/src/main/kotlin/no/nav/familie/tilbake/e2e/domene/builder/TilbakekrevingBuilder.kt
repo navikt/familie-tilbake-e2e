@@ -22,29 +22,29 @@ class TilbakekrevingBuilder(eksternFagsakId: String,
                             varsel: Boolean,
                             verge: Boolean) {
 
-    private val request = OpprettTilbakekrevingRequest(fagsystem = fagsystem,
-                                                       ytelsestype = ytelsestype,
-                                                       eksternFagsakId = eksternFagsakId,
-                                                       eksternId = eksternBehandlingId ?: Random.nextInt(1000000, 9999999)
-                                                               .toString(),
-                                                       personIdent = "12345678901",
-                                                       saksbehandlerIdent = "Z994824",
-                                                       behandlingstype = Behandlingstype.TILBAKEKREVING,
-                                                       språkkode = Språkkode.NB,
-                                                       enhetId = "0106",
-                                                       enhetsnavn = "NAV Fredrikstad",
-                                                       revurderingsvedtaksdato = LocalDate.now().minusDays(35),
-                                                       faktainfo = Faktainfo(revurderingsårsak = "Nye opplysninger",
-                                                                             revurderingsresultat = "Endring i ytelsen",
-                                                                             tilbakekrevingsvalg = utledTilbakekrevingsvalg(varsel),
-                                                                             konsekvensForYtelser = setOf("Reduksjon av ytelsen",
-                                                                                                          "Feilutbetaling")),
-                                                       varsel = utledVarsel(varsel),
-                                                       manueltOpprettet = false,
-                                                       verge = utledVerge(verge))
+    private val request =
+        OpprettTilbakekrevingRequest(fagsystem = fagsystem,
+                                     ytelsestype = ytelsestype,
+                                     eksternFagsakId = eksternFagsakId,
+                                     eksternId = eksternBehandlingId ?: Random.nextInt(1000000, 9999999).toString(),
+                                     personIdent = "12345678901",
+                                     saksbehandlerIdent = "Z994824",
+                                     behandlingstype = Behandlingstype.TILBAKEKREVING,
+                                     språkkode = Språkkode.NB,
+                                     enhetId = "0106",
+                                     enhetsnavn = "NAV Fredrikstad",
+                                     revurderingsvedtaksdato = LocalDate.now().minusDays(35),
+                                     faktainfo = Faktainfo(revurderingsårsak = "Nye opplysninger",
+                                                           revurderingsresultat = "Endring i ytelsen",
+                                                           tilbakekrevingsvalg = utledTilbakekrevingsvalg(varsel),
+                                                           konsekvensForYtelser = setOf("Reduksjon av ytelsen", "Feilutbetaling")),
+                                     varsel = utledVarsel(varsel),
+                                     manueltOpprettet = false,
+                                     verge = utledVerge(verge))
 
     private fun utledTilbakekrevingsvalg(varsel: Boolean): Tilbakekrevingsvalg {
-        return if (varsel) Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_MED_VARSEL else Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_UTEN_VARSEL
+        return if (varsel) Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_MED_VARSEL
+        else Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_UTEN_VARSEL
     }
 
     private fun utledVarsel(varsel: Boolean): Varsel? {

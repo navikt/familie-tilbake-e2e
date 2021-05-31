@@ -40,21 +40,22 @@ class BehandleVilkårsvurderingStegBuilder(hentVilkårsvurderingResponse: HentVi
                                                 vilkårsvurderingsresultat = vilkårvurderingsresultat,
                                                 begrunnelse = BEGRUNNELSE,
                                                 godTroDto = when (vilkårvurderingsresultat) {
-                                                    Vilkårsvurderingsresultat.GOD_TRO -> godTroGenerator(beløpErIBehold = beløpErIBehold,
-                                                                                                         beløpTilbakekreves = beløpTilbakekreves,
-                                                                                                         feilutbetaltBeløp = it.feilutbetaltBeløp)
+                                                    Vilkårsvurderingsresultat.GOD_TRO ->
+                                                        godTroGenerator(beløpErIBehold = beløpErIBehold,
+                                                                        beløpTilbakekreves = beløpTilbakekreves,
+                                                                        feilutbetaltBeløp = it.feilutbetaltBeløp)
                                                     else -> null
                                                 },
                                                 aktsomhetDto = when (vilkårvurderingsresultat) {
                                                     Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
                                                     Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
-                                                    Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER -> aktsomhetGenerator(
-                                                            aktsomhet = aktsomhet,
-                                                            andelTilbakekreves = andelTilbakekreves,
-                                                            beløpTilbakekreves = beløpTilbakekreves,
-                                                            tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
-                                                            særligeGrunner = særligeGrunner,
-                                                            feilutbetaltBeløp = it.feilutbetaltBeløp)
+                                                    Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER ->
+                                                        aktsomhetGenerator(aktsomhet = aktsomhet,
+                                                                           andelTilbakekreves = andelTilbakekreves,
+                                                                           beløpTilbakekreves = beløpTilbakekreves,
+                                                                           tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
+                                                                           særligeGrunner = særligeGrunner,
+                                                                           feilutbetaltBeløp = it.feilutbetaltBeløp)
                                                     else -> null
                                                 }))
         }

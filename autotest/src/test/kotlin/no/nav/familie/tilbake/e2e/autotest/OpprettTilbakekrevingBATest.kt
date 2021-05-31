@@ -28,8 +28,8 @@ import kotlin.random.Random
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
 
-    val fagsystem = Fagsystem.BA
-    val ytelsestype = Ytelsestype.BARNETRYGD
+    private val fagsystem = Fagsystem.BA
+    private val ytelsestype = Ytelsestype.BARNETRYGD
 
     lateinit var saksbehandler: Saksbehandler
 
@@ -90,7 +90,8 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 2,
+                                antallPerioder = 12,
+                                periodelengde = 2,
                                 under4rettsgebyr = false,
                                 muligforeldelse = false)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)

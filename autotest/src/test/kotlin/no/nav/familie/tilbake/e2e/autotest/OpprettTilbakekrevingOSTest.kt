@@ -27,8 +27,8 @@ import kotlin.random.Random
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
 
-    val fagsystem = Fagsystem.EF
-    val ytelsestype = Ytelsestype.OVERGANGSSTØNAD
+    private val fagsystem = Fagsystem.EF
+    private val ytelsestype = Ytelsestype.OVERGANGSSTØNAD
 
     lateinit var saksbehandler: Saksbehandler
 
@@ -58,7 +58,7 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
                                 antallPerioder = 4,
                                 under4rettsgebyr = false,
                                 muligforeldelse = true,
-                                periodeLengde = 4)
+                                periodelengde = 4)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             behandleFakta(Hendelsestype.EF_ANNET, Hendelsesundertype.ANNET_FRITEKST)

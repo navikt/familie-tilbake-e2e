@@ -24,11 +24,11 @@ import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.domene.builder.KravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.StatusmeldingBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.TilbakekrevingBuilder
+import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
 import no.nav.familie.tilbake.e2e.felles.utils.Vent
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.math.BigDecimal
 import java.time.LocalDate
-import javax.validation.constraints.Max
 import kotlin.random.Random
 
 class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
@@ -46,9 +46,11 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                             fagsystem = fagsystem,
                                             ytelsestype = ytelsestype,
                                             varsel = varsel,
-                                            verge = verge).build()
+                                            verge = verge)
+            .build()
         val eksternBrukId = familieTilbakeKlient.opprettTilbakekreving(request).data
         val behandlingId = hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
+
         gjeldendeBehandling = GjeldendeBehandling(fagsystem = fagsystem,
                                                   ytelsestype = ytelsestype,
                                                   eksternFagsakId = eksternFagsakId,
@@ -56,7 +58,8 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                                   eksternBrukId = eksternBrukId,
                                                   behandlingId = behandlingId,
                                                   vedtakId = null,
-                                                  kravgrunnlagId = null)
+                                                  kravgrunnlagId = null,
+                                                  perioder = null)
 
         println("Opprettet behandling med eksternFagsakId: $eksternFagsakId og eksternBrukId: $eksternBrukId")
 
@@ -67,17 +70,21 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                           fagsystem: Fagsystem,
                                           ytelsestype: Ytelsestype,
                                           eksternFagsakId: String,
-                                          @Max(6)
                                           antallPerioder: Int,
                                           under4rettsgebyr: Boolean,
                                           muligforeldelse: Boolean) {
         // TODO: Fullfør implementasjon når funksjonalitet kommer
 
-        gjeldendeBehandling = GjeldendeBehandling(eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
-                                                  fagsystem = fagsystem,
+
+        gjeldendeBehandling = GjeldendeBehandling(fagsystem = fagsystem,
                                                   ytelsestype = ytelsestype,
                                                   eksternFagsakId = eksternFagsakId,
-                                                  eksternBrukId = null)
+                                                  eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
+                                                  eksternBrukId = null,
+                                                  behandlingId = null,
+                                                  vedtakId = null,
+                                                  kravgrunnlagId = null,
+                                                  perioder = null)
 
         opprettKravgrunnlag(status = status,
                             antallPerioder = antallPerioder,
@@ -86,11 +93,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
     }
 
     fun opprettKravgrunnlag(status: KodeStatusKrav,
-                            @Max(29)
-                            antallPerioder: Int,
+                            antallPerioder: Int = 2,
                             under4rettsgebyr: Boolean,
                             muligforeldelse: Boolean,
-                            periodeLengde: Int = 3) {
+                            periodelengde: Int = 3) {
         val request = KravgrunnlagBuilder(status = status,
                                           ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype,
                                                                        { "Ytelsestype ikke definert. Opprett behandling" +
@@ -106,13 +112,19 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                           antallPerioder = antallPerioder,
                                           under4rettsgebyr = under4rettsgebyr,
                                           muligforeldelse = muligforeldelse,
-                                          periodeLengde = periodeLengde).build()
-        gjeldendeBehandling.kravgrunnlagId = request.detaljertKravgrunnlag.kravgrunnlagId
-        gjeldendeBehandling.vedtakId = request.detaljertKravgrunnlag.vedtakId
+                                          periodeLengde = periodelengde)
+            .build()
 
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = request)
+
+        gjeldendeBehandling.apply {
+            kravgrunnlagId = request.detaljertKravgrunnlag.kravgrunnlagId
+            vedtakId = request.detaljertKravgrunnlag.vedtakId
+        }
+
         println("Sendt inn $status kravgrunnlag med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId}," +
-                "på ytelsestype: ${gjeldendeBehandling.fagsystem}")
+                        "på ytelsestype: ${gjeldendeBehandling.fagsystem}")
+
     }
 
     fun opprettStatusmelding(status: KodeStatusKrav) {
@@ -292,14 +304,3 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
         println("Behandling med behandlingsId ${gjeldendeBehandling.behandlingId} er bekreftet avsluttet med resultat $resultat")
     }
 }
-
-/* STATE-object */
-
-//class GjeldendeBehandling(var fagsystem: Fagsystem?,
-//                          var ytelsestype: Ytelsestype?,
-//                          var eksternFagsakId: String?,
-//                          var eksternBehandlingId: String?,
-//                          var eksternBrukId: String?,
-//                          var behandlingId: String? = null,
-//                          var vedtakId: BigInteger? = null,
-//                          var kravgrunnlagId: BigInteger? = null)
