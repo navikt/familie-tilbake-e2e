@@ -16,9 +16,8 @@ class BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse: List<AvsnittDto
     init {
         hentVedtakbrevtekstResponse.filter { it.avsnittstype == Avsnittstype.PERIODE && it.fom != null && it.tom != null }
                 .forEach { avsnitt ->
-                    perioderMedTekst.add(PeriodeMedTekstDto(periode = PeriodeDto(
-                        fom = requireNotNull(avsnitt.fom),
-                        tom = requireNotNull(avsnitt.tom)),
+                    perioderMedTekst.add(PeriodeMedTekstDto(periode = PeriodeDto(fom = requireNotNull(avsnitt.fom),
+                                                                                 tom = requireNotNull(avsnitt.tom)),
                                                             faktaAvsnitt = utledAvsnitt(avsnitt.underavsnittsliste,
                                                                                         Underavsnittstype.FAKTA),
                                                             foreldelseAvsnitt = utledAvsnitt(avsnitt.underavsnittsliste,

@@ -75,6 +75,10 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             forhåndsvisVedtaksbrev()
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            forhåndsvisVarselbrev(vedtakdato = LocalDate.now())
+            println("Success")
+            Thread.sleep(3000)
         }
     }
 

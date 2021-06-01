@@ -3,9 +3,6 @@ package no.nav.familie.tilbake.e2e.domene.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
 import java.time.LocalDate
-import java.time.YearMonth
-import javax.validation.Valid
-import javax.validation.constraints.Size
 import kotlin.collections.List
 
 /**

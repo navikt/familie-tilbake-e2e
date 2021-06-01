@@ -8,7 +8,7 @@ import java.util.UUID
 class ForhåndsvisVedtaksbrevBuilder(behandlingId: String,
                                     perioder: List<PeriodeDto>) {
 
-    private val BEGRUNNELSE = "Dette er en automatisk begrunnelse fra Autotest"
+    private val BEGRUNNELSE = "Automatisk begrunnelse fra Autotest"
     private val request = ForhåndsvisningVedtaksbrevPdfDto(behandlingId = UUID.fromString(behandlingId),
                                                            perioderMedTekst = perioder.map {
                                                                PeriodeMedTekstDto(periode = it,
