@@ -164,4 +164,10 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
 
         return postForEntity(uri, data)
     }
+
+    fun hentJournaldokument(behandlingId: String, journalpostId: String, dokumentId: String) {
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/journalpost/$behandlingId/dokument/$dokumentId")
+
+        return getForEntity(uri)
+    }
 }

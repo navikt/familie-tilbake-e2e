@@ -346,4 +346,11 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
 
         familieTilbakeKlient.forhåndsvisHenleggelsesbrev(data = request)
     }
+
+    fun hentJournaldokument() {
+        // TODO: Oppdater med reelle IDer når det er implementert i familie-tilbake
+        familieTilbakeKlient.hentJournaldokument(behandlingId = gjeldendeBehandling.behandlingId!!,
+                                                 journalpostId = "jpId",
+                                                 dokumentId = "id")
+    }
 }
