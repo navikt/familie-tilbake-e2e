@@ -14,6 +14,7 @@ import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.felles.Beslutter
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,10 +33,12 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     private val ytelsestype = Ytelsestype.BARNETRYGD
 
     lateinit var saksbehandler: Saksbehandler
+    lateinit var beslutter: Beslutter
 
     @BeforeEach
     fun setup() {
         saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient)
+        beslutter = Beslutter(familieTilbakeKlient = familieTilbakeKlient)
     }
 
     @Test
@@ -47,7 +50,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                                       ytelsestype = ytelsestype,
                                                       varsel = true,
                                                       verge = false)
-            // saksbehandler.hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
+            val behandlingId = hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             taBehandlingAvVent()
@@ -74,6 +77,12 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            settBehandlingPåVent(årsak = Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING, frist = LocalDate.now().plusWeeks(3))
+            taBehandlingAvVent()
+
+            beslutter.behandleFatteVedtak(godkjenn = true, behandlingId = behandlingId)
+            erBehandlingISteg(Behandlingssteg.IVERKSETT_VEDTAK, Behandlingsstegstatus.KLAR)
         }
     }
 

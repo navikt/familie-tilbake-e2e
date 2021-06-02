@@ -21,6 +21,7 @@ import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.domene.builder.BehandleVedtakBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.KravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.StatusmeldingBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.TilbakekrevingBuilder
@@ -46,8 +47,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                             fagsystem = fagsystem,
                                             ytelsestype = ytelsestype,
                                             varsel = varsel,
-                                            verge = verge)
-            .build()
+                                            verge = verge).build()
         val eksternBrukId = familieTilbakeKlient.opprettTilbakekreving(request).data
         val behandlingId = hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
 
@@ -302,5 +302,17 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
             }
         }
         println("Behandling med behandlingsId ${gjeldendeBehandling.behandlingId} er bekreftet avsluttet med resultat $resultat")
+    }
+
+
+    //TODO: Fjern
+    fun behandleFatteVedtak(godkjenn: Boolean) {
+        val hentTotrinnsvurderingerResponse =
+            requireNotNull(familieTilbakeKlient.hentTotrinnsvurderinger(gjeldendeBehandling.behandlingId!!).data)
+            { "Kunne ikke hente data for behandling av fatte vedtak" }
+        val request = BehandleVedtakBuilder(hentTotrinnsvurderingerResponse = hentTotrinnsvurderingerResponse,
+                                            godkjenn = godkjenn).build()
+
+        familieTilbakeKlient.behandleSteg(stegdata = request, behandlingId = gjeldendeBehandling.behandlingId!!)
     }
 }
