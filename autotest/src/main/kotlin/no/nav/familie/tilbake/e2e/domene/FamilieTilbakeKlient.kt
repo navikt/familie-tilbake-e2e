@@ -11,6 +11,7 @@ import no.nav.familie.tilbake.e2e.domene.dto.VersjonInfoDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentFaktaDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentForeldelseDto
 import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVentDto
+import no.nav.familie.tilbake.e2e.domene.dto.EndreAnsvarligSaksbehandlerDto
 import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentVilkårsvurderingDto
 import no.nav.familie.tilbake.e2e.domene.dto.TotrinnsvurderingDto
@@ -136,6 +137,12 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
 
     fun henleggBehandling(behandlingId: String, data: HenleggDto): Ressurs<String> {
         val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/henlegg/v1")
+
+        return putForEntity(uri, data)
+    }
+
+    fun endreAnsvarligSaksbehandler(behandlingId: String, data: EndreAnsvarligSaksbehandlerDto): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/autotest/behandling/$behandlingId/endre/saksbehandler/")
 
         return putForEntity(uri, data)
     }

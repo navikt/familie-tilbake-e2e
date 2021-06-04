@@ -1,6 +1,7 @@
 package no.nav.familie.tilbake.e2e.felles
 
 import no.nav.familie.kontrakter.felles.Fagsystem
+import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsresultatstype
 import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstatus
@@ -25,7 +26,7 @@ import no.nav.familie.tilbake.e2e.domene.builder.BehandleVedtakBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.KravgrunnlagBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.StatusmeldingBuilder
 import no.nav.familie.tilbake.e2e.domene.builder.TilbakekrevingBuilder
-import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.domene.dto.EndreAnsvarligSaksbehandlerDto
 import no.nav.familie.tilbake.e2e.felles.utils.Vent
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.math.BigDecimal
@@ -196,15 +197,21 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
     }
 
     fun behandleForeslåVedtak() {
-        val hentVedtakbrevtekstResponse = familieTilbakeKlient.hentVedtaksbrevtekst(gjeldendeBehandling.behandlingId!!)
-        familieTilbakeKlient
-                .behandleSteg(stegdata = BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse = requireNotNull(
-                        hentVedtakbrevtekstResponse.data)).build(),
-                              behandlingId = gjeldendeBehandling.behandlingId!!)
+        val hentVedtakbrevtekstResponse =
+            requireNotNull(familieTilbakeKlient.hentVedtaksbrevtekst(gjeldendeBehandling.behandlingId!!).data)
+            { "Kunne ikke hente data for behandling av foreslå vedtak" }
+        val request = BehandleForeslåVedtakBuilder(hentVedtakbrevtekstResponse = hentVedtakbrevtekstResponse).build()
+        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId!!, stegdata = request)
     }
 
-    fun behandleSteg(stegdata: Any, behandlingId: String) {
-        familieTilbakeKlient.behandleSteg(stegdata, behandlingId)
+    fun behandleFatteVedtak(godkjent: Boolean) {
+        val hentTotrinnsvurderingerResponse =
+            requireNotNull(familieTilbakeKlient.hentTotrinnsvurderinger(gjeldendeBehandling.behandlingId!!).data)
+            { "Kunne ikke hente data for behandling av fatte vedtak" }
+        val request = BehandleVedtakBuilder(hentTotrinnsvurderingerResponse = hentTotrinnsvurderingerResponse,
+                                            godkjent = godkjent).build()
+
+        familieTilbakeKlient.behandleSteg(stegdata = request, behandlingId = gjeldendeBehandling.behandlingId!!)
     }
 
     fun settBehandlingPåVent(årsak: Venteårsak, frist: LocalDate) {
@@ -304,15 +311,11 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
         println("Behandling med behandlingsId ${gjeldendeBehandling.behandlingId} er bekreftet avsluttet med resultat $resultat")
     }
 
+    fun endreAnsvarligSaksbehandler(ansvarligSaksbehandler: String) {
+        val request = EndreAnsvarligSaksbehandlerDto(ansvarligSaksbehandler = ansvarligSaksbehandler)
 
-    //TODO: Fjern
-    fun behandleFatteVedtak(godkjenn: Boolean) {
-        val hentTotrinnsvurderingerResponse =
-            requireNotNull(familieTilbakeKlient.hentTotrinnsvurderinger(gjeldendeBehandling.behandlingId!!).data)
-            { "Kunne ikke hente data for behandling av fatte vedtak" }
-        val request = BehandleVedtakBuilder(hentTotrinnsvurderingerResponse = hentTotrinnsvurderingerResponse,
-                                            godkjenn = godkjenn).build()
-
-        familieTilbakeKlient.behandleSteg(stegdata = request, behandlingId = gjeldendeBehandling.behandlingId!!)
+        Vent.til({ familieTilbakeKlient.endreAnsvarligSaksbehandler(behandlingId = gjeldendeBehandling.behandlingId!!,
+                                                                    data = request).status == Ressurs.Status.SUKSESS },
+                 30, "Kunne ikke endre saksbehandler")
     }
 }
