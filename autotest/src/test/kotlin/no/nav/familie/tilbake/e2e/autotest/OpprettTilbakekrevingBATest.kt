@@ -128,6 +128,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
             endreAnsvarligSaksbehandler(ansvarligSaksbehandler = "nyAnsvarligSaksbehandler")
             behandleFatteVedtak(godkjent = false)
+            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.TILBAKEFØRT)
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             behandleForeslåVedtak()

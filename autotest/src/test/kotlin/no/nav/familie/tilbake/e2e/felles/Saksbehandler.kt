@@ -159,20 +159,24 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
     /*HANDLING-metoder*/
 
     fun behandleFakta(hendelsestype: Hendelsestype, hendelsesundertype: Hendelsesundertype) {
-        val hentFaktaResponse = familieTilbakeKlient.hentFakta(gjeldendeBehandling.behandlingId!!)
-        familieTilbakeKlient.behandleSteg(stegdata = BehandleFaktaStegBuilder(hentFaktaResponse = requireNotNull(hentFaktaResponse.data),
-                                                                              hendelsestype = hendelsestype,
-                                                                              hendelsesundertype = hendelsesundertype).build(),
-                                          behandlingId = gjeldendeBehandling.behandlingId!!)
+        val hentFaktaResponse =
+            requireNotNull(familieTilbakeKlient.hentFakta(gjeldendeBehandling.behandlingId!!).data)
+            { "Kunne ikke hente data for behandling av fakta" }
+        val request = BehandleFaktaStegBuilder(hentFaktaResponse = hentFaktaResponse,
+                                               hendelsestype = hendelsestype,
+                                               hendelsesundertype = hendelsesundertype).build()
+
+        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId!!, stegdata = request)
     }
 
     fun behandleForeldelse(beslutning: Foreldelsesvurderingstype) {
-        val hentForeldelseResponse = familieTilbakeKlient.hentForeldelse(gjeldendeBehandling.behandlingId!!)
-        familieTilbakeKlient
-                .behandleSteg(stegdata = BehandleForeldelseStegBuilder(hentForeldelseResponse = requireNotNull(
-                        hentForeldelseResponse.data),
-                                                                       beslutning = beslutning).build(),
-                              behandlingId = gjeldendeBehandling.behandlingId!!)
+        val hentForeldelseResponse =
+            requireNotNull(familieTilbakeKlient.hentForeldelse(gjeldendeBehandling.behandlingId!!).data)
+            { "Kunne ikke hente data for behandling av foreldelse" }
+        val request = BehandleForeldelseStegBuilder(hentForeldelseResponse = hentForeldelseResponse,
+                                                    beslutning = beslutning).build()
+
+        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId!!, stegdata = request)
     }
 
     fun behandleVilkårsvurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat,
@@ -182,18 +186,19 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                  andelTilbakekreves: BigDecimal? = null,
                                  beløpTilbakekreves: BigDecimal? = null,
                                  tilbakekrevSmåbeløp: Boolean? = null) {
-        val hentVilkårsvurderingResponse = familieTilbakeKlient.hentVilkårsvurdering(gjeldendeBehandling.behandlingId!!)
-        familieTilbakeKlient
-                .behandleSteg(stegdata = BehandleVilkårsvurderingStegBuilder(hentVilkårsvurderingResponse = requireNotNull(
-                        hentVilkårsvurderingResponse.data),
-                                                                             vilkårvurderingsresultat = vilkårvurderingsresultat,
-                                                                             aktsomhet = aktsomhet,
-                                                                             særligeGrunner = særligeGrunner,
-                                                                             beløpErIBehold = beløpErIBehold,
-                                                                             andelTilbakekreves = andelTilbakekreves,
-                                                                             beløpTilbakekreves = beløpTilbakekreves,
-                                                                             tilbakekrevSmåbeløp = tilbakekrevSmåbeløp).build(),
-                              behandlingId = gjeldendeBehandling.behandlingId!!)
+        val hentVilkårsvurderingResponse =
+            requireNotNull(familieTilbakeKlient.hentVilkårsvurdering(gjeldendeBehandling.behandlingId!!).data)
+            { "Kunne ikke hente data for behandling av vilkår" }
+        val request = BehandleVilkårsvurderingStegBuilder(hentVilkårsvurderingResponse = hentVilkårsvurderingResponse,
+                                                          vilkårvurderingsresultat = vilkårvurderingsresultat,
+                                                          aktsomhet = aktsomhet,
+                                                          særligeGrunner = særligeGrunner,
+                                                          beløpErIBehold = beløpErIBehold,
+                                                          andelTilbakekreves = andelTilbakekreves,
+                                                          beløpTilbakekreves = beløpTilbakekreves,
+                                                          tilbakekrevSmåbeløp = tilbakekrevSmåbeløp).build()
+
+        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId!!, stegdata = request)
     }
 
     fun behandleForeslåVedtak() {
