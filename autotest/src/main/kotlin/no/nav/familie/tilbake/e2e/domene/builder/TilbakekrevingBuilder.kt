@@ -20,7 +20,8 @@ class TilbakekrevingBuilder(eksternFagsakId: String,
                             fagsystem: Fagsystem,
                             ytelsestype: Ytelsestype,
                             varsel: Boolean,
-                            verge: Boolean) {
+                            verge: Boolean,
+                            sumFeilutbetaling: BigDecimal? = null) {
 
     private val request =
         OpprettTilbakekrevingRequest(fagsystem = fagsystem,
@@ -38,7 +39,7 @@ class TilbakekrevingBuilder(eksternFagsakId: String,
                                                            revurderingsresultat = "Endring i ytelsen",
                                                            tilbakekrevingsvalg = utledTilbakekrevingsvalg(varsel),
                                                            konsekvensForYtelser = setOf("Reduksjon av ytelsen", "Feilutbetaling")),
-                                     varsel = utledVarsel(varsel),
+                                     varsel = utledVarsel(varsel, sumFeilutbetaling),
                                      manueltOpprettet = false,
                                      verge = utledVerge(verge))
 
@@ -47,10 +48,10 @@ class TilbakekrevingBuilder(eksternFagsakId: String,
         else Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_UTEN_VARSEL
     }
 
-    private fun utledVarsel(varsel: Boolean): Varsel? {
+    private fun utledVarsel(varsel: Boolean, sumFeilutbetaling: BigDecimal?): Varsel? {
         return if (varsel) {
             Varsel(varseltekst = "Automatisk varseltekst fra Autotest",
-                   sumFeilutbetaling = BigDecimal(8124),
+                   sumFeilutbetaling = sumFeilutbetaling ?: BigDecimal(8124),
                    perioder = arrayListOf(
                            Periode(fom = LocalDate.now().minusMonths(5).withDayOfMonth(1),
                                    tom = LocalDate.now()

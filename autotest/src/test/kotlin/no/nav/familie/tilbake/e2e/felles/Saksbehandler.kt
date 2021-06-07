@@ -48,12 +48,14 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                               fagsystem: Fagsystem,
                               ytelsestype: Ytelsestype,
                               varsel: Boolean,
-                              verge: Boolean): String {
+                              verge: Boolean,
+                              sumFeilutbetaling: BigDecimal? = null): String {
         val request = TilbakekrevingBuilder(eksternFagsakId = eksternFagsakId,
                                             fagsystem = fagsystem,
                                             ytelsestype = ytelsestype,
                                             varsel = varsel,
-                                            verge = verge).build()
+                                            verge = verge,
+                                            sumFeilutbetaling = sumFeilutbetaling).build()
 
         val eksternBrukId = familieTilbakeKlient.opprettTilbakekreving(data = request).data
         val behandlingId = hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
@@ -63,7 +65,8 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                                   eksternFagsakId = eksternFagsakId,
                                                   eksternBehandlingId = request.eksternId,
                                                   eksternBrukId = eksternBrukId,
-                                                  behandlingId = behandlingId)
+                                                  behandlingId = behandlingId,
+                                                  sumFeilutbetaling = sumFeilutbetaling)
 
         println("Opprettet behandling med eksternFagsakId: $eksternFagsakId og eksternBrukId: $eksternBrukId")
 
@@ -95,23 +98,26 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                             antallPerioder: Int = 2,
                             under4rettsgebyr: Boolean,
                             muligforeldelse: Boolean,
-                            periodelengde: Int = 3) {
-        val request = KravgrunnlagBuilder(status = status,
-                                          ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype,
-                                                                       { "Ytelsestype ikke definert. Opprett behandling" +
+                            periodelengde: Int = 3,
+                            sumFeilutbetaling: BigDecimal? = null) {
+        val request =
+            KravgrunnlagBuilder(status = status,
+                                ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype,
+                                                             { "Ytelsestype ikke definert. Opprett behandling" +
+                                                                     " først eller bruk opprettKravgrunnlagUtenBehandling." }),
+                                eksternFagsakId = requireNotNull(gjeldendeBehandling.eksternFagsakId,
+                                                                 { "EksternFagsakId ikke definert. Opprett behandling" +
                                                                          " først eller bruk opprettKravgrunnlagUtenBehandling." }),
-                                          eksternFagsakId = requireNotNull(gjeldendeBehandling.eksternFagsakId,
-                                                                           { "EksternFagsakId ikke definert. Opprett behandling" +
-                                                                             " først eller bruk opprettKravgrunnlagUtenBehandling." }),
-                                          eksternBehandlingId = requireNotNull(gjeldendeBehandling.eksternBehandlingId,
-                                                                               { "EksternBehandlingId ikke definert. Opprett behandling først" +
-                                                                                 " eller bruk opprettKravgrunnlagUtenBehandling." }),
-                                          kravgrunnlagId = gjeldendeBehandling.kravgrunnlagId,
-                                          vedtakId = gjeldendeBehandling.vedtakId,
-                                          antallPerioder = antallPerioder,
-                                          under4rettsgebyr = under4rettsgebyr,
-                                          muligforeldelse = muligforeldelse,
-                                          periodeLengde = periodelengde).build()
+                                eksternBehandlingId = requireNotNull(gjeldendeBehandling.eksternBehandlingId,
+                                                                     { "EksternBehandlingId ikke definert. Opprett behandling først" +
+                                                                             " eller bruk opprettKravgrunnlagUtenBehandling." }),
+                                kravgrunnlagId = gjeldendeBehandling.kravgrunnlagId,
+                                vedtakId = gjeldendeBehandling.vedtakId,
+                                antallPerioder = antallPerioder,
+                                under4rettsgebyr = under4rettsgebyr,
+                                muligforeldelse = muligforeldelse,
+                                periodeLengde = periodelengde,
+                                sumFeilutbetaling = sumFeilutbetaling).build()
 
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = request)
 
