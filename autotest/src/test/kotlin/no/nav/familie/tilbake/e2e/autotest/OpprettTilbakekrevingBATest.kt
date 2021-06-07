@@ -74,7 +74,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(ansvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
             behandleFatteVedtak(godkjent = true)
             erBehandlingISteg(Behandlingssteg.IVERKSETT_VEDTAK, Behandlingsstegstatus.KLAR)
         }
@@ -126,7 +126,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(ansvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
             behandleFatteVedtak(godkjent = false)
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.TILBAKEFØRT)
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
@@ -134,7 +134,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(ansvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
             behandleFatteVedtak(godkjent = true)
             erBehandlingISteg(Behandlingssteg.IVERKSETT_VEDTAK, Behandlingsstegstatus.KLAR)
         }
@@ -168,14 +168,14 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(ansvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
             behandleFatteVedtak(godkjent = true)
             erBehandlingISteg(Behandlingssteg.IVERKSETT_VEDTAK, Behandlingsstegstatus.KLAR)
         }
     }
 
     @Test
-    fun `kravgrunnlag uten at behandling opprettes først`() {
+    fun `Kravgrunnlag uten at behandling opprettes først`() {
         with(saksbehandler) {
             val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
             opprettKravgrunnlagUtenBehandling(status = KodeStatusKrav.NY,
@@ -254,7 +254,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(ansvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
             behandleFatteVedtak(godkjent = true)
             erBehandlingISteg(Behandlingssteg.IVERKSETT_VEDTAK, Behandlingsstegstatus.KLAR)
         }

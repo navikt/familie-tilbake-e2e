@@ -316,11 +316,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
         println("Behandling med behandlingsId ${gjeldendeBehandling.behandlingId} er bekreftet avsluttet med resultat $resultat")
     }
 
-    fun endreAnsvarligSaksbehandler(ansvarligSaksbehandler: String) {
-        val request = EndreAnsvarligSaksbehandlerDto(ansvarligSaksbehandler = ansvarligSaksbehandler)
-
-        Vent.til({ familieTilbakeKlient.endreAnsvarligSaksbehandler(behandlingId = gjeldendeBehandling.behandlingId!!,
-                                                                    data = request).status == Ressurs.Status.SUKSESS },
+    fun endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler: String) {
+        Vent.til({ familieTilbakeKlient
+            .endreAnsvarligSaksbehandler(behandlingId = gjeldendeBehandling.behandlingId!!,
+                                         nyAnsvarligSaksbehandler = nyAnsvarligSaksbehandler).status == Ressurs.Status.SUKSESS },
                  30, "Kunne ikke endre saksbehandler")
     }
 }

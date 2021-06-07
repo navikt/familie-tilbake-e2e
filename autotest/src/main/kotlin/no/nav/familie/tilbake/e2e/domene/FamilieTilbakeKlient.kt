@@ -141,9 +141,9 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return putForEntity(uri, data)
     }
 
-    fun endreAnsvarligSaksbehandler(behandlingId: String, data: EndreAnsvarligSaksbehandlerDto): Ressurs<String> {
-        val uri = URI.create("$familieTilbakeApiUrl/api/autotest/behandling/$behandlingId/endre/saksbehandler/")
+    fun endreAnsvarligSaksbehandler(behandlingId: String, nyAnsvarligSaksbehandler: String): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl//api/autotest/behandling/$behandlingId/endre/saksbehandler/$nyAnsvarligSaksbehandler")
 
-        return putForEntity(uri, data)
+        return putForEntity(uri, "")
     }
 }
