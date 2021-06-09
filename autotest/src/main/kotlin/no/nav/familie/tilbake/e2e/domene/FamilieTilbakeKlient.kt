@@ -11,7 +11,6 @@ import no.nav.familie.tilbake.e2e.domene.dto.VersjonInfoDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentFaktaDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentForeldelseDto
 import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVentDto
-import no.nav.familie.tilbake.e2e.domene.dto.EndreAnsvarligSaksbehandlerDto
 import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentVilkårsvurderingDto
 import no.nav.familie.tilbake.e2e.domene.dto.TotrinnsvurderingDto
