@@ -13,6 +13,7 @@ import no.nav.familie.tilbake.e2e.domene.dto.HentForeldelseDto
 import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVentDto
 import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentVilkårsvurderingDto
+import no.nav.familie.tilbake.e2e.domene.dto.TotrinnsvurderingDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import org.springframework.beans.factory.annotation.Qualifier
@@ -107,7 +108,11 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return getForEntity(uri)
     }
 
-    // TODO: FattVedtak/to-trinn
+    fun hentTotrinnsvurderinger(behandlingId: String): Ressurs<TotrinnsvurderingDto> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/totrinn/v1")
+
+        return getForEntity(uri)
+    }
 
     /* BEHANDLE- og SETT-tjenester*/
 
@@ -133,5 +138,11 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/henlegg/v1")
 
         return putForEntity(uri, data)
+    }
+
+    fun endreAnsvarligSaksbehandler(behandlingId: String, nyAnsvarligSaksbehandler: String): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl//api/autotest/behandling/$behandlingId/endre/saksbehandler/$nyAnsvarligSaksbehandler")
+
+        return putForEntity(uri, "")
     }
 }

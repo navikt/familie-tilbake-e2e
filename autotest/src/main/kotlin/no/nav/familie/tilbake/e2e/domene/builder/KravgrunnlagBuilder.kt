@@ -86,9 +86,9 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
 
         // Setter feilutbetalt beløp til under 4.796 kr dersom det skal være under4rettsgebyr
         val beløpprmåned = if (under4rettsgebyr) {
-            BigDecimal(4500).divide(BigDecimal(antallPerioder).multiply(BigDecimal(3)), 2, RoundingMode.HALF_DOWN)
+            BigDecimal(4500).divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
         } else {
-            BigDecimal(20000).divide(BigDecimal(antallPerioder).multiply(BigDecimal(3)), 2, RoundingMode.HALF_DOWN)
+            BigDecimal(20000).divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
         }
 
         val tilbakekrevingsperiodeList: MutableList<DetaljertKravgrunnlagPeriodeDto> = mutableListOf()
@@ -101,7 +101,6 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
                     belopSkattMnd = BigDecimal.ZERO.setScale(2)
                     tilbakekrevingsBelop.addAll(utledTilbakekrevingsbelop(beløpprmåned, ytelsestype))
                 }
-
                 tilbakekrevingsperiodeList.add(kravgrunnlagPeriode)
 
                 startdato = startdato.plusMonths(1)
@@ -142,7 +141,7 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
             typeKlasse = TypeKlasseDto.YTEL
             belopOpprUtbet = beløpprmåned
             belopNy =  BigDecimal.ZERO.setScale(2)
-            belopTilbakekreves = beløpprmåned
+            belopTilbakekreves = beløpprmåned.setScale(2)
             belopUinnkrevd =  BigDecimal.ZERO.setScale(2)
             skattProsent =  BigDecimal.ZERO.setScale(2)
         }

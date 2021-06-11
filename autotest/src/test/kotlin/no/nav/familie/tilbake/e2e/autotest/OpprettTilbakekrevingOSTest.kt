@@ -13,6 +13,7 @@ import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsresultatstype
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -41,16 +42,13 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
     fun `Tilbakekreving med varsel, gjenoppta, kravgrunnlag med foreldelse, vilkårsvurdering simpel uaktsomhet delvis tilbakebetaling`() {
         with(saksbehandler) {
             val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            val eksternBrukId = saksbehandler.opprettTilbakekreving(
-                eksternFagsakId = eksternFagsakId,
-                fagsystem = fagsystem,
-                ytelsestype = ytelsestype,
-                varsel = true,
-                verge = false
-            )
-
-            hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
+            val eksternBrukId = saksbehandler.opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+                                                                    fagsystem = fagsystem,
+                                                                    ytelsestype = ytelsestype,
+                                                                    varsel = true,
+                                                                    verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
             taBehandlingAvVent()
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
@@ -75,6 +73,10 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
 
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.DELVIS_TILBAKEBETALING)
         }
     }
 
@@ -87,8 +89,6 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
                                                       ytelsestype = ytelsestype,
                                                       varsel = false,
                                                       verge = false)
-
-            hentBehandlingId(fagsystem, eksternFagsakId, eksternBrukId)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
@@ -121,6 +121,10 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
 
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.DELVIS_TILBAKEBETALING)
         }
     }
 }
