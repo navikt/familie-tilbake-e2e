@@ -42,12 +42,14 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     fun `Tilbakekreving med varsel, kravgrunnlag med foreldelse, ikke foreldet, vilkårsvurdering simpel uaktsomhet full tilbakebetaling småbeløp`() {
         with(saksbehandler) {
             val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            val eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+            opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
                                                       fagsystem = fagsystem,
                                                       ytelsestype = ytelsestype,
                                                       varsel = true,
                                                       verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
+            Thread.sleep(1000*10)
 
             taBehandlingAvVent()
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
@@ -85,7 +87,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     fun `Tilbakekreving uten varsel, kravgrunnlag, SPER-melding, ENDR-melding, vilkårsvurdering grov uaktsomhet delvis tilbakekreving`() {
         with(saksbehandler) {
             val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            val eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+            opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
                                                       fagsystem = fagsystem,
                                                       ytelsestype = ytelsestype,
                                                       varsel = false,
@@ -145,7 +147,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     fun `Tilbakekreving med alle perioder foreldet`() {
         with(saksbehandler) {
             val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            val eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+            opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
                                                       fagsystem = fagsystem,
                                                       ytelsestype = Ytelsestype.BARNETRYGD,
                                                       varsel = false,
@@ -195,12 +197,14 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     fun `Tilbakekreving behandles så langt det er mulig før iverksetting, vilkårsvurdering god tro, så AVSL-melding og henleggelse`() {
         with(saksbehandler) {
             val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            val eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+            opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
                                                       fagsystem = fagsystem,
                                                       ytelsestype = Ytelsestype.BARNETRYGD,
                                                       varsel = true,
                                                       verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
+            Thread.sleep(1000*10)
 
             taBehandlingAvVent()
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
@@ -230,7 +234,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     fun `Tilbakekreving uten varsel, tilleggsfrist for foreldelse, uaktsomhet forsett`() {
         with(saksbehandler) {
             val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            val eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+            opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
                                                       fagsystem = fagsystem,
                                                       ytelsestype = ytelsestype,
                                                       varsel = false,
@@ -266,7 +270,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     fun `Tilbakekreving med verge, send brev innhent dokumentasjon, ingen tilbakekreving`() {
         with(saksbehandler) {
             val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            val eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+            opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
                                                       fagsystem = fagsystem,
                                                       ytelsestype = ytelsestype,
                                                       varsel = false,
