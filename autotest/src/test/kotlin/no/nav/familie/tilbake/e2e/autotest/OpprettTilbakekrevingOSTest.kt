@@ -31,7 +31,9 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
     private val fagsystem = Fagsystem.EF
     private val ytelsestype = Ytelsestype.OVERGANGSSTØNAD
 
-    lateinit var saksbehandler: Saksbehandler
+    private lateinit var saksbehandler: Saksbehandler
+    private lateinit var eksternFagsakId: String
+    private lateinit var eksternBrukId: String
 
     @BeforeEach
     fun setup() {
@@ -41,12 +43,12 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Tilbakekreving med varsel, gjenoppta, kravgrunnlag med foreldelse, vilkårsvurdering simpel uaktsomhet delvis tilbakebetaling`() {
         with(saksbehandler) {
-            val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            val eksternBrukId = saksbehandler.opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                                    fagsystem = fagsystem,
-                                                                    ytelsestype = ytelsestype,
-                                                                    varsel = true,
-                                                                    verge = false)
+            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
+            eksternBrukId = saksbehandler.opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+                                                                fagsystem = fagsystem,
+                                                                ytelsestype = ytelsestype,
+                                                                varsel = true,
+                                                                verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             taBehandlingAvVent()
@@ -83,12 +85,12 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Tilbakekreving uten varsel, SPER melding, ENDR melding, vilkårsvurdering god tro`() {
         with(saksbehandler) {
-            val eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            val eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                      fagsystem = fagsystem,
-                                                      ytelsestype = ytelsestype,
-                                                      varsel = false,
-                                                      verge = false)
+            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
+            eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
+                                                  fagsystem = fagsystem,
+                                                  ytelsestype = ytelsestype,
+                                                  varsel = false,
+                                                  verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,

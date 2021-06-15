@@ -83,13 +83,13 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
             .minusMonths(antallMånederTilbake.toLong())
             .withDayOfMonth(1)
 
-        // Første periode må starte 3 år tilbake i tid dersom det skal være mulig foreldelse
+        // Første periode må starte minst 3 år tilbake i tid dersom det skal være mulig foreldelse
         if (muligForeldelse) {
             startdato = minOf(startdato, LocalDate.now().minusYears(3L).withDayOfMonth(1))
         }
 
         // Setter feilutbetalt beløp til under 4.796 kr dersom det skal være under4rettsgebyr, ellers egendefinert/20.000 kr
-        var feilutbetaltBeløp = if (under4rettsgebyr) {
+        val feilutbetaltBeløp = if (under4rettsgebyr) {
             FIRE_RETTSGEBYR - BigDecimal(100)
         } else {
             sumFeilutbetaling ?: BigDecimal(20000)
