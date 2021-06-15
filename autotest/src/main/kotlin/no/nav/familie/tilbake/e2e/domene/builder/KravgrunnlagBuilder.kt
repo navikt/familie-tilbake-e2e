@@ -96,7 +96,7 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
         }
 
         val beløpPrMåned = feilutbetaltBeløp
-            .divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), 2, RoundingMode.HALF_DOWN)
+            .divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
 
         val tilbakekrevingsperiodeList: MutableList<DetaljertKravgrunnlagPeriodeDto> = mutableListOf()
         for (i in 1..antallPerioder) {
@@ -147,7 +147,7 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
         val tilbakekrevingsbelopYtel = DetaljertKravgrunnlagBelopDto().apply {
             kodeKlasse = ytelKodeKlasse.name
             typeKlasse = TypeKlasseDto.YTEL
-            belopOpprUtbet = beløpprmåned
+            belopOpprUtbet = beløpprmåned.setScale(2)
             belopNy =  BigDecimal.ZERO.setScale(2)
             belopTilbakekreves = beløpprmåned.setScale(2)
             belopUinnkrevd =  BigDecimal.ZERO.setScale(2)

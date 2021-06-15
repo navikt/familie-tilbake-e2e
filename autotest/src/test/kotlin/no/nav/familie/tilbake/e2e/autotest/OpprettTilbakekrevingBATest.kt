@@ -217,8 +217,8 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
                                 antallPerioder = 2,
-                                under4rettsgebyr = false,
-                                muligforeldelse = false)
+                                under4rettsgebyr = true,
+                                muligforeldelse = true)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)

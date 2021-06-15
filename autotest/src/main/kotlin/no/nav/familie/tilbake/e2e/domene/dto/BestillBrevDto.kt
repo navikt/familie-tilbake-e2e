@@ -12,4 +12,3 @@ enum class Dokumentmalstype {
     VARSEL,
     KORRIGERT_VARSEL;
 }
-
