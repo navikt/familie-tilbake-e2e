@@ -44,8 +44,6 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     private lateinit var gjeldendeBehandling: GjeldendeBehandling
 
-    /*OPPRETT-metoder*/
-
     fun opprettTilbakekreving(eksternFagsakId: String,
                               fagsystem: Fagsystem,
                               ytelsestype: Ytelsestype,
@@ -152,8 +150,6 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
         println("Sendt inn statusmelding $status på eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId}")
     }
 
-    /*HENT-metoder*/
-
     fun hentBehandlingId(fagsystem: Fagsystem, eksternFagsakId: String, eksternBrukId: String?): String {
         familieTilbakeKlient.hentFagsak(fagsystem, eksternFagsakId).data?.behandlinger?.forEach {
             if (it.eksternBrukId.toString() == eksternBrukId) {
@@ -163,8 +159,6 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
         throw Exception("Fant ingen behandling med eksternBrukId: $eksternBrukId med eksternFagsakId: $eksternFagsakId" +
                                 " og fagsystem: $fagsystem")
     }
-
-    /*HANDLING-metoder*/
 
     fun behandleFakta(hendelsestype: Hendelsestype, hendelsesundertype: Hendelsesundertype) {
         val hentFaktaResponse =
@@ -252,8 +246,6 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
 
         familieTilbakeKlient.henleggBehandling(behandlingId = behandlingId, data = request)
     }
-
-    /*SJEKK-metoder*/
 
     fun erBehandlingPåVent(venteårsak: Venteårsak) {
         Vent.til(
@@ -343,7 +335,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
         familieTilbakeKlient.forhåndsvisVedtaksbrev(data = request)
     }
 
-    fun forhåndsvisVarselbrev(vedtakdato: LocalDate) {
+    fun forhåndsvisVarselbrev(vedtaksdato: LocalDate) {
         val hentBehandlingResponse = familieTilbakeKlient.hentBehandling(behandlingId = gjeldendeBehandling.behandlingId!!).data
 
         val request = ForhåndsvisVarselbrevBuilder(behandlendeEnhetId = hentBehandlingResponse?.enhetskode ?: "0106",
@@ -351,10 +343,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                                    eksternFagsakId = gjeldendeBehandling.eksternFagsakId,
                                                    fagsystem = gjeldendeBehandling.fagsystem,
                                                    perioder = requireNotNull(gjeldendeBehandling.perioder),
-                                                   ident = "31079221655", // Kan hentes fra hentFagsak
+                                                   ident = "31079221655", // TODO: Inkluder ident i gjeldendeBehandling
                                                    saksbehandlerIdent = hentBehandlingResponse?.ansvarligSaksbehandler ?: "VL",
                                                    språkkode = Språkkode.NB,
-                                                   vedtakdato = vedtakdato,
+                                                   vedtaksdato = vedtaksdato,
                                                    verge = null, // TODO: Implementer sjekk på harVerge i hentBehandlingResponse
                                                    ytelsestype = gjeldendeBehandling.ytelsestype).build()
 

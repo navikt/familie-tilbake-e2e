@@ -1,6 +1,7 @@
 package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.Fagsystem
+import no.nav.familie.kontrakter.felles.Språkkode
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsresultatstype
@@ -14,6 +15,8 @@ import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.domene.builder.ForhåndsvisHenleggelsesbrevBuilder
+import no.nav.familie.tilbake.e2e.domene.builder.ForhåndsvisVarselbrevBuilder
 import no.nav.familie.tilbake.e2e.domene.dto.Dokumentmalstype
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
 import org.junit.jupiter.api.BeforeEach
@@ -80,8 +83,6 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             forhåndsvisVedtaksbrev()
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
-
-            // forhåndsvisVarselbrev(vedtakdato = LocalDate.now())
 
             endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
             behandleFatteVedtak(godkjent = true)
@@ -273,7 +274,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
-    fun `Tilbakekreving med verge, send brev innhent dokumentasjon, ingen tilbakekreving`() {
+    fun `Tilbakekreving med verge, ingen tilbakekreving`() {
         with(saksbehandler) {
             eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
             eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
@@ -288,8 +289,6 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                 under4rettsgebyr = false,
                                 muligforeldelse = true)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
-
-            // TODO: Implementer send brev
 
             behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
@@ -312,7 +311,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
-    fun `Manuell bestilling av brev`() {
+    fun `Manuell bestilling og forhåndsvisning av brev`() {
         with(saksbehandler) {
             eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
             eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
@@ -339,6 +338,12 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             taBehandlingAvVent()
             bestillBrev(Dokumentmalstype.KORRIGERT_VARSEL)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
+            forhåndsvisVarselbrev(LocalDate.now())
+
+            forhåndsvisHenleggelsesbrev()
+
+            hentJournaldokument()
         }
     }
 

@@ -18,7 +18,7 @@ class ForhåndsvisVarselbrevBuilder(behandlendeEnhetId: String = "0106",
                                    ident: String = "31079221655",
                                    saksbehandlerIdent: String = "VL",
                                    språkkode: Språkkode = Språkkode.NB,
-                                   vedtakdato: LocalDate = LocalDate.now(),
+                                   vedtaksdato: LocalDate = LocalDate.now(),
                                    verge: Verge? = null,
                                    ytelsestype: Ytelsestype) {
 
@@ -34,7 +34,7 @@ class ForhåndsvisVarselbrevBuilder(behandlendeEnhetId: String = "0106",
                                      saksbehandlerIdent = saksbehandlerIdent,
                                      språkkode = språkkode,
                                      varseltekst = "Varseltekst fra Autotest",
-                                     vedtaksdato = vedtakdato,
+                                     vedtaksdato = vedtaksdato,
                                      verge = verge,
                                      ytelsestype = ytelsestype)
 
