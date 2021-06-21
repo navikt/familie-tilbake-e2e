@@ -348,6 +348,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                                    språkkode = Språkkode.NB,
                                                    vedtaksdato = vedtaksdato,
                                                    verge = null, // TODO: Implementer sjekk på harVerge i hentBehandlingResponse
+                                                   sumFeilutbetaling = gjeldendeBehandling.sumFeilutbetaling?.toLong() ?: 4000L,
                                                    ytelsestype = gjeldendeBehandling.ytelsestype).build()
 
         familieTilbakeKlient.forhåndsvisVarselbrev(data = request)

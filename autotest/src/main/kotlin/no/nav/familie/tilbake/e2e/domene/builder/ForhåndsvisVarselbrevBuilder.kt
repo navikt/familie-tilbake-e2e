@@ -20,7 +20,8 @@ class ForhåndsvisVarselbrevBuilder(behandlendeEnhetId: String = "0106",
                                    språkkode: Språkkode = Språkkode.NB,
                                    vedtaksdato: LocalDate = LocalDate.now(),
                                    verge: Verge? = null,
-                                   ytelsestype: Ytelsestype) {
+                                   ytelsestype: Ytelsestype,
+                                   sumFeilutbetaling: Long) {
 
     private val request =
         ForhåndsvisVarselbrevRequest(behandlendeEnhetId = behandlendeEnhetId,
@@ -29,7 +30,7 @@ class ForhåndsvisVarselbrevBuilder(behandlendeEnhetId: String = "0106",
                                      fagsystem = fagsystem,
                                      feilutbetaltePerioderDto =
                                      FeilutbetaltePerioderDto(perioder = perioder.map { Periode(fom = it.fom, tom = it.tom) },
-                                                              sumFeilutbetaling = 4000L),
+                                                              sumFeilutbetaling = sumFeilutbetaling),
                                      ident = ident,
                                      saksbehandlerIdent = saksbehandlerIdent,
                                      språkkode = språkkode,
