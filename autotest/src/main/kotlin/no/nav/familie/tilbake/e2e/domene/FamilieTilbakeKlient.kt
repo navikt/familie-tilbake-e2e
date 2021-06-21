@@ -3,6 +3,7 @@ package no.nav.familie.tilbake.e2e.domene
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Fagsystem
+import no.nav.familie.kontrakter.felles.tilbakekreving.ForhåndsvisVarselbrevRequest
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
 import no.nav.familie.tilbake.e2e.domene.dto.AvsnittDto
 import no.nav.familie.tilbake.e2e.domene.dto.BehandlingDto
@@ -11,6 +12,9 @@ import no.nav.familie.tilbake.e2e.domene.dto.VersjonInfoDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentFaktaDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentForeldelseDto
 import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVentDto
+import no.nav.familie.tilbake.e2e.domene.dto.BestillBrevDto
+import no.nav.familie.tilbake.e2e.domene.dto.ForhåndsvisningHenleggelsesbrevDto
+import no.nav.familie.tilbake.e2e.domene.dto.ForhåndsvisningVedtaksbrevPdfDto
 import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
 import no.nav.familie.tilbake.e2e.domene.dto.HentVilkårsvurderingDto
 import no.nav.familie.tilbake.e2e.domene.dto.TotrinnsvurderingDto
@@ -30,12 +34,10 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
                            @Qualifier("azure") private val restOperations: RestOperations)
     : AbstractRestClient(restOperations, "familie-tilbake") {
 
-    /* OPPRETT-tjenester */
-
-    fun opprettTilbakekreving(opprettTilbakekrevingRequest: OpprettTilbakekrevingRequest): Ressurs<String> {
+    fun opprettTilbakekreving(data: OpprettTilbakekrevingRequest): Ressurs<String> {
         val uri = URI.create("$familieTilbakeApiUrl/api/behandling/v1")
 
-        return postForEntity(uri, opprettTilbakekrevingRequest)
+        return postForEntity(uri, data)
     }
 
     fun opprettKravgrunnlag(kravgrunnlag: DetaljertKravgrunnlagMelding): Ressurs<String> {
@@ -62,8 +64,6 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return sw.toString()
     }
 
-    /*HENT-tjenester*/
-
     fun hentFagsak(fagsystem: Fagsystem, eksternFagsakId: String): Ressurs<FagsakDto> {
         val uri = URI.create("$familieTilbakeApiUrl/api/fagsystem/$fagsystem/fagsak/$eksternFagsakId/v1")
 
@@ -81,8 +81,6 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
 
         return getForEntity(uri)
     }
-
-    /*HENT-tjenester for behandlingsteg*/
 
     fun hentFakta(behandlingId: String): Ressurs<HentFaktaDto> {
         val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/fakta/v1")
@@ -114,12 +112,10 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return getForEntity(uri)
     }
 
-    /* BEHANDLE- og SETT-tjenester*/
-
-    fun behandleSteg(stegdata: Any, behandlingId: String): Ressurs<String> {
+    fun behandleSteg(data: Any, behandlingId: String): Ressurs<String> {
         val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/steg/v1")
 
-        return postForEntity(uri, stegdata)
+        return postForEntity(uri, data)
     }
 
     fun settBehandlingPåVent(data: BehandlingPåVentDto, behandlingId: String): Ressurs<String> {
@@ -144,5 +140,35 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         val uri = URI.create("$familieTilbakeApiUrl//api/autotest/behandling/$behandlingId/endre/saksbehandler/$nyAnsvarligSaksbehandler")
 
         return putForEntity(uri, "")
+    }
+
+    fun bestillBrev(data: BestillBrevDto): Ressurs<Any> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/dokument/bestill")
+
+        return postForEntity(uri, data)
+    }
+
+    fun forhåndsvisVedtaksbrev(data: ForhåndsvisningVedtaksbrevPdfDto): Ressurs<ByteArray> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/dokument/forhandsvis-vedtaksbrev")
+
+        return postForEntity(uri, data)
+    }
+
+    fun forhåndsvisVarselbrev(data: ForhåndsvisVarselbrevRequest): ByteArray {
+        val uri = URI.create("$familieTilbakeApiUrl/api/dokument/forhandsvis-varselbrev")
+
+        return postForEntity(uri, data)
+    }
+
+    fun forhåndsvisHenleggelsesbrev(data: ForhåndsvisningHenleggelsesbrevDto): Ressurs<ByteArray> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/dokument/forhandsvis-henleggelsesbrev")
+
+        return postForEntity(uri, data)
+    }
+
+    fun hentJournaldokument(behandlingId: String, journalpostId: String, dokumentId: String) {
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/journalpost/$behandlingId/dokument/$dokumentId")
+
+        return getForEntity(uri)
     }
 }

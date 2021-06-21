@@ -3,8 +3,6 @@ package no.nav.familie.tilbake.e2e.domene.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
 import java.time.LocalDate
-import javax.validation.Valid
-import javax.validation.constraints.Size
 import kotlin.collections.List
 
 /**
@@ -32,8 +30,8 @@ data class VedtaksbrevtekstDto(val avsnitt: List<AvsnittDto>)
 data class AvsnittDto(val overskrift: String? = null,
                       val underavsnittsliste: List<UnderavsnittDto> = listOf(),
                       val avsnittstype: Avsnittstype? = null,
-                      val fom: String? = null,
-                      val tom: String? = null)
+                      val fom: LocalDate? = null,
+                      val tom: LocalDate? = null)
 
 data class UnderavsnittDto(val overskrift: String? = null,
                            val brødtekst: String? = null,

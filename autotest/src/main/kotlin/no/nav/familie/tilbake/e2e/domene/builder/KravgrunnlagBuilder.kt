@@ -27,10 +27,12 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
                           antallPerioder: Int,
                           under4rettsgebyr: Boolean,
                           muligforeldelse: Boolean,
-                          periodeLengde: Int) {
+                          periodeLengde: Int,
+                          sumFeilutbetaling: BigDecimal?) {
 
     // TODO: Vil trenge å kunne sette kontrollfelt tilbake i tid for at den plukkes av auto-opprett batch (ikke laget enda)
     private val finalKontrollfelt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"))
+    private val FIRE_RETTSGEBYR = BigDecimal(4796)
 
     private val request = DetaljertKravgrunnlagMelding().also { detaljertKravgrunnlagMelding ->
         detaljertKravgrunnlagMelding.detaljertKravgrunnlag = DetaljertKravgrunnlagDto().apply {
@@ -54,7 +56,8 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
                                                                             under4rettsgebyr = under4rettsgebyr,
                                                                             muligForeldelse = muligforeldelse,
                                                                             ytelsestype = ytelsestype,
-                                                                            periodelengde = periodeLengde))
+                                                                            periodelengde = periodeLengde,
+                                                                            sumFeilutbetaling = sumFeilutbetaling))
         }
     }
 
@@ -72,24 +75,28 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
                                              under4rettsgebyr: Boolean,
                                              muligForeldelse: Boolean,
                                              ytelsestype: Ytelsestype,
-                                             periodelengde: Int): List<DetaljertKravgrunnlagPeriodeDto> {
+                                             periodelengde: Int,
+                                             sumFeilutbetaling: BigDecimal?): List<DetaljertKravgrunnlagPeriodeDto> {
         // Finner startdato for første periode, hvor periodene har 1 måned mellomrom
         val antallMånederTilbake = antallPerioder * periodelengde + antallPerioder - 1
         var startdato = LocalDate.now()
             .minusMonths(antallMånederTilbake.toLong())
             .withDayOfMonth(1)
 
-        // Første periode må starte 3 år tilbake i tid dersom det skal være mulig foreldelse
+        // Første periode må starte minst 3 år tilbake i tid dersom det skal være mulig foreldelse
         if (muligForeldelse) {
             startdato = minOf(startdato, LocalDate.now().minusYears(3L).withDayOfMonth(1))
         }
 
-        // Setter feilutbetalt beløp til under 4.796 kr dersom det skal være under4rettsgebyr
-        val beløpprmåned = if (under4rettsgebyr) {
-            BigDecimal(4500).divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
+        // Setter feilutbetalt beløp til under 4.796 kr dersom det skal være under4rettsgebyr, ellers egendefinert/20.000 kr
+        val feilutbetaltBeløp = if (under4rettsgebyr) {
+            FIRE_RETTSGEBYR - BigDecimal(100)
         } else {
-            BigDecimal(20000).divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
+            sumFeilutbetaling ?: BigDecimal(20000)
         }
+
+        val beløpPrMåned = feilutbetaltBeløp
+            .divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
 
         val tilbakekrevingsperiodeList: MutableList<DetaljertKravgrunnlagPeriodeDto> = mutableListOf()
         for (i in 1..antallPerioder) {
@@ -99,8 +106,9 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
                     periode.fom = startdato
                     periode.tom = startdato.withDayOfMonth(startdato.lengthOfMonth())
                     belopSkattMnd = BigDecimal.ZERO.setScale(2)
-                    tilbakekrevingsBelop.addAll(utledTilbakekrevingsbelop(beløpprmåned, ytelsestype))
+                    tilbakekrevingsBelop.addAll(utledTilbakekrevingsbelop(beløpPrMåned, ytelsestype))
                 }
+
                 tilbakekrevingsperiodeList.add(kravgrunnlagPeriode)
 
                 startdato = startdato.plusMonths(1)
@@ -139,7 +147,7 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
         val tilbakekrevingsbelopYtel = DetaljertKravgrunnlagBelopDto().apply {
             kodeKlasse = ytelKodeKlasse.name
             typeKlasse = TypeKlasseDto.YTEL
-            belopOpprUtbet = beløpprmåned
+            belopOpprUtbet = beløpprmåned.setScale(2)
             belopNy =  BigDecimal.ZERO.setScale(2)
             belopTilbakekreves = beløpprmåned.setScale(2)
             belopUinnkrevd =  BigDecimal.ZERO.setScale(2)
