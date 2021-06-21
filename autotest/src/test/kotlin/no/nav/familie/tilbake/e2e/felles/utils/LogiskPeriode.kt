@@ -27,7 +27,7 @@ object LogiskPeriode {
     }
 
     private fun harOppholdMellom(måned1: YearMonth, måned2: YearMonth): Boolean {
-        require(måned2 > måned1) { "dag2 må være etter dag1" }
+        require(måned2 > måned1) { "måned2 må være etter måned1" }
         return måned1.plusMonths(1) != måned2
     }
 }
