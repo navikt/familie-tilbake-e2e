@@ -6,13 +6,12 @@ import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
 import java.math.BigDecimal
 import java.math.BigInteger
 
-data class GjeldendeBehandling(val fagsystem: Fagsystem,
-                               val ytelsestype: Ytelsestype,
-                               val eksternFagsakId: String,
-                               val eksternBehandlingId: String,
+data class GjeldendeBehandling(val eksternFagsakId: String,
                                var eksternBrukId: String? = null,
                                val behandlingId: String? = null,
+                               val eksternBehandlingId: String,
+                               val fagsystem: Fagsystem,
+                               val ytelsestype: Ytelsestype,
                                var vedtakId: BigInteger? = null,
                                var kravgrunnlagId: BigInteger? = null,
-                               var perioder: List<PeriodeDto>? = null,
-                               var sumFeilutbetaling: BigDecimal? = null)
+                               var perioder: List<PeriodeDto>? = null)

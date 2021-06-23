@@ -171,4 +171,6 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
 
         return getForEntity(uri)
     }
+
+    // TODO: Implementer manglende tjenester historikk, manuell opprettelse av behandling
 }

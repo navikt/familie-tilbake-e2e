@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.domene.builder
+package no.nav.familie.tilbake.e2e.felles.datagenerator
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Behandlingstype
 import no.nav.familie.kontrakter.felles.Fagsystem
@@ -15,33 +15,35 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.random.Random
 
-class TilbakekrevingBuilder(eksternFagsakId: String,
-                            eksternBehandlingId: String? = null,
-                            fagsystem: Fagsystem,
-                            ytelsestype: Ytelsestype,
-                            varsel: Boolean,
-                            verge: Boolean,
-                            sumFeilutbetaling: BigDecimal? = null) {
+class TilbakekrevingData(val eksternFagsakId: String,
+                         val eksternBehandlingId: String? = null,
+                         val fagsystem: Fagsystem,
+                         val ytelsestype: Ytelsestype,
+                         val varsel: Boolean,
+                         val verge: Boolean,
+                         val sumFeilutbetaling: BigDecimal? = null) {
 
-    private val request =
-        OpprettTilbakekrevingRequest(fagsystem = fagsystem,
-                                     ytelsestype = ytelsestype,
-                                     eksternFagsakId = eksternFagsakId,
-                                     eksternId = eksternBehandlingId ?: Random.nextInt(1000000, 9999999).toString(),
-                                     personIdent = "12345678901",
-                                     saksbehandlerIdent = "Z994824",
-                                     behandlingstype = Behandlingstype.TILBAKEKREVING,
-                                     språkkode = Språkkode.NB,
-                                     enhetId = "0106",
-                                     enhetsnavn = "NAV Fredrikstad",
-                                     revurderingsvedtaksdato = LocalDate.now().minusDays(35),
-                                     faktainfo = Faktainfo(revurderingsårsak = "Nye opplysninger",
-                                                           revurderingsresultat = "Endring i ytelsen",
-                                                           tilbakekrevingsvalg = utledTilbakekrevingsvalg(varsel),
-                                                           konsekvensForYtelser = setOf("Reduksjon av ytelsen", "Feilutbetaling")),
-                                     varsel = utledVarsel(varsel, sumFeilutbetaling),
-                                     manueltOpprettet = false,
-                                     verge = utledVerge(verge))
+    fun lag(): OpprettTilbakekrevingRequest {
+        return OpprettTilbakekrevingRequest(fagsystem = fagsystem,
+                                            ytelsestype = ytelsestype,
+                                            eksternFagsakId = eksternFagsakId,
+                                            eksternId = eksternBehandlingId ?: Random.nextInt(1000000, 9999999).toString(),
+                                            personIdent = "12345678901",
+                                            saksbehandlerIdent = "Z994824",
+                                            behandlingstype = Behandlingstype.TILBAKEKREVING,
+                                            språkkode = Språkkode.NB,
+                                            enhetId = "0106",
+                                            enhetsnavn = "NAV Fredrikstad",
+                                            revurderingsvedtaksdato = LocalDate.now().minusDays(35),
+                                            faktainfo = Faktainfo(revurderingsårsak = "Nye opplysninger",
+                                                                  revurderingsresultat = "Endring i ytelsen",
+                                                                  tilbakekrevingsvalg = utledTilbakekrevingsvalg(varsel),
+                                                                  konsekvensForYtelser = setOf("Reduksjon av ytelsen",
+                                                                                               "Feilutbetaling")),
+                                            varsel = utledVarsel(varsel, sumFeilutbetaling),
+                                            manueltOpprettet = false,
+                                            verge = utledVerge(verge))
+    }
 
     private fun utledTilbakekrevingsvalg(varsel: Boolean): Tilbakekrevingsvalg {
         return if (varsel) Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_MED_VARSEL
@@ -72,9 +74,5 @@ class TilbakekrevingBuilder(eksternFagsakId: String,
                   navn = "Jens Pettersen",
                   organisasjonsnummer = "987654321")
         } else null
-    }
-
-    fun build(): OpprettTilbakekrevingRequest {
-        return request
     }
 }

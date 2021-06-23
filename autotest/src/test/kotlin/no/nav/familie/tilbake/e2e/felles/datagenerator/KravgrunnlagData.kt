@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.domene.builder
+package no.nav.familie.tilbake.e2e.felles.datagenerator
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.domene.dto.KodeKlasse
@@ -18,46 +18,46 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
-class KravgrunnlagBuilder(status: KodeStatusKrav,
-                          ytelsestype: Ytelsestype,
-                          eksternFagsakId: String,
-                          eksternBehandlingId: String,
-                          kravgrunnlagId: BigInteger? = null,
-                          vedtakId: BigInteger? = null,
-                          antallPerioder: Int,
-                          under4rettsgebyr: Boolean,
-                          muligforeldelse: Boolean,
-                          periodeLengde: Int,
-                          sumFeilutbetaling: BigDecimal?) {
+class KravgrunnlagData(val status: KodeStatusKrav,
+                       val ytelsestype: Ytelsestype,
+                       val eksternFagsakId: String,
+                       val eksternBehandlingId: String,
+                       val antallPerioder: Int,
+                       val under4rettsgebyr: Boolean,
+                       val muligforeldelse: Boolean,
+                       val periodeLengde: Int,
+                       val sumFeilutbetaling: BigDecimal?) {
 
     // TODO: Vil trenge å kunne sette kontrollfelt tilbake i tid for at den plukkes av auto-opprett batch (ikke laget enda)
     private val finalKontrollfelt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"))
     private val FIRE_RETTSGEBYR = BigDecimal(4796)
 
-    private val request = DetaljertKravgrunnlagMelding().also { detaljertKravgrunnlagMelding ->
-        detaljertKravgrunnlagMelding.detaljertKravgrunnlag = DetaljertKravgrunnlagDto().apply {
-            this.kravgrunnlagId = kravgrunnlagId ?: Random.nextInt(100000, 999999).toBigInteger()
-            this.vedtakId = vedtakId ?: Random.nextInt(100000, 999999).toBigInteger()
-            this.kodeStatusKrav = status.toString()
-            this.kodeFagomraade = utledFagområdeKode(ytelsestype = ytelsestype)
-            this.fagsystemId = eksternFagsakId
-            this.vedtakIdOmgjort = BigInteger.ZERO
-            this.vedtakGjelderId = "12345678901"
-            this.typeGjelderId = TypeGjelderDto.PERSON
-            this.utbetalesTilId = "12345678901"
-            this.typeUtbetId = TypeGjelderDto.PERSON
-            this.enhetAnsvarlig = "8020"
-            this.enhetBosted = "8020"
-            this.enhetBehandl = "8020"
-            this.kontrollfelt = finalKontrollfelt
-            this.saksbehId = "K231B433"
-            this.referanse = eksternBehandlingId
-            this.tilbakekrevingsPeriode.addAll(utledTilbakekrevingsPerioder(antallPerioder = antallPerioder,
-                                                                            under4rettsgebyr = under4rettsgebyr,
-                                                                            muligForeldelse = muligforeldelse,
-                                                                            ytelsestype = ytelsestype,
-                                                                            periodelengde = periodeLengde,
-                                                                            sumFeilutbetaling = sumFeilutbetaling))
+    fun lag(): DetaljertKravgrunnlagMelding {
+        return DetaljertKravgrunnlagMelding().also { detaljertKravgrunnlagMelding ->
+            detaljertKravgrunnlagMelding.detaljertKravgrunnlag = DetaljertKravgrunnlagDto().apply {
+                this.kravgrunnlagId = Random.nextInt(100000, 999999).toBigInteger()
+                this.vedtakId = Random.nextInt(100000, 999999).toBigInteger()
+                this.kodeStatusKrav = status.toString()
+                this.kodeFagomraade = utledFagområdeKode(ytelsestype = ytelsestype)
+                this.fagsystemId = eksternFagsakId
+                this.vedtakIdOmgjort = BigInteger.ZERO
+                this.vedtakGjelderId = "12345678901"
+                this.typeGjelderId = TypeGjelderDto.PERSON
+                this.utbetalesTilId = "12345678901"
+                this.typeUtbetId = TypeGjelderDto.PERSON
+                this.enhetAnsvarlig = "8020"
+                this.enhetBosted = "8020"
+                this.enhetBehandl = "8020"
+                this.kontrollfelt = finalKontrollfelt
+                this.saksbehId = "K231B433"
+                this.referanse = eksternBehandlingId
+                this.tilbakekrevingsPeriode.addAll(utledTilbakekrevingsPerioder(antallPerioder = antallPerioder,
+                                                                                under4rettsgebyr = under4rettsgebyr,
+                                                                                muligForeldelse = muligforeldelse,
+                                                                                ytelsestype = ytelsestype,
+                                                                                periodelengde = periodeLengde,
+                                                                                sumFeilutbetaling = sumFeilutbetaling))
+            }
         }
     }
 
@@ -167,9 +167,5 @@ class KravgrunnlagBuilder(status: KodeStatusKrav,
         tilbakekrevingsBelopList.add(tilbakekrevingsbelopFeil)
 
         return tilbakekrevingsBelopList
-    }
-
-    fun build(): DetaljertKravgrunnlagMelding {
-        return request
     }
 }

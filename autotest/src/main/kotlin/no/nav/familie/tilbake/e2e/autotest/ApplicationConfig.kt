@@ -37,7 +37,7 @@ class ApplicationConfig {
     class LocalINaisProxyCustomiser : INaisProxyCustomizer {
 
         override fun customize(restTemplate: RestTemplate?) {
-            // should do nothing!!!!!!1
+            // Should do nothing
         }
     }
 }
