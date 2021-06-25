@@ -26,9 +26,11 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                        val under4rettsgebyr: Boolean,
                        val muligforeldelse: Boolean,
                        val periodeLengde: Int,
-                       val sumFeilutbetaling: BigDecimal?) {
+                       val personIdent: String,
+                       val enhetId: String,
+                       val sumFeilutbetaling: BigDecimal) {
 
-    // TODO: Vil trenge å kunne sette kontrollfelt tilbake i tid for at den plukkes av auto-opprett batch (ikke laget enda)
+    // TODO: Vil trenge å kunne sette kontrollfelt tilbake i tid for at den plukkes av auto-opprett batch
     private val finalKontrollfelt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"))
     private val FIRE_RETTSGEBYR = BigDecimal(4796)
 
@@ -41,15 +43,15 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                 this.kodeFagomraade = utledFagområdeKode(ytelsestype = ytelsestype)
                 this.fagsystemId = eksternFagsakId
                 this.vedtakIdOmgjort = BigInteger.ZERO
-                this.vedtakGjelderId = "12345678901"
+                this.vedtakGjelderId = personIdent
                 this.typeGjelderId = TypeGjelderDto.PERSON
-                this.utbetalesTilId = "12345678901"
+                this.utbetalesTilId = personIdent
                 this.typeUtbetId = TypeGjelderDto.PERSON
-                this.enhetAnsvarlig = "8020"
-                this.enhetBosted = "8020"
-                this.enhetBehandl = "8020"
+                this.enhetAnsvarlig = enhetId
+                this.enhetBosted = enhetId
+                this.enhetBehandl = enhetId
                 this.kontrollfelt = finalKontrollfelt
-                this.saksbehId = "K231B433"
+                this.saksbehId = "VL"
                 this.referanse = eksternBehandlingId
                 this.tilbakekrevingsPeriode.addAll(utledTilbakekrevingsPerioder(antallPerioder = antallPerioder,
                                                                                 under4rettsgebyr = under4rettsgebyr,
@@ -76,7 +78,7 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                                              muligForeldelse: Boolean,
                                              ytelsestype: Ytelsestype,
                                              periodelengde: Int,
-                                             sumFeilutbetaling: BigDecimal?): List<DetaljertKravgrunnlagPeriodeDto> {
+                                             sumFeilutbetaling: BigDecimal): List<DetaljertKravgrunnlagPeriodeDto> {
         // Finner startdato for første periode, hvor periodene har 1 måned mellomrom
         val antallMånederTilbake = antallPerioder * periodelengde + antallPerioder - 1
         var startdato = LocalDate.now()
@@ -88,11 +90,11 @@ class KravgrunnlagData(val status: KodeStatusKrav,
             startdato = minOf(startdato, LocalDate.now().minusYears(3L).withDayOfMonth(1))
         }
 
-        // Setter feilutbetalt beløp til under 4.796 kr dersom det skal være under4rettsgebyr, ellers egendefinert/20.000 kr
+        // Setter feilutbetalt beløp til under 4.796 kr dersom det skal være under4rettsgebyr
         val feilutbetaltBeløp = if (under4rettsgebyr) {
             FIRE_RETTSGEBYR - BigDecimal(100)
         } else {
-            sumFeilutbetaling ?: BigDecimal(20000)
+            sumFeilutbetaling
         }
 
         val beløpPrMåned = feilutbetaltBeløp
