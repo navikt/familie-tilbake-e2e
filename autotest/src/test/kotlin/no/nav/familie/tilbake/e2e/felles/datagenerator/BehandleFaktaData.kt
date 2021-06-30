@@ -1,14 +1,15 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.FaktaDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Hendelsestype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Hendelsesundertype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HentFaktaDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.VurdertFaktaFeilutbetaltPeriodeDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.FaktaDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsestype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.HentFaktaDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.VurdertFaktaFeilutbetaltPeriodeDto
 
 class BehandleFaktaData(val hentFaktaResponse: HentFaktaDto,
                         val hendelsestype: Hendelsestype,
-                        val hendelsesundertype: Hendelsesundertype) {
+                        val hendelsesundertype: Hendelsesundertype
+) {
 
     fun lag(): FaktaDto {
         return FaktaDto(begrunnelse = "Automatisk begrunnelse fra Autotest",

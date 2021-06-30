@@ -1,7 +1,8 @@
-package no.nav.familie.tilbake.e2e.familie_tilbake.dto
+package no.nav.familie.tilbake.e2e.klienter.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsestype
 import no.nav.tilbakekreving.typer.v1.PeriodeDto
 import java.math.BigDecimal
 

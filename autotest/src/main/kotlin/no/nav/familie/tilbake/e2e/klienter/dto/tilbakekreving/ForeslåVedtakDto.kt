@@ -1,7 +1,7 @@
-package no.nav.familie.tilbake.e2e.familie_tilbake.dto
+package no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.klienter.dto.felles.PeriodeDto
 import java.time.LocalDate
 import kotlin.collections.List
 
@@ -10,7 +10,8 @@ import kotlin.collections.List
  */
 data class ForeslåVedtakDto(@JsonProperty("@type")
                             val type: String = "FORESLÅ_VEDTAK",
-                            val fritekstavsnitt: FritekstavsnittDto)
+                            val fritekstavsnitt: FritekstavsnittDto
+)
 
 data class FritekstavsnittDto(val oppsummeringstekst: String? = null,
                               val perioderMedTekst: List<PeriodeMedTekstDto>)

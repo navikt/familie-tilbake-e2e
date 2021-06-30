@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.familie_historikk.dto
+package no.nav.familie.tilbake.e2e.klienter.dto.historikkinnslag
 
 import no.nav.familie.kontrakter.felles.Applikasjon
 import no.nav.familie.kontrakter.felles.Fagsystem

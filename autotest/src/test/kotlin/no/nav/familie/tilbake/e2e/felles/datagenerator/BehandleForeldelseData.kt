@@ -1,13 +1,14 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.ForeldelseDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HentForeldelseDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Foreldelsesvurderingstype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.VurdertForeldelsesperiodeDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.ForeldelseDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.HentForeldelseDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.VurdertForeldelsesperiodeDto
 import java.time.LocalDate
 
 class BehandleForeldelseData(val hentForeldelseResponse: HentForeldelseDto,
-                             val beslutning: Foreldelsesvurderingstype) {
+                             val beslutning: Foreldelsesvurderingstype
+) {
 
     fun lag(): ForeldelseDto {
         return ForeldelseDto(foreldetPerioder = hentForeldelseResponse.foreldetPerioder.map {

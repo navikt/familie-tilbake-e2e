@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.familie_tilbake.dto
+package no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving
 
 enum class KodeStatusKrav {
     NY,

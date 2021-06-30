@@ -1,13 +1,13 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.AvsnittDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Avsnittstype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.ForeslåVedtakDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.FritekstavsnittDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.PeriodeMedTekstDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.UnderavsnittDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Underavsnittstype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.AvsnittDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Avsnittstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.ForeslåVedtakDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.FritekstavsnittDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.PeriodeMedTekstDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.UnderavsnittDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Underavsnittstype
+import no.nav.familie.tilbake.e2e.klienter.dto.felles.PeriodeDto
 
 class BehandleForeslåVedtakData(val hentVedtakbrevtekstResponse: List<AvsnittDto>) {
 
@@ -28,11 +28,13 @@ class BehandleForeslåVedtakData(val hentVedtakbrevtekstResponse: List<AvsnittDt
                                                                                Underavsnittstype.SÆRLIGEGRUNNER),
                                           særligeGrunnerAnnetAvsnitt = utledAvsnitt(it.underavsnittsliste,
                                                                                     Underavsnittstype.SÆRLIGEGRUNNER_ANNET))
-                }))
+                })
+        )
     }
 
     private fun utledAvsnitt(underavsnittsliste: List<UnderavsnittDto>,
-                             underavsnittstype: Underavsnittstype): String? {
+                             underavsnittstype: Underavsnittstype
+    ): String? {
         return if (underavsnittsliste.any { it.fritekstTillatt && it.underavsnittstype == underavsnittstype }) {
             "Automatisk vurdering fra Autotest for underavsnitt $underavsnittstype."
         } else null

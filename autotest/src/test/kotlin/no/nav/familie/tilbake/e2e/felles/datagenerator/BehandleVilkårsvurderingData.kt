@@ -1,15 +1,15 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Aktsomhet
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.AktsomhetDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.VilkårsvurderingDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.GodTroDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HentVilkårsvurderingDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.SærligGrunn
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.SærligGrunnDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.VilkårsvurderingsperiodeDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Vilkårsvurderingsresultat
+import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
+import no.nav.familie.tilbake.e2e.klienter.dto.AktsomhetDto
+import no.nav.familie.tilbake.e2e.klienter.dto.VilkårsvurderingDto
+import no.nav.familie.tilbake.e2e.klienter.dto.GodTroDto
+import no.nav.familie.tilbake.e2e.klienter.dto.HentVilkårsvurderingDto
+import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
+import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunnDto
+import no.nav.familie.tilbake.e2e.klienter.dto.VilkårsvurderingsperiodeDto
+import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
 import java.math.BigDecimal
 
 class BehandleVilkårsvurderingData(val hentVilkårsvurderingResponse: HentVilkårsvurderingDto,

@@ -1,6 +1,6 @@
-package no.nav.familie.tilbake.e2e.familie_tilbake.dto
+package no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving
 
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.klienter.dto.felles.PeriodeDto
 import java.math.BigDecimal
 
 /**
@@ -14,7 +14,8 @@ data class BeregnetPeriodeDto(val periode: PeriodeDto, val feilutbetaltBeløp: B
  * DTO-er relatert til beregningsresultat
  */
 data class BeregningsresultatDto(val beregningsresultatsperioder: List<BeregningsresultatsperiodeDto>,
-                                 val vedtaksresultat: Vedtaksresultat)
+                                 val vedtaksresultat: Vedtaksresultat
+)
 
 data class BeregningsresultatsperiodeDto(val periode: PeriodeDto,
                                          val vurdering: String? = null,

@@ -1,8 +1,8 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.KodeKlasse
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeKlasse
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeStatusKrav
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding

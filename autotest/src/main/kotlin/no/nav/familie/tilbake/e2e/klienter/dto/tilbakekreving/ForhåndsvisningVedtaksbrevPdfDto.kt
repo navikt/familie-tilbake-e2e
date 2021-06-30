@@ -1,5 +1,6 @@
-package no.nav.familie.tilbake.e2e.familie_tilbake.dto
+package no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving
 
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.PeriodeMedTekstDto
 import java.util.UUID
 
 data class ForhåndsvisningVedtaksbrevPdfDto(var behandlingId: UUID,

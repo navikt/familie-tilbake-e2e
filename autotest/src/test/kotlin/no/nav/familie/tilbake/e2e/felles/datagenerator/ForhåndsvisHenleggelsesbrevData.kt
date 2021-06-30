@@ -1,6 +1,6 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.ForhåndsvisningHenleggelsesbrevDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.ForhåndsvisningHenleggelsesbrevDto
 import java.util.UUID
 
 class ForhåndsvisHenleggelsesbrevData(val behandlingId: String) {

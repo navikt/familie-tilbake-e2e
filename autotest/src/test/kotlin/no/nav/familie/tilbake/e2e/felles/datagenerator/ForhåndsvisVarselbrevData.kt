@@ -8,7 +8,7 @@ import no.nav.familie.kontrakter.felles.tilbakekreving.Periode
 import no.nav.familie.kontrakter.felles.tilbakekreving.Verge
 import no.nav.familie.kontrakter.felles.tilbakekreving.Vergetype
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.klienter.dto.felles.PeriodeDto
 import java.time.LocalDate
 
 class ForhåndsvisVarselbrevData(val behandlendeEnhetId: String = "0106",

@@ -1,8 +1,8 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.TotrinnskontrollDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.TotrinnsvurderingDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.VurdertTotrinnDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.TotrinnskontrollDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.TotrinnsvurderingDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.VurdertTotrinnDto
 
 class BehandleFatteVedtakData(val hentTotrinnsvurderingerResponse: TotrinnsvurderingDto,
                               val godkjent: Boolean) {

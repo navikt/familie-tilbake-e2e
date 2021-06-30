@@ -3,26 +3,26 @@ package no.nav.familie.tilbake.e2e.felles
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.Språkkode
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.tilbake.e2e.familie_historikk.FamilieHistorikkKlient
+import no.nav.familie.tilbake.e2e.klienter.FamilieHistorikkKlient
 import no.nav.familie.tilbake.e2e.familie_historikk.dto.TilbakekrevingHistorikkinnslagstype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingsresultatstype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingsstatus
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingssteg
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingsstegstatus
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.KodeStatusKrav
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Venteårsak
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsresultatstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsstatus
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingssteg
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsstegstatus
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Venteårsak
 import no.nav.familie.tilbake.e2e.felles.datagenerator.BehandleForeldelseData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.BehandleForeslåVedtakData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.BehandleVilkårsvurderingData
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Aktsomhet
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Foreldelsesvurderingstype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Hendelsestype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Hendelsesundertype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.BehandlingPåVentDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HenleggDto
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.SærligGrunn
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Vilkårsvurderingsresultat
-import no.nav.familie.tilbake.e2e.familie_tilbake.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsestype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.BehandlingPåVentDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.HenleggDto
+import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
+import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
+import no.nav.familie.tilbake.e2e.klienter.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.felles.datagenerator.BehandleFaktaData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.BestillBrevData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.ForhåndsvisHenleggelsesbrevData
@@ -32,7 +32,7 @@ import no.nav.familie.tilbake.e2e.felles.datagenerator.BehandleFatteVedtakData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.KravgrunnlagData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.StatusmeldingData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.TilbakekrevingData
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Dokumentmalstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Dokumentmalstype
 import no.nav.familie.tilbake.e2e.felles.utils.LogiskPeriodeUtil.utledLogiskPeriodeFraKravgrunnlag
 import no.nav.familie.tilbake.e2e.felles.utils.Vent
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -327,7 +327,8 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
     }
 
     fun erBehandlingISteg(behandlingssteg: Behandlingssteg,
-                          behandlingsstegstatus: Behandlingsstegstatus) {
+                          behandlingsstegstatus: Behandlingsstegstatus
+    ) {
         Vent.til(
                 {
                     familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId).data?.behandlingsstegsinfo?.any {
@@ -341,18 +342,20 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun erBehandlingAvsluttet(resultat: Behandlingsresultatstype) {
         Vent.til(
-                { familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId).data?.status == Behandlingsstatus.AVSLUTTET },
-                30, "Behandlingen fikk aldri status AVSLUTTET")
+            { familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId).data?.status == Behandlingsstatus.AVSLUTTET },
+            30, "Behandlingen fikk aldri status AVSLUTTET")
         val behandling = requireNotNull(familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId).data)
-        val henlagttyper = listOf(Behandlingsresultatstype.HENLAGT,
-                                  Behandlingsresultatstype.HENLAGT_FEILOPPRETTET,
-                                  Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_MED_BREV,
-                                  Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_UTEN_BREV,
-                                  Behandlingsresultatstype.HENLAGT_TEKNISK_VEDLIKEHOLD,
-                                  Behandlingsresultatstype.HENLAGT_KRAVGRUNNLAG_NULLSTILT)
-        val iverksatttyper = listOf(Behandlingsresultatstype.INGEN_TILBAKEBETALING,
-                                    Behandlingsresultatstype.DELVIS_TILBAKEBETALING,
-                                    Behandlingsresultatstype.FULL_TILBAKEBETALING)
+        val henlagttyper = listOf(
+            Behandlingsresultatstype.HENLAGT,
+            Behandlingsresultatstype.HENLAGT_FEILOPPRETTET,
+            Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_MED_BREV,
+            Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_UTEN_BREV,
+            Behandlingsresultatstype.HENLAGT_TEKNISK_VEDLIKEHOLD,
+            Behandlingsresultatstype.HENLAGT_KRAVGRUNNLAG_NULLSTILT)
+        val iverksatttyper = listOf(
+            Behandlingsresultatstype.INGEN_TILBAKEBETALING,
+            Behandlingsresultatstype.DELVIS_TILBAKEBETALING,
+            Behandlingsresultatstype.FULL_TILBAKEBETALING)
         when (resultat) {
             in henlagttyper -> {
                 assertTrue(behandling.erBehandlingHenlagt,
@@ -370,7 +373,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                 assertTrue(behandling.behandlingsstegsinfo.all {
                     it.behandlingsstegstatus == Behandlingsstegstatus.UTFØRT ||
                     it.behandlingsstegstatus == Behandlingsstegstatus.AUTOUTFØRT },
-                    "Behandlingen var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke UTFØRT/AUTOUTFØRT")
+                           "Behandlingen var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke UTFØRT/AUTOUTFØRT")
                 assertTrue(behandling.resultatstype == resultat,
                            "Forventet resultat: $resultat, Behandlingens resultat: ${behandling.resultatstype}")
             }

@@ -1,8 +1,8 @@
-package no.nav.familie.tilbake.e2e.familie_historikk
+package no.nav.familie.tilbake.e2e.klienter
 
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.tilbake.e2e.familie_historikk.dto.HistorikkinnslagDto
+import no.nav.familie.tilbake.e2e.klienter.dto.historikkinnslag.HistorikkinnslagDto
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service

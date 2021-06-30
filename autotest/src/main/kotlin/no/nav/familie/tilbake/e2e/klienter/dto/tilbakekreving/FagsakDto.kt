@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.familie_tilbake.dto
+package no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving
 
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.Språkkode
@@ -16,7 +16,8 @@ data class FagsakDto(val eksternFagsakId: String,
 data class BrukerDto(val personIdent: String,
                      val navn: String,
                      val fødselsdato: LocalDate,
-                     val kjønn: Kjønn)
+                     val kjønn: Kjønn
+)
 
 data class BehandlingsoppsummeringDto(val behandlingId: UUID,
                                       val eksternBrukId: UUID,

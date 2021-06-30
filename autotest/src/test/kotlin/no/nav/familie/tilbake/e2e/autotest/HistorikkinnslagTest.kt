@@ -2,20 +2,20 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.familie_historikk.FamilieHistorikkKlient
-import no.nav.familie.tilbake.e2e.familie_tilbake.FamilieTilbakeKlient
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Aktsomhet
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingsresultatstype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingssteg
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingsstegstatus
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Dokumentmalstype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Foreldelsesvurderingstype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Hendelsestype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Hendelsesundertype
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.KodeStatusKrav
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.SærligGrunn
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Venteårsak
-import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Vilkårsvurderingsresultat
+import no.nav.familie.tilbake.e2e.klienter.FamilieHistorikkKlient
+import no.nav.familie.tilbake.e2e.klienter.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsresultatstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingssteg
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsstegstatus
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Dokumentmalstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsestype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Venteårsak
+import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
 import no.nav.familie.tilbake.e2e.felles.Scenario
 import org.junit.jupiter.api.BeforeEach
@@ -29,7 +29,8 @@ import kotlin.random.Random
 @SpringBootTest(classes = [ApplicationConfig::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HistorikkinnslagTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient,
-                           @Autowired val familieHistorikkKlient: FamilieHistorikkKlient) {
+                           @Autowired val familieHistorikkKlient: FamilieHistorikkKlient
+) {
 
     private lateinit var saksbehandler: Saksbehandler
     private lateinit var scenario: Scenario
