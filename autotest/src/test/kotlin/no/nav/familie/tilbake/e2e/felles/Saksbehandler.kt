@@ -265,8 +265,9 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
             lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VEDTAK_FATTET)
             lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_SENDT_TIL_BESLUTTER)
             lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VEDTAKSBREV_SENDT)
-            if (gjeldendeBehandling.harVerge)
+            if (gjeldendeBehandling.harVerge) {
                 lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VEDTAKSBREV_SENDT_TIL_VERGE)
+            }
             lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_AVSLUTTET)
         } else {
             lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_SENDT_TILBAKE_TIL_SAKSBEHANDLER)
@@ -398,18 +399,21 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         when (dokumentmalstype) {
             Dokumentmalstype.INNHENT_DOKUMENTASJON -> {
                 lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.INNHENT_DOKUMENTASJON_BREV_SENDT)
-                if (gjeldendeBehandling.harVerge)
+                if (gjeldendeBehandling.harVerge) {
                     lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.INNHENT_DOKUMENTASJON_BREV_SENDT_TIL_VERGE)
+                }
             }
             Dokumentmalstype.VARSEL -> {
                 lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VARSELBREV_SENDT)
-                if (gjeldendeBehandling.harVerge)
+                if (gjeldendeBehandling.harVerge) {
                     lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VARSELBREV_SENDT_TIL_VERGE)
+                }
             }
             Dokumentmalstype.KORRIGERT_VARSEL -> {
                 lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.KORRIGERT_VARSELBREV_SENDT)
-                if (gjeldendeBehandling.harVerge)
+                if (gjeldendeBehandling.harVerge) {
                     lagreHistorikkinnslag((TilbakekrevingHistorikkinnslagstype.KORRIGERT_VARSELBREV_SENDT_TIL_VERGE))
+                }
             }
         }
 
@@ -489,7 +493,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                                                         behandlingId = gjeldendeBehandling.eksternBrukId)?.data)
         { "Kunne ikke hente historikkinnsag" }
 
-        // TODO: Implementer sjekk på mer enn tittel
+        // Sjekker at det finnes historikkinnslag med forventet tittel
         val historikkinnslagTitler = historikkinnslag.map{ it.tittel }
 
         gjeldendeBehandling.historikkinnslag.forEach {
