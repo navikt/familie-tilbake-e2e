@@ -2,7 +2,7 @@ package no.nav.familie.tilbake.e2e.felles
 
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.familie_historikk.dto.TilbakekrevingHistorikkinnslagstype
+import no.nav.familie.tilbake.e2e.klienter.dto.historikkinnslag.TilbakekrevingHistorikkinnslagstype
 import no.nav.familie.tilbake.e2e.felles.utils.LogiskPeriode
 import java.math.BigInteger
 

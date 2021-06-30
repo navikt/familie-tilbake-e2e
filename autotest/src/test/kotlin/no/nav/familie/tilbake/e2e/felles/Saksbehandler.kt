@@ -4,7 +4,7 @@ import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.Språkkode
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.tilbake.e2e.klienter.FamilieHistorikkKlient
-import no.nav.familie.tilbake.e2e.familie_historikk.dto.TilbakekrevingHistorikkinnslagstype
+import no.nav.familie.tilbake.e2e.klienter.dto.historikkinnslag.TilbakekrevingHistorikkinnslagstype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsresultatstype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsstatus
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingssteg
