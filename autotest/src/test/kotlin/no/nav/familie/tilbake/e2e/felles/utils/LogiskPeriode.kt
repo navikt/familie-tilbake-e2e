@@ -12,14 +12,15 @@ data class LogiskPeriode(val periode: PeriodeDto, val feilutbetaltBeløp: BigDec
 object LogiskPeriodeUtil {
 
     fun utledLogiskPeriodeFraKravgrunnlag(detaljertKravgrunnlag: DetaljertKravgrunnlagDto): List<LogiskPeriode> {
-        return utledLogiskPeriode2(detaljertKravgrunnlag.tilbakekrevingsPeriode.associate { tilbakekrevingsPeriode ->
+        return utledLogiskPeriode(
+            detaljertKravgrunnlag.tilbakekrevingsPeriode.associate { tilbakekrevingsPeriode ->
                 Periode(fom = tilbakekrevingsPeriode.periode.fom,
                         tom = tilbakekrevingsPeriode.periode.tom) to
                         tilbakekrevingsPeriode.tilbakekrevingsBelop.sumOf { it.belopTilbakekreves }
             }.toSortedMap())
     }
 
-    fun utledLogiskPeriode2(feilutbetalingPrPeriode: SortedMap<Periode, BigDecimal>): List<LogiskPeriode> {
+    fun utledLogiskPeriode(feilutbetalingPrPeriode: SortedMap<Periode, BigDecimal>): List<LogiskPeriode> {
         var førsteMåned: YearMonth? = null
         var sisteMåned: YearMonth? = null
         var logiskPeriodeBeløp = BigDecimal.ZERO
@@ -43,26 +44,6 @@ object LogiskPeriodeUtil {
             resultat.add(LogiskPeriode(periode = PeriodeDto(førsteMåned!!, sisteMåned!!),
                                        feilutbetaltBeløp = logiskPeriodeBeløp))
         }
-        return resultat.toList()
-    }
-
-    fun utledLogiskPeriode(perioder: List<Periode>): List<PeriodeDto>{
-        var førsteMåned: YearMonth? = null
-        var sisteMåned: YearMonth? = null
-        val resultat = mutableListOf<PeriodeDto>()
-        for (periode in perioder) {
-            if (førsteMåned == null && sisteMåned == null) {
-                førsteMåned = periode.fom
-                sisteMåned = periode.tom
-            } else {
-                if (harOppholdMellom(sisteMåned!!, periode.fom)) {
-                    resultat.add(PeriodeDto(førsteMåned!!, sisteMåned))
-                    førsteMåned = periode.fom
-                }
-                sisteMåned = periode.tom
-            }
-        }
-        resultat.add(PeriodeDto(førsteMåned!!, sisteMåned!!))
         return resultat.toList()
     }
 

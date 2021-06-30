@@ -28,8 +28,7 @@ import kotlin.random.Random
 
 @SpringBootTest(classes = [ApplicationConfig::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient,
-                                  @Autowired val familieHistorikkKlient: FamilieHistorikkKlient) {
+class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     private lateinit var saksbehandler: Saksbehandler
     private lateinit var scenario: Scenario
@@ -39,8 +38,7 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
 
     @BeforeEach
     fun setup() {
-        saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient,
-                                      familieHistorikkKlient = familieHistorikkKlient)
+        saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient)
         scenario = Scenario(eksternFagsakId = Random.nextInt(1000000, 9999999).toString(),
                             eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
                             fagsystem = fagsystem,

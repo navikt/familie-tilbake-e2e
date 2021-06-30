@@ -40,7 +40,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
-                    private val familieHistorikkKlient: FamilieHistorikkKlient) {
+                    private val familieHistorikkKlient: FamilieHistorikkKlient? = null) {
 
     private lateinit var gjeldendeBehandling: GjeldendeBehandling
 
@@ -483,13 +483,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         println("Beregnet feilutbetaling for behandling ${gjeldendeBehandling.behandlingId}" )
     }
 
-    fun verifiesrHistorikkinnslag() {
-        println("Venter 30 sekunder for å forsikre om at alle historikkinnslag er lagret før de verifiseres")
-        Thread.sleep(30_000)
-
+    fun verifiserHistorikkinnslag() {
         val historikkinnslag = requireNotNull(
-            familieHistorikkKlient.hentHistorikkinnslag(applikasjon = "FAMILIE_TILBAKE",
-                                                        behandlingId = gjeldendeBehandling.eksternBrukId).data)
+            familieHistorikkKlient?.hentHistorikkinnslag(applikasjon = "FAMILIE_TILBAKE",
+                                                        behandlingId = gjeldendeBehandling.eksternBrukId)?.data)
         { "Kunne ikke hente historikkinnsag" }
 
         // TODO: Implementer sjekk på mer enn tittel

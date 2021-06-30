@@ -29,8 +29,7 @@ import kotlin.random.Random
 
 @SpringBootTest(classes = [ApplicationConfig::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient,
-                                  @Autowired val familieHistorikkKlient: FamilieHistorikkKlient) {
+class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     private lateinit var saksbehandler: Saksbehandler
     private lateinit var scenario: Scenario
@@ -40,8 +39,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
     @BeforeEach
     fun setup() {
-        saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient,
-                                      familieHistorikkKlient = familieHistorikkKlient)
+        saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient)
         scenario = Scenario(eksternFagsakId = Random.nextInt(1000000, 9999999).toString(),
                             eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
                             fagsystem = fagsystem,
@@ -163,7 +161,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             taBehandlingAvVent()
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-            // Ikke mulig foreldelse, steget skal derfor være autoutført
+            // Ikke mulig foreldelse, foreldelsessteget skal derfor være autoutført
             behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
@@ -258,9 +256,9 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
         }
     }
 
-    /**
-    @Test // TODO: Fortsette å utvide testen når funk kommer i familie-tilbake
-    fun `Kravgrunnlag uten at behandling opprettes først`() {
+    /** TODO: Fortsette å utvikle testen når funk kommer i familie-tilbake
+    @Test
+    fun `Opprett tilbakekrevingsbehandling manuelt`() {
         with(saksbehandler) {
             opprettKravgrunnlagUtenBehandling(status = KodeStatusKrav.NY,
                                               fagsystem = Fagsystem.BA,

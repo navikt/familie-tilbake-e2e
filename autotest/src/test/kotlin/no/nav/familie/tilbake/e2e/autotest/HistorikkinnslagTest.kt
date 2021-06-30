@@ -109,7 +109,9 @@ class HistorikkinnslagTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKl
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
 
-            saksbehandler.verifiesrHistorikkinnslag()
+            Thread.sleep(30_000)
+
+            saksbehandler.verifiserHistorikkinnslag()
         }
     }
 }
