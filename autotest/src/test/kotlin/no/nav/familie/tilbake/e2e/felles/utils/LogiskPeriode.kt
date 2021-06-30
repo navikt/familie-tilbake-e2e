@@ -1,7 +1,7 @@
 package no.nav.familie.tilbake.e2e.felles.utils
 
-import no.nav.familie.tilbake.e2e.domene.dto.felles.Periode
-import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.Periode
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.PeriodeDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto
 import java.math.BigDecimal
 import java.time.YearMonth

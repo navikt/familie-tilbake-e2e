@@ -1,8 +1,8 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.dto.KodeKlasse
-import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.KodeKlasse
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.KodeStatusKrav
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
@@ -28,6 +28,7 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                        val periodeLengde: Int,
                        val personIdent: String,
                        val enhetId: String,
+                       val skattProsent: BigDecimal,
                        val sumFeilutbetaling: BigDecimal) {
 
     // TODO: Vil trenge å kunne sette kontrollfelt tilbake i tid for at den plukkes av auto-opprett batch
@@ -58,6 +59,7 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                                                                                 muligForeldelse = muligforeldelse,
                                                                                 ytelsestype = ytelsestype,
                                                                                 periodelengde = periodeLengde,
+                                                                                skattProsent = skattProsent,
                                                                                 sumFeilutbetaling = sumFeilutbetaling))
             }
         }
@@ -78,6 +80,7 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                                              muligForeldelse: Boolean,
                                              ytelsestype: Ytelsestype,
                                              periodelengde: Int,
+                                             skattProsent: BigDecimal,
                                              sumFeilutbetaling: BigDecimal): List<DetaljertKravgrunnlagPeriodeDto> {
         // Finner startdato for første periode, hvor periodene har 1 måned mellomrom
         val antallMånederTilbake = antallPerioder * periodelengde + antallPerioder - 1
@@ -100,6 +103,12 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         val beløpPrMåned = feilutbetaltBeløp
             .divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
 
+        // Finner skattbeløp
+        val skattIProsent = when(ytelsestype) {
+            Ytelsestype.BARNETRYGD -> BigDecimal.ZERO.setScale(2)
+            else -> skattProsent
+        }
+
         val tilbakekrevingsperiodeList: MutableList<DetaljertKravgrunnlagPeriodeDto> = mutableListOf()
         for (i in 1..antallPerioder) {
             for (j in 1..periodelengde) {
@@ -107,8 +116,8 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                     periode = PeriodeDto()
                     periode.fom = startdato
                     periode.tom = startdato.withDayOfMonth(startdato.lengthOfMonth())
-                    belopSkattMnd = BigDecimal.ZERO.setScale(2)
-                    tilbakekrevingsBelop.addAll(utledTilbakekrevingsbelop(beløpPrMåned, ytelsestype))
+                    belopSkattMnd = beløpPrMåned.multiply(skattIProsent).divide(BigDecimal(100)).setScale(2)
+                    tilbakekrevingsBelop.addAll(utledTilbakekrevingsbelop(beløpPrMåned, ytelsestype, skattIProsent))
                 }
 
                 tilbakekrevingsperiodeList.add(kravgrunnlagPeriode)
@@ -120,8 +129,9 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         return tilbakekrevingsperiodeList
     }
 
-    private fun utledTilbakekrevingsbelop(beløpprmåned: BigDecimal,
-                                          ytelsestype: Ytelsestype): Collection<DetaljertKravgrunnlagBelopDto> {
+    private fun utledTilbakekrevingsbelop(beløpPrMnd: BigDecimal,
+                                          ytelsestype: Ytelsestype,
+                                          skattIProsent: BigDecimal): Collection<DetaljertKravgrunnlagBelopDto> {
         val ytelKodeKlasse: KodeKlasse
         val feilKodeKlasse: KodeKlasse
         when (ytelsestype) {
@@ -149,22 +159,22 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         val tilbakekrevingsbelopYtel = DetaljertKravgrunnlagBelopDto().apply {
             kodeKlasse = ytelKodeKlasse.name
             typeKlasse = TypeKlasseDto.YTEL
-            belopOpprUtbet = beløpprmåned.setScale(2)
-            belopNy =  BigDecimal.ZERO.setScale(2)
-            belopTilbakekreves = beløpprmåned.setScale(2)
-            belopUinnkrevd =  BigDecimal.ZERO.setScale(2)
-            skattProsent =  BigDecimal.ZERO.setScale(2)
+            belopOpprUtbet = beløpPrMnd.setScale(2)
+            belopNy = BigDecimal.ZERO.setScale(2)
+            belopTilbakekreves = beløpPrMnd.setScale(2)
+            belopUinnkrevd = BigDecimal.ZERO.setScale(2)
+            skattProsent = skattIProsent.setScale(2)
         }
         tilbakekrevingsBelopList.add(tilbakekrevingsbelopYtel)
 
         val tilbakekrevingsbelopFeil = DetaljertKravgrunnlagBelopDto().apply {
             kodeKlasse = feilKodeKlasse.name
             typeKlasse = TypeKlasseDto.FEIL
-            belopOpprUtbet =  BigDecimal.ZERO.setScale(2)
-            belopNy = beløpprmåned
-            belopTilbakekreves =  BigDecimal.ZERO.setScale(2)
-            belopUinnkrevd =  BigDecimal.ZERO.setScale(2)
-            skattProsent =  BigDecimal.ZERO.setScale(2)
+            belopOpprUtbet = BigDecimal.ZERO.setScale(2)
+            belopNy = beløpPrMnd.setScale(2)
+            belopTilbakekreves = BigDecimal.ZERO.setScale(2)
+            belopUinnkrevd = BigDecimal.ZERO.setScale(2)
+            skattProsent = skattIProsent.setScale(2)
         }
         tilbakekrevingsBelopList.add(tilbakekrevingsbelopFeil)
 

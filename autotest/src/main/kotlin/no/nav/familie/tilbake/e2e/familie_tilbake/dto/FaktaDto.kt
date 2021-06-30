@@ -1,7 +1,7 @@
-package no.nav.familie.tilbake.e2e.domene.dto
+package no.nav.familie.tilbake.e2e.familie_tilbake.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.PeriodeDto
 import java.time.LocalDate
 
 /**

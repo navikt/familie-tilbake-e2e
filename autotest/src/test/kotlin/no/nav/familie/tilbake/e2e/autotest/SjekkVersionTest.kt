@@ -1,6 +1,6 @@
 package no.nav.familie.tilbake.e2e.autotest
 
-import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.familie_tilbake.FamilieTilbakeKlient
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired

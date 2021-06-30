@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.domene.dto.felles
+package no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles
 
 import java.time.LocalDate
 import java.time.YearMonth

@@ -1,8 +1,8 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
-import no.nav.familie.tilbake.e2e.domene.dto.ForhåndsvisningVedtaksbrevPdfDto
-import no.nav.familie.tilbake.e2e.domene.dto.PeriodeMedTekstDto
-import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.ForhåndsvisningVedtaksbrevPdfDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.PeriodeMedTekstDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.PeriodeDto
 import java.util.UUID
 
 class ForhåndsvisVedtaksbrevBuilder(val behandlingId: String,

@@ -1,10 +1,10 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
-import no.nav.familie.tilbake.e2e.domene.dto.FaktaDto
-import no.nav.familie.tilbake.e2e.domene.dto.Hendelsestype
-import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
-import no.nav.familie.tilbake.e2e.domene.dto.HentFaktaDto
-import no.nav.familie.tilbake.e2e.domene.dto.VurdertFaktaFeilutbetaltPeriodeDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.FaktaDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Hendelsestype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HentFaktaDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.VurdertFaktaFeilutbetaltPeriodeDto
 
 class BehandleFaktaData(val hentFaktaResponse: HentFaktaDto,
                         val hendelsestype: Hendelsestype,

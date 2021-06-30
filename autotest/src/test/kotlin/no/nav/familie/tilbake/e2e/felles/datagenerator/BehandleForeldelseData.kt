@@ -1,9 +1,9 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
-import no.nav.familie.tilbake.e2e.domene.dto.ForeldelseDto
-import no.nav.familie.tilbake.e2e.domene.dto.HentForeldelseDto
-import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
-import no.nav.familie.tilbake.e2e.domene.dto.VurdertForeldelsesperiodeDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.ForeldelseDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HentForeldelseDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.VurdertForeldelsesperiodeDto
 import java.time.LocalDate
 
 class BehandleForeldelseData(val hentForeldelseResponse: HentForeldelseDto,
@@ -14,7 +14,7 @@ class BehandleForeldelseData(val hentForeldelseResponse: HentForeldelseDto,
             VurdertForeldelsesperiodeDto(periode = it.periode,
                                          foreldelsesvurderingstype = beslutning,
                                          begrunnelse = "Automatisk begrunnelse fra Autotest",
-                                         foreldelsesfrist = when(beslutning) {
+                                         foreldelsesfrist = when (beslutning) {
                                              Foreldelsesvurderingstype.FORELDET,
                                              Foreldelsesvurderingstype.TILLEGGSFRIST -> LocalDate.now().minusMonths(31)
                                              else -> null

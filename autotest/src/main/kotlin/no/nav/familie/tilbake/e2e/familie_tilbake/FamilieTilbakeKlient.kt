@@ -1,25 +1,26 @@
-package no.nav.familie.tilbake.e2e.domene
+package no.nav.familie.tilbake.e2e.familie_tilbake
 
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.ForhåndsvisVarselbrevRequest
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
-import no.nav.familie.tilbake.e2e.domene.dto.AvsnittDto
-import no.nav.familie.tilbake.e2e.domene.dto.BehandlingDto
-import no.nav.familie.tilbake.e2e.domene.dto.FagsakDto
-import no.nav.familie.tilbake.e2e.domene.dto.VersjonInfoDto
-import no.nav.familie.tilbake.e2e.domene.dto.HentFaktaDto
-import no.nav.familie.tilbake.e2e.domene.dto.HentForeldelseDto
-import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVentDto
-import no.nav.familie.tilbake.e2e.domene.dto.BeregnetPerioderDto
-import no.nav.familie.tilbake.e2e.domene.dto.BestillBrevDto
-import no.nav.familie.tilbake.e2e.domene.dto.ForhåndsvisningHenleggelsesbrevDto
-import no.nav.familie.tilbake.e2e.domene.dto.ForhåndsvisningVedtaksbrevPdfDto
-import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
-import no.nav.familie.tilbake.e2e.domene.dto.HentVilkårsvurderingDto
-import no.nav.familie.tilbake.e2e.domene.dto.TotrinnsvurderingDto
-import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.AvsnittDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.BehandlingDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.FagsakDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.VersjonInfoDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HentFaktaDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HentForeldelseDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.BehandlingPåVentDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.BeregnetPerioderDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.BeregningsresultatDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.BestillBrevDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.ForhåndsvisningHenleggelsesbrevDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.ForhåndsvisningVedtaksbrevPdfDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HenleggDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HentVilkårsvurderingDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.TotrinnsvurderingDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.PeriodeDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import org.springframework.beans.factory.annotation.Qualifier
@@ -180,5 +181,10 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return postForEntity(uri, data)
     }
 
+    fun beregnResultat(behandlingId: String): Ressurs<BeregningsresultatDto> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/beregn/resultat/v1")
+
+        return getForEntity(uri)
+    }
     // TODO: Implementer manglende tjenester historikk, manuell opprettelse av behandling
 }

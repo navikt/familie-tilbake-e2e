@@ -3,25 +3,26 @@ package no.nav.familie.tilbake.e2e.felles
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.Språkkode
 import no.nav.familie.kontrakter.felles.Ressurs
-import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsresultatstype
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstatus
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingssteg
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstegstatus
-import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
-import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
+import no.nav.familie.tilbake.e2e.familie_historikk.FamilieHistorikkKlient
+import no.nav.familie.tilbake.e2e.familie_historikk.dto.TilbakekrevingHistorikkinnslagstype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingsresultatstype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingsstatus
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingssteg
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Behandlingsstegstatus
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Venteårsak
 import no.nav.familie.tilbake.e2e.felles.datagenerator.BehandleForeldelseData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.BehandleForeslåVedtakData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.BehandleVilkårsvurderingData
-import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
-import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
-import no.nav.familie.tilbake.e2e.domene.dto.Hendelsestype
-import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
-import no.nav.familie.tilbake.e2e.domene.dto.BehandlingPåVentDto
-import no.nav.familie.tilbake.e2e.domene.dto.HenleggDto
-import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
-import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
-import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Aktsomhet
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Hendelsestype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.BehandlingPåVentDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.HenleggDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.SærligGrunn
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Vilkårsvurderingsresultat
+import no.nav.familie.tilbake.e2e.familie_tilbake.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.felles.datagenerator.BehandleFaktaData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.BestillBrevData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.ForhåndsvisHenleggelsesbrevData
@@ -31,63 +32,65 @@ import no.nav.familie.tilbake.e2e.felles.datagenerator.BehandleFatteVedtakData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.KravgrunnlagData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.StatusmeldingData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.TilbakekrevingData
-import no.nav.familie.tilbake.e2e.domene.dto.Dokumentmalstype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Dokumentmalstype
 import no.nav.familie.tilbake.e2e.felles.utils.LogiskPeriodeUtil.utledLogiskPeriodeFraKravgrunnlag
 import no.nav.familie.tilbake.e2e.felles.utils.Vent
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.math.BigDecimal
 import java.time.LocalDate
 
-class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
+class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
+                    private val familieHistorikkKlient: FamilieHistorikkKlient) {
 
     private lateinit var gjeldendeBehandling: GjeldendeBehandling
 
-    fun opprettScenario(eksternFagsakId: String,
-                        eksternBehandlingId: String,
-                        fagsystem: Fagsystem,
-                        ytelsestype: Ytelsestype,
-                        personIdent: String,
-                        enhetId: String,
-                        enhetsnavn: String) {
-        gjeldendeBehandling = GjeldendeBehandling(eksternFagsakId = eksternFagsakId,
-                                                  eksternBehandlingId = eksternBehandlingId,
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = ytelsestype,
-                                                  personIdent = personIdent,
-                                                  enhetId = enhetId,
-                                                  enhetsnavn = enhetsnavn)
-    }
-
-    fun opprettTilbakekreving(varsel: Boolean,
+    fun opprettTilbakekreving(scenario: Scenario,
+                              varsel: Boolean,
                               verge: Boolean,
                               sumFeilutbetaling: BigDecimal? = null) {
-        val data = TilbakekrevingData(eksternFagsakId = gjeldendeBehandling.eksternFagsakId,
-                                      eksternBehandlingId = gjeldendeBehandling.eksternBehandlingId,
-                                      fagsystem = gjeldendeBehandling.fagsystem,
-                                      ytelsestype = gjeldendeBehandling.ytelsestype,
-                                      personIdent = gjeldendeBehandling.personIdent,
-                                      enhetId = gjeldendeBehandling.enhetId,
-                                      enhetsnavn = gjeldendeBehandling.enhetsnavn,
+        val data = TilbakekrevingData(eksternFagsakId = scenario.eksternFagsakId,
+                                      eksternBehandlingId = scenario.eksternBehandlingId,
+                                      fagsystem = scenario.fagsystem,
+                                      ytelsestype = scenario.ytelsestype,
+                                      personIdent = scenario.personIdent,
+                                      enhetId = scenario.enhetId,
+                                      enhetsnavn = scenario.enhetsnavn,
                                       varsel = varsel,
                                       verge = verge,
                                       sumFeilutbetaling = sumFeilutbetaling).lag()
 
-        val eksternBrukId = familieTilbakeKlient.opprettTilbakekreving(data = data).data
+        val eksternBrukId = requireNotNull(familieTilbakeKlient.opprettTilbakekreving(data = data).data)
+        { "Det oppstod en feil under opprettelse av tilbakekreving" }
 
-        val behandlingId = hentBehandlingId(fagsystem = gjeldendeBehandling.fagsystem,
-                                            eksternFagsakId = gjeldendeBehandling.eksternFagsakId,
+        val behandlingId = hentBehandlingId(fagsystem = scenario.fagsystem,
+                                            eksternFagsakId = scenario.eksternFagsakId,
                                             eksternBrukId = eksternBrukId)
 
-        gjeldendeBehandling.apply {
-            this.eksternBrukId = eksternBrukId
-            this.behandlingId = behandlingId
+        gjeldendeBehandling = GjeldendeBehandling(eksternFagsakId = scenario.eksternFagsakId,
+                                                  eksternBrukId = eksternBrukId,
+                                                  behandlingId = behandlingId,
+                                                  eksternBehandlingId = scenario.eksternBehandlingId,
+                                                  fagsystem = scenario.fagsystem,
+                                                  ytelsestype = scenario.ytelsestype,
+                                                  personIdent = scenario.personIdent,
+                                                  enhetId = scenario.enhetId,
+                                                  enhetsnavn = scenario.enhetsnavn,
+                                                  harVerge = verge)
+
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_OPPRETTET)
+        if (varsel) {
+            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_PÅ_VENT)
+            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VARSELBREV_SENDT)
+            if (verge) {
+                lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VARSELBREV_SENDT_TIL_VERGE)
+            }
         }
 
         println("Opprettet behandling med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId} og " +
                         "eksternBrukId: ${gjeldendeBehandling.eksternBrukId}")
     }
 
-    /**
+    /** TODO: Fullfør implementasjon når funksjonalitet for å opprette manuell behandling er implementert i familie-tilbake
     fun opprettKravgrunnlagUtenBehandling(status: KodeStatusKrav,
                                           fagsystem: Fagsystem,
                                           ytelsestype: Ytelsestype,
@@ -95,8 +98,6 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                           antallPerioder: Int,
                                           under4rettsgebyr: Boolean,
                                           muligforeldelse: Boolean) {
-        // TODO: Fullfør implementasjon når funksjonalitet kommer
-
 
         gjeldendeBehandling = GjeldendeBehandling(fagsystem = fagsystem,
                                                   ytelsestype = ytelsestype,
@@ -114,6 +115,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                             under4rettsgebyr: Boolean,
                             muligforeldelse: Boolean,
                             periodelengde: Int = 3,
+                            skattProsent: BigDecimal = BigDecimal.ZERO,
                             sumFeilutbetaling: BigDecimal = BigDecimal(20000)) {
 
         val data = KravgrunnlagData(status = status,
@@ -132,6 +134,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                     under4rettsgebyr = under4rettsgebyr,
                                     muligforeldelse = muligforeldelse,
                                     periodeLengde = periodelengde,
+                                    skattProsent = skattProsent,
                                     sumFeilutbetaling = sumFeilutbetaling).lag()
 
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = data)
@@ -141,6 +144,9 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
             vedtakId = data.detaljertKravgrunnlag.vedtakId
             feilutbetaltePerioder = utledLogiskPeriodeFraKravgrunnlag(data.detaljertKravgrunnlag)
         }
+
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.KRAVGRUNNLAG_MOTTATT)
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_GJENOPPTATT)
 
         println("Sendte inn $status kravgrunnlag med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId} " +
                         "på ytelsestype: ${gjeldendeBehandling.fagsystem}")
@@ -174,13 +180,15 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     fun behandleFakta(hendelsestype: Hendelsestype, hendelsesundertype: Hendelsesundertype) {
         val hentFaktaResponse =
-            requireNotNull(familieTilbakeKlient.hentFakta(gjeldendeBehandling.behandlingId!!).data)
+            requireNotNull(familieTilbakeKlient.hentFakta(gjeldendeBehandling.behandlingId).data)
             { "Kunne ikke hente data for behandling av fakta" }
         val data = BehandleFaktaData(hentFaktaResponse = hentFaktaResponse,
                                      hendelsestype = hendelsestype,
                                      hendelsesundertype = hendelsesundertype).lag()
 
-        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId!!, data = data)
+        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId, data = data)
+
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.FAKTA_VURDERT)
 
         println("Behandling ${gjeldendeBehandling.behandlingId} ble behandlet i steg fakta: hendelsestype $hendelsestype, " +
                         "hendelsesundertype $hendelsesundertype")
@@ -188,12 +196,14 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     fun behandleForeldelse(beslutning: Foreldelsesvurderingstype) {
         val hentForeldelseResponse =
-            requireNotNull(familieTilbakeKlient.hentForeldelse(gjeldendeBehandling.behandlingId!!).data)
+            requireNotNull(familieTilbakeKlient.hentForeldelse(gjeldendeBehandling.behandlingId).data)
             { "Kunne ikke hente data for behandling av foreldelse" }
         val data = BehandleForeldelseData(hentForeldelseResponse = hentForeldelseResponse,
                                           beslutning = beslutning).lag()
 
-        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId!!, data = data)
+        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId, data = data)
+
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.FORELDELSE_VURDERT)
 
         println("Behandling ${gjeldendeBehandling.behandlingId} ble behandlet i steg foreldelse: beslutning $beslutning")
     }
@@ -204,9 +214,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                  beløpErIBehold: Boolean = true,
                                  andelTilbakekreves: BigDecimal? = null,
                                  beløpTilbakekreves: BigDecimal? = null,
-                                 tilbakekrevSmåbeløp: Boolean? = null) {
+                                 tilbakekrevSmåbeløp: Boolean? = null,
+                                 ileggRenter: Boolean = false) {
         val hentVilkårsvurderingResponse =
-            requireNotNull(familieTilbakeKlient.hentVilkårsvurdering(gjeldendeBehandling.behandlingId!!).data)
+            requireNotNull(familieTilbakeKlient.hentVilkårsvurdering(gjeldendeBehandling.behandlingId).data)
             { "Kunne ikke hente data for behandling av vilkår" }
         val data = BehandleVilkårsvurderingData(hentVilkårsvurderingResponse = hentVilkårsvurderingResponse,
                                                 vilkårvurderingsresultat = vilkårvurderingsresultat,
@@ -215,9 +226,13 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
                                                 beløpErIBehold = beløpErIBehold,
                                                 andelTilbakekreves = andelTilbakekreves,
                                                 beløpTilbakekreves = beløpTilbakekreves,
-                                                tilbakekrevSmåbeløp = tilbakekrevSmåbeløp).lag()
+                                                tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
+                                                ileggRenter = ileggRenter,
+                                                ytelsestype = gjeldendeBehandling.ytelsestype).lag()
 
-        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId!!, data = data)
+        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId, data = data)
+
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VILKÅRSVURDERING_VURDERT)
 
         println("Behandling ${gjeldendeBehandling.behandlingId} ble behandlet i steg vilkårsvurdering: " +
                         "vilkårvurderingsresultat $vilkårvurderingsresultat")
@@ -225,23 +240,37 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     fun behandleForeslåVedtak() {
         val hentVedtakbrevtekstResponse =
-            requireNotNull(familieTilbakeKlient.hentVedtaksbrevtekst(gjeldendeBehandling.behandlingId!!).data)
+            requireNotNull(familieTilbakeKlient.hentVedtaksbrevtekst(gjeldendeBehandling.behandlingId).data)
             { "Kunne ikke hente data for behandling av foreslå vedtak" }
         val data = BehandleForeslåVedtakData(hentVedtakbrevtekstResponse = hentVedtakbrevtekstResponse).lag()
 
-        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId!!, data = data)
+        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId, data = data)
+
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.FORESLÅ_VEDTAK_VURDERT)
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_SENDT_TIL_BESLUTTER)
 
         println("Behandling ${gjeldendeBehandling.behandlingId} ble behandlet i steg foreslå vedtak")
     }
 
     fun behandleFatteVedtak(godkjent: Boolean) {
         val hentTotrinnsvurderingerResponse =
-            requireNotNull(familieTilbakeKlient.hentTotrinnsvurderinger(gjeldendeBehandling.behandlingId!!).data)
+            requireNotNull(familieTilbakeKlient.hentTotrinnsvurderinger(gjeldendeBehandling.behandlingId).data)
             { "Kunne ikke hente data for behandling av fatte vedtak" }
         val data = BehandleFatteVedtakData(hentTotrinnsvurderingerResponse = hentTotrinnsvurderingerResponse,
                                            godkjent = godkjent).lag()
 
-        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId!!, data = data)
+        familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId, data = data)
+
+        if (godkjent) {
+            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VEDTAK_FATTET)
+            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_SENDT_TIL_BESLUTTER)
+            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VEDTAKSBREV_SENDT)
+            if (gjeldendeBehandling.harVerge)
+                lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VEDTAKSBREV_SENDT_TIL_VERGE)
+            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_AVSLUTTET)
+        } else {
+            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_SENDT_TILBAKE_TIL_SAKSBEHANDLER)
+        }
 
         println("Behandling ${gjeldendeBehandling.behandlingId} ble behandlet i steg fatte vedtak: " +
                         if(godkjent) "vedtak GODKJENT" else "vedtak UNDERKJENT")
@@ -251,14 +280,18 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
         val data = BehandlingPåVentDto(venteårsak = venteårsak,
                                        tidsfrist = tidsfrist)
 
-        familieTilbakeKlient.settBehandlingPåVent(behandlingId = gjeldendeBehandling.behandlingId!!, data = data)
+        familieTilbakeKlient.settBehandlingPåVent(behandlingId = gjeldendeBehandling.behandlingId, data = data)
         erBehandlingPåVent(venteårsak)
+
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_PÅ_VENT)
 
         println("Behandling ${gjeldendeBehandling.behandlingId} satt på vent: $venteårsak med frist $tidsfrist")
     }
 
     fun taBehandlingAvVent() {
-        familieTilbakeKlient.taBehandlingAvVent(gjeldendeBehandling.behandlingId!!)
+        familieTilbakeKlient.taBehandlingAvVent(gjeldendeBehandling.behandlingId)
+
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_GJENOPPTATT)
 
         println("Behandling ${gjeldendeBehandling.behandlingId} tatt av vent")
     }
@@ -274,7 +307,9 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
             data.fritekst = "Dette er en automatisk fritekst generert av autotest"
         }
 
-        familieTilbakeKlient.henleggBehandling(behandlingId = gjeldendeBehandling.behandlingId!!, data = data)
+        familieTilbakeKlient.henleggBehandling(behandlingId = gjeldendeBehandling.behandlingId, data = data)
+
+        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_HENLAGT)
 
         println("Behandling ${gjeldendeBehandling.behandlingId} ble henlagt: $behandlingsresultat")
     }
@@ -282,32 +317,32 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
     fun erBehandlingPåVent(venteårsak: Venteårsak) {
         Vent.til(
                 {
-                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId!!).data?.behandlingsstegsinfo?.any {
+                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId).data?.behandlingsstegsinfo?.any {
                         it.behandlingsstegstatus == Behandlingsstegstatus.VENTER && it.venteårsak == venteårsak
                     }
                 },
                 30, "Behandling kom aldri i vent med årsak $venteårsak")
-        println("Behandling ${gjeldendeBehandling.behandlingId!!} er bekreftet på vent med årsak $venteårsak")
+        println("Behandling ${gjeldendeBehandling.behandlingId} er bekreftet på vent med årsak $venteårsak")
     }
 
     fun erBehandlingISteg(behandlingssteg: Behandlingssteg,
                           behandlingsstegstatus: Behandlingsstegstatus) {
         Vent.til(
                 {
-                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId!!).data?.behandlingsstegsinfo?.any {
+                    familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId).data?.behandlingsstegsinfo?.any {
                         it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus
                     }
                 },
                 30, "Behandlingen kom aldri i status $behandlingsstegstatus i steg $behandlingssteg")
-        println("Behandling ${gjeldendeBehandling.behandlingId!!} er bekreftet i " +
+        println("Behandling ${gjeldendeBehandling.behandlingId} er bekreftet i " +
                         "status $behandlingsstegstatus i steg $behandlingssteg")
     }
 
     fun erBehandlingAvsluttet(resultat: Behandlingsresultatstype) {
         Vent.til(
-                { familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId!!).data?.status == Behandlingsstatus.AVSLUTTET },
+                { familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId).data?.status == Behandlingsstatus.AVSLUTTET },
                 30, "Behandlingen fikk aldri status AVSLUTTET")
-        val behandling = requireNotNull(familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId!!).data)
+        val behandling = requireNotNull(familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId).data)
         val henlagttyper = listOf(Behandlingsresultatstype.HENLAGT,
                                   Behandlingsresultatstype.HENLAGT_FEILOPPRETTET,
                                   Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_MED_BREV,
@@ -349,22 +384,40 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     fun endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler: String) {
         Vent.til({ familieTilbakeKlient
-            .endreAnsvarligSaksbehandler(behandlingId = gjeldendeBehandling.behandlingId!!,
+            .endreAnsvarligSaksbehandler(behandlingId = gjeldendeBehandling.behandlingId,
                                          nyAnsvarligSaksbehandler = nyAnsvarligSaksbehandler).status == Ressurs.Status.SUKSESS },
                  30, "Kunne ikke endre saksbehandler")
     }
 
     fun bestillBrev(dokumentmalstype: Dokumentmalstype) {
-        val data = BestillBrevData(behandlingId = gjeldendeBehandling.behandlingId!!,
+        val data = BestillBrevData(behandlingId = gjeldendeBehandling.behandlingId,
                                    dokumentmalstype = dokumentmalstype).lag()
 
         familieTilbakeKlient.bestillBrev(data = data)
+
+        when (dokumentmalstype) {
+            Dokumentmalstype.INNHENT_DOKUMENTASJON -> {
+                lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.INNHENT_DOKUMENTASJON_BREV_SENDT)
+                if (gjeldendeBehandling.harVerge)
+                    lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.INNHENT_DOKUMENTASJON_BREV_SENDT_TIL_VERGE)
+            }
+            Dokumentmalstype.VARSEL -> {
+                lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VARSELBREV_SENDT)
+                if (gjeldendeBehandling.harVerge)
+                    lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VARSELBREV_SENDT_TIL_VERGE)
+            }
+            Dokumentmalstype.KORRIGERT_VARSEL -> {
+                lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.KORRIGERT_VARSELBREV_SENDT)
+                if (gjeldendeBehandling.harVerge)
+                    lagreHistorikkinnslag((TilbakekrevingHistorikkinnslagstype.KORRIGERT_VARSELBREV_SENDT_TIL_VERGE))
+            }
+        }
 
         println("Bestilte brev $dokumentmalstype for behandling ${gjeldendeBehandling.behandlingId}")
     }
 
     fun forhåndsvisVedtaksbrev() {
-        val data = ForhåndsvisVedtaksbrevBuilder(behandlingId = gjeldendeBehandling.behandlingId!!,
+        val data = ForhåndsvisVedtaksbrevBuilder(behandlingId = gjeldendeBehandling.behandlingId,
                                                  perioder = gjeldendeBehandling.feilutbetaltePerioder?.map { it.periode }!!).lag()
 
         familieTilbakeKlient.forhåndsvisVedtaksbrev(data = data)
@@ -373,19 +426,21 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
     }
 
     fun forhåndsvisVarselbrev(vedtaksdato: LocalDate) {
-        val hentBehandlingResponse = familieTilbakeKlient.hentBehandling(behandlingId = gjeldendeBehandling.behandlingId!!).data
+        val hentBehandlingResponse = familieTilbakeKlient.hentBehandling(behandlingId = gjeldendeBehandling.behandlingId).data
 
         val data = ForhåndsvisVarselbrevData(behandlendeEnhetId = gjeldendeBehandling.enhetId,
                                              behandlendeEnhetsNavn = gjeldendeBehandling.enhetsnavn,
                                              eksternFagsakId = gjeldendeBehandling.eksternFagsakId,
                                              fagsystem = gjeldendeBehandling.fagsystem,
-                                             perioder = requireNotNull(gjeldendeBehandling.feilutbetaltePerioder?.map{ it.periode }),
+                                             perioder = requireNotNull(gjeldendeBehandling.feilutbetaltePerioder?.map { it.periode }),
                                              ident = gjeldendeBehandling.personIdent,
                                              saksbehandlerIdent = requireNotNull(hentBehandlingResponse?.ansvarligSaksbehandler),
                                              språkkode = Språkkode.NB,
                                              vedtaksdato = vedtaksdato,
-                                             verge = null, // TODO: Implementer sjekk på harVerge i hentBehandlingResponse
-                                             sumFeilutbetaling = 20000L, // TODO: Inkluder sumFeilutbetaling i gjeldendeBehandling
+                                             verge = gjeldendeBehandling.harVerge,
+                                             sumFeilutbetaling = requireNotNull(gjeldendeBehandling.feilutbetaltePerioder?.sumOf {
+                                                 it.feilutbetaltBeløp
+                                             }).toLong(),
                                              ytelsestype = gjeldendeBehandling.ytelsestype).lag()
 
         familieTilbakeKlient.forhåndsvisVarselbrev(data = data)
@@ -394,7 +449,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
     }
 
     fun forhåndsvisHenleggelsesbrev() {
-        val data = ForhåndsvisHenleggelsesbrevData(behandlingId = gjeldendeBehandling.behandlingId!!).lag()
+        val data = ForhåndsvisHenleggelsesbrevData(behandlingId = gjeldendeBehandling.behandlingId).lag()
 
         familieTilbakeKlient.forhåndsvisHenleggelsesbrev(data = data)
 
@@ -402,8 +457,8 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
     }
 
     fun hentJournaldokument() {
-        // TODO: Oppdater med reelle IDer når det er implementert i familie-tilbake
-        familieTilbakeKlient.hentJournaldokument(behandlingId = gjeldendeBehandling.behandlingId!!,
+        // TODO: Oppdater med reelle IDer når dette er implementert i familie-tilbake
+        familieTilbakeKlient.hentJournaldokument(behandlingId = gjeldendeBehandling.behandlingId,
                                                  journalpostId = "jpId",
                                                  dokumentId = "id")
 
@@ -412,18 +467,42 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     fun beregn() {
         val data = requireNotNull(gjeldendeBehandling.feilutbetaltePerioder?.map { it.periode })
-        { "Fant ikke informasjon om perioder å beregne feilutbetalinger for i Autotest" }
+        { "Autotest mangler informasjon om perioder å beregne feilutbetalinger for" }
 
-        val beregnedePerioder = requireNotNull(familieTilbakeKlient.beregn(behandlingId = gjeldendeBehandling.behandlingId!!,
-                                                                           data = data).data)
-        { "Kunne ikke hente beregnede perioder" }
+        familieTilbakeKlient.beregn(behandlingId = gjeldendeBehandling.behandlingId,
+                                    data = data).data
+
+        val beregnedePerioder = familieTilbakeKlient.beregnResultat(behandlingId = gjeldendeBehandling.behandlingId).data
 
         val forventetFeilutbetaling = gjeldendeBehandling.feilutbetaltePerioder?.sumOf { it.feilutbetaltBeløp }?.setScale(2)
-        val beregnetFeilutbetaling = beregnedePerioder.beregnetPerioder.sumOf { it.feilutbetaltBeløp }.setScale(2)
+        val beregnetFeilutbetaling = beregnedePerioder?.beregningsresultatsperioder?.sumOf { it.feilutbetaltBeløp }?.setScale(2)
 
         assertTrue(beregnetFeilutbetaling == forventetFeilutbetaling,
                    "Forventet resultat: $forventetFeilutbetaling, beregnet resultat: $beregnetFeilutbetaling")
 
         println("Beregnet feilutbetaling for behandling ${gjeldendeBehandling.behandlingId}" )
+    }
+
+    fun verifiesrHistorikkinnslag() {
+        println("Venter 30 sekunder for å forsikre om at alle historikkinnslag er lagret før de verifiseres")
+        Thread.sleep(30_000)
+
+        val historikkinnslag = requireNotNull(
+            familieHistorikkKlient.hentHistorikkinnslag(applikasjon = "FAMILIE_TILBAKE",
+                                                        behandlingId = gjeldendeBehandling.eksternBrukId).data)
+        { "Kunne ikke hente historikkinnsag" }
+
+        // TODO: Implementer sjekk på mer enn tittel
+        val historikkinnslagTitler = historikkinnslag.map{ it.tittel }
+
+        gjeldendeBehandling.historikkinnslag.forEach {
+            assertTrue(it.tittel in historikkinnslagTitler)
+        }
+
+        println("Verifiserte historikkinnslag for ${gjeldendeBehandling.behandlingId}" )
+    }
+
+    private fun lagreHistorikkinnslag(innslag: TilbakekrevingHistorikkinnslagstype) {
+        gjeldendeBehandling.historikkinnslag.add(innslag)
     }
 }

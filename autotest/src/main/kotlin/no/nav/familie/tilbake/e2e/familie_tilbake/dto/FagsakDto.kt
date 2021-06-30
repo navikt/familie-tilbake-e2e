@@ -1,4 +1,4 @@
-package no.nav.familie.tilbake.e2e.domene.dto
+package no.nav.familie.tilbake.e2e.familie_tilbake.dto
 
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.Språkkode

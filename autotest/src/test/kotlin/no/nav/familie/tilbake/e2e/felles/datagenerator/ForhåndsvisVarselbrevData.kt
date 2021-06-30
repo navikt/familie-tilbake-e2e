@@ -6,8 +6,9 @@ import no.nav.familie.kontrakter.felles.tilbakekreving.FeilutbetaltePerioderDto
 import no.nav.familie.kontrakter.felles.tilbakekreving.ForhåndsvisVarselbrevRequest
 import no.nav.familie.kontrakter.felles.tilbakekreving.Periode
 import no.nav.familie.kontrakter.felles.tilbakekreving.Verge
+import no.nav.familie.kontrakter.felles.tilbakekreving.Vergetype
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.PeriodeDto
 import java.time.LocalDate
 
 class ForhåndsvisVarselbrevData(val behandlendeEnhetId: String = "0106",
@@ -19,7 +20,7 @@ class ForhåndsvisVarselbrevData(val behandlendeEnhetId: String = "0106",
                                 val saksbehandlerIdent: String = "VL",
                                 val språkkode: Språkkode = Språkkode.NB,
                                 val vedtaksdato: LocalDate = LocalDate.now(),
-                                val verge: Verge? = null,
+                                val verge: Boolean,
                                 val ytelsestype: Ytelsestype,
                                 val sumFeilutbetaling: Long) {
 
@@ -37,7 +38,19 @@ class ForhåndsvisVarselbrevData(val behandlendeEnhetId: String = "0106",
                                             språkkode = språkkode,
                                             varseltekst = "Varseltekst fra Autotest",
                                             vedtaksdato = vedtaksdato,
-                                            verge = verge,
+                                            verge = utledVerge(verge),
                                             ytelsestype = ytelsestype)
+    }
+
+    private fun utledVerge(harVerge: Boolean): Verge? {
+        return if (harVerge) {
+            Verge(gyldigFom = LocalDate.now().minusYears(2).withDayOfMonth(1),
+                  gyldigTom = LocalDate.now().plusYears(1).withDayOfMonth(15),
+                  vergetype = Vergetype.ADVOKAT,
+                  navn = "Jens Pettersen",
+                  organisasjonsnummer = "987654321")
+        } else {
+            null
+        }
     }
 }

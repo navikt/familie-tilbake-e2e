@@ -1,13 +1,13 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
-import no.nav.familie.tilbake.e2e.domene.dto.AvsnittDto
-import no.nav.familie.tilbake.e2e.domene.dto.Avsnittstype
-import no.nav.familie.tilbake.e2e.domene.dto.ForeslåVedtakDto
-import no.nav.familie.tilbake.e2e.domene.dto.FritekstavsnittDto
-import no.nav.familie.tilbake.e2e.domene.dto.PeriodeMedTekstDto
-import no.nav.familie.tilbake.e2e.domene.dto.UnderavsnittDto
-import no.nav.familie.tilbake.e2e.domene.dto.Underavsnittstype
-import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.AvsnittDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Avsnittstype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.ForeslåVedtakDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.FritekstavsnittDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.PeriodeMedTekstDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.UnderavsnittDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Underavsnittstype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.felles.PeriodeDto
 
 class BehandleForeslåVedtakData(val hentVedtakbrevtekstResponse: List<AvsnittDto>) {
 

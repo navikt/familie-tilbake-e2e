@@ -1,7 +1,7 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.KodeStatusKrav
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto

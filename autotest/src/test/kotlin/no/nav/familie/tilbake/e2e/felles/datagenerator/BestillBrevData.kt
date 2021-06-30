@@ -1,7 +1,7 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
-import no.nav.familie.tilbake.e2e.domene.dto.BestillBrevDto
-import no.nav.familie.tilbake.e2e.domene.dto.Dokumentmalstype
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.BestillBrevDto
+import no.nav.familie.tilbake.e2e.familie_tilbake.dto.Dokumentmalstype
 import java.util.UUID
 
 class BestillBrevData(val behandlingId: String,
