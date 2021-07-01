@@ -1,24 +1,22 @@
 package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.Fagsystem
-import no.nav.familie.kontrakter.felles.Språkkode
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsresultatstype
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingssteg
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstegstatus
-import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
-import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
-import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
-import no.nav.familie.tilbake.e2e.domene.dto.Hendelsestype
-import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
-import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
-import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
-import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
-import no.nav.familie.tilbake.e2e.domene.builder.ForhåndsvisHenleggelsesbrevBuilder
-import no.nav.familie.tilbake.e2e.domene.builder.ForhåndsvisVarselbrevBuilder
-import no.nav.familie.tilbake.e2e.domene.dto.Dokumentmalstype
+import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsresultatstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingssteg
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsstegstatus
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Venteårsak
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsestype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
+import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
+import no.nav.familie.tilbake.e2e.klienter.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Dokumentmalstype
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
+import no.nav.familie.tilbake.e2e.felles.Scenario
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -32,27 +30,73 @@ import kotlin.random.Random
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
 
-    private val fagsystem = Fagsystem.BA
-    private val ytelsestype = Ytelsestype.BARNETRYGD
-
     private lateinit var saksbehandler: Saksbehandler
-    private lateinit var eksternFagsakId: String
-    private lateinit var eksternBrukId: String
+    private lateinit var scenario: Scenario
+
+    private val fagsystem: Fagsystem = Fagsystem.BA
+    private val ytelsestype: Ytelsestype = Ytelsestype.BARNETRYGD
 
     @BeforeEach
     fun setup() {
         saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient)
+        scenario = Scenario(eksternFagsakId = Random.nextInt(1000000, 9999999).toString(),
+                            eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
+                            fagsystem = fagsystem,
+                            ytelsestype = ytelsestype,
+                            personIdent = "12345678901",
+                            enhetId = "0106",
+                            enhetsnavn = "NAV Fredrikstad")
+    }
+
+    @Test
+    fun `Tilbakekreving med varsel, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling`() {
+        with(saksbehandler) {
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = true,
+                                  verge = false)
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
+            Thread.sleep(10_000)
+
+            taBehandlingAvVent()
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
+            opprettKravgrunnlag(status = KodeStatusKrav.NY,
+                                antallPerioder = 4,
+                                under4rettsgebyr = false,
+                                muligforeldelse = false)
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            // Ikke mulig foreldelse, steget skal derfor være autoutført
+            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                                     aktsomhet = Aktsomhet.FORSETT,
+                                     andelTilbakekreves = BigDecimal(100),
+                                     særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET,
+                                                             SærligGrunn.STØRRELSE_BELØP,
+                                                             SærligGrunn.ANNET))
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            beregn()
+
+            behandleForeslåVedtak()
+            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
+        }
     }
 
     @Test
     fun `Tilbakekreving med varsel, kravgrunnlag med foreldelse, ikke foreldet, vilkårsvurdering simpel uaktsomhet full tilbakebetaling småbeløp`() {
         with(saksbehandler) {
-            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = ytelsestype,
-                                                  varsel = true,
-                                                  verge = false)
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = true,
+                                  verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             Thread.sleep(10_000)
@@ -80,7 +124,6 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                                              SærligGrunn.ANNET))
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            forhåndsvisVedtaksbrev()
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
@@ -91,20 +134,17 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
-    fun `Tilbakekreving uten varsel, kravgrunnlag, SPER-melding, ENDR-melding, vilkårsvurdering grov uaktsomhet delvis tilbakekreving`() {
+    fun `Tilbakekreving uten varsel, kravgrunnlag, SPER-melding, ENDR-melding, vilkårsvurdering simpel uaktsomhet 22-15 6 ledd, ingen tilbakekreving`() {
         with(saksbehandler) {
-            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = ytelsestype,
-                                                  varsel = false,
-                                                  verge = false)
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = false,
+                                  verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
                                 antallPerioder = 4,
                                 periodelengde = 2,
-                                under4rettsgebyr = false,
+                                under4rettsgebyr = true,
                                 muligforeldelse = false)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
@@ -120,7 +160,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             taBehandlingAvVent()
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-            // Ikke mulig foreldelse, steget skal derfor være autoutført
+            // Ikke mulig foreldelse, foreldelsessteget skal derfor være autoutført
             behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
@@ -128,9 +168,8 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
             behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
                                      aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
-                                     særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.ANNET),
-                                     andelTilbakekreves = BigDecimal(40),
-                                     tilbakekrevSmåbeløp = true)
+                                     særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING),
+                                     tilbakekrevSmåbeløp = false)
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             behandleForeslåVedtak()
@@ -146,69 +185,16 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
             endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
             behandleFatteVedtak(godkjent = true)
-            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.DELVIS_TILBAKEBETALING)
-        }
-    }
-
-    @Test
-    fun `Tilbakekreving med alle perioder foreldet`() {
-        with(saksbehandler) {
-            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = Ytelsestype.BARNETRYGD,
-                                                  varsel = false,
-                                                  verge = false)
-            erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
-
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 2,
-                                under4rettsgebyr = false,
-                                muligforeldelse = true)
-            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
-
-            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
-            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
-
-            // Alle perioder er foreldet, vilkårsvurdering skal derfor være autoutført
-            behandleForeldelse(Foreldelsesvurderingstype.FORELDET)
-            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.AUTOUTFØRT)
-            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
-
-            behandleForeslåVedtak()
-            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
-
-            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
-            behandleFatteVedtak(godkjent = true)
-            erBehandlingISteg(Behandlingssteg.IVERKSETT_VEDTAK, Behandlingsstegstatus.KLAR)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.INGEN_TILBAKEBETALING)
-        }
-    }
-
-    @Test
-    fun `Kravgrunnlag uten at behandling opprettes først`() {
-        with(saksbehandler) {
-            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            opprettKravgrunnlagUtenBehandling(status = KodeStatusKrav.NY,
-                                              fagsystem = Fagsystem.BA,
-                                              ytelsestype = Ytelsestype.BARNETRYGD,
-                                              eksternFagsakId = eksternFagsakId,
-                                              antallPerioder = 1,
-                                              under4rettsgebyr = false,
-                                              muligforeldelse = false)
-            // TODO: Fortsette å utvide testen når funk kommer i familie-tilbake
         }
     }
 
     @Test
     fun `Tilbakekreving behandles så langt det er mulig før iverksetting, vilkårsvurdering god tro, så AVSL-melding og henleggelse`() {
         with(saksbehandler) {
-            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = Ytelsestype.BARNETRYGD,
-                                                  varsel = true,
-                                                  verge = false)
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = true,
+                                  verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             Thread.sleep(10_000)
@@ -238,14 +224,57 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
+    fun `Tilbakekreving med alle perioder foreldet`() {
+        with(saksbehandler) {
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = false,
+                                  verge = false)
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
+            opprettKravgrunnlag(status = KodeStatusKrav.NY,
+                                antallPerioder = 2,
+                                under4rettsgebyr = false,
+                                muligforeldelse = true)
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
+
+            // Alle perioder er foreldet, vilkårsvurdering skal derfor være autoutført
+            behandleForeldelse(Foreldelsesvurderingstype.FORELDET)
+            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.AUTOUTFØRT)
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            behandleForeslåVedtak()
+            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingISteg(Behandlingssteg.IVERKSETT_VEDTAK, Behandlingsstegstatus.KLAR)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.INGEN_TILBAKEBETALING)
+        }
+    }
+
+    /** TODO: Fortsette å utvikle testen når funk kommer i familie-tilbake
+    @Test
+    fun `Opprett tilbakekrevingsbehandling manuelt`() {
+        with(saksbehandler) {
+            opprettKravgrunnlagUtenBehandling(status = KodeStatusKrav.NY,
+                                              fagsystem = Fagsystem.BA,
+                                              ytelsestype = Ytelsestype.BARNETRYGD,
+                                              eksternFagsakId = eksternFagsakId,
+                                              antallPerioder = 1,
+                                              under4rettsgebyr = false,
+                                              muligforeldelse = false)
+        }
+    }*/
+
+    @Test
     fun `Tilbakekreving uten varsel, tilleggsfrist for foreldelse, uaktsomhet forsett`() {
         with(saksbehandler) {
-            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = ytelsestype,
-                                                  varsel = false,
-                                                  verge = false)
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = false,
+                                  verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
@@ -274,14 +303,11 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
-    fun `Tilbakekreving med verge, ingen tilbakekreving`() {
+    fun `Tilbakekreving med verge, vilkårsvurdering grov uaktsomhet, delvis tilbakekreving`() {
         with(saksbehandler) {
-            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = ytelsestype,
-                                                  varsel = false,
-                                                  verge = true)
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = false,
+                                  verge = true)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
@@ -297,8 +323,10 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
-                                     beløpErIBehold = false)
+            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                                     aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
+                                     særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
+                                     andelTilbakekreves = BigDecimal(50))
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             behandleForeslåVedtak()
@@ -306,19 +334,16 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
             endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
             behandleFatteVedtak(godkjent = true)
-            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.INGEN_TILBAKEBETALING)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.DELVIS_TILBAKEBETALING)
         }
     }
 
     @Test
     fun `Manuell bestilling og forhåndsvisning av brev`() {
         with(saksbehandler) {
-            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = ytelsestype,
-                                                  varsel = true,
-                                                  verge = false)
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = true,
+                                  verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             Thread.sleep(10_000)
@@ -348,6 +373,28 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             forhåndsvisHenleggelsesbrev()
 
             hentJournaldokument()
+
+            taBehandlingAvVent()
+
+            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
+
+            behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
+            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                                     aktsomhet = Aktsomhet.FORSETT,
+                                     andelTilbakekreves = BigDecimal(100),
+                                     særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET,
+                                                             SærligGrunn.STØRRELSE_BELØP,
+                                                             SærligGrunn.ANNET))
+
+            behandleForeslåVedtak()
+            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
         }
     }
 

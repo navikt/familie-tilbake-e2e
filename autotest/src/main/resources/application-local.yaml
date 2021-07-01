@@ -20,9 +20,20 @@ no.nav.security.jwt:
           client-id: ${TILBAKE_CLIENT_ID}
           client-secret: ${TILBAKE_CLIENT_SECRET}
           client-auth-method: client_secret_basic
+      familie-historikk:
+        resource-url: ${FAMILIE_HISTORIKK_API_URL}
+        token-endpoint-url: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/v2.0/token
+        grant-type: client_credentials
+        scope: ${FAMILIE_HISTORIKK_SCOPE}
+        authentication:
+          client-id: ${TILBAKE_CLIENT_ID}
+          client-secret: ${TILBAKE_CLIENT_SECRET}
+          client-auth-method: client_secret_basic
 
 FAMILIE_TILBAKE_API_URL: http://localhost:8030
 FAMILIE_TILBAKE_SCOPE: api://dev-gcp.teamfamilie.familie-tilbake-lokal/.default
+FAMILIE_HISTORIKK_API_URL: http://localhost:8050
+FAMILIE_HISTORIKK_SCOPE: api://dev-gcp.teamfamilie.familie-historikk-lokal/.default
 TILBAKE_CLIENT_ID: d7d22abc-9619-428e-86df-872a60a03a98
 
 logging:

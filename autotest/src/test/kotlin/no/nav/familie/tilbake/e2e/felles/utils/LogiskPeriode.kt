@@ -1,28 +1,49 @@
 package no.nav.familie.tilbake.e2e.felles.utils
 
-import no.nav.familie.tilbake.e2e.domene.dto.felles.Periode
-import no.nav.familie.tilbake.e2e.domene.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.klienter.dto.felles.Periode
+import no.nav.familie.tilbake.e2e.klienter.dto.felles.PeriodeDto
+import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto
+import java.math.BigDecimal
 import java.time.YearMonth
+import java.util.SortedMap
 
-object LogiskPeriode {
+data class LogiskPeriode(val periode: PeriodeDto, val feilutbetaltBeløp: BigDecimal)
 
-    fun utledLogiskPeriode(perioder: List<Periode>): List<PeriodeDto>{
+object LogiskPeriodeUtil {
+
+    fun utledLogiskPeriodeFraKravgrunnlag(detaljertKravgrunnlag: DetaljertKravgrunnlagDto): List<LogiskPeriode> {
+        return utledLogiskPeriode(
+            detaljertKravgrunnlag.tilbakekrevingsPeriode.associate { tilbakekrevingsPeriode ->
+                Periode(fom = tilbakekrevingsPeriode.periode.fom,
+                        tom = tilbakekrevingsPeriode.periode.tom) to
+                        tilbakekrevingsPeriode.tilbakekrevingsBelop.sumOf { it.belopTilbakekreves }
+            }.toSortedMap())
+    }
+
+    fun utledLogiskPeriode(feilutbetalingPrPeriode: SortedMap<Periode, BigDecimal>): List<LogiskPeriode> {
         var førsteMåned: YearMonth? = null
         var sisteMåned: YearMonth? = null
-        val resultat = mutableListOf<PeriodeDto>()
-        for (periode in perioder) {
+        var logiskPeriodeBeløp = BigDecimal.ZERO
+        val resultat = mutableListOf<LogiskPeriode>()
+        for ((periode, feilutbetaltBeløp) in feilutbetalingPrPeriode) {
             if (førsteMåned == null && sisteMåned == null) {
                 førsteMåned = periode.fom
                 sisteMåned = periode.tom
             } else {
                 if (harOppholdMellom(sisteMåned!!, periode.fom)) {
-                    resultat.add(PeriodeDto(førsteMåned!!, sisteMåned))
+                    resultat.add(LogiskPeriode(PeriodeDto(førsteMåned!!, sisteMåned),
+                                               feilutbetaltBeløp = logiskPeriodeBeløp))
                     førsteMåned = periode.fom
+                    logiskPeriodeBeløp = BigDecimal.ZERO
                 }
                 sisteMåned = periode.tom
             }
+            logiskPeriodeBeløp = logiskPeriodeBeløp.add(feilutbetaltBeløp)
         }
-        resultat.add(PeriodeDto(førsteMåned!!, sisteMåned!!))
+        if (BigDecimal.ZERO.compareTo(logiskPeriodeBeløp) != 0) {
+            resultat.add(LogiskPeriode(periode = PeriodeDto(førsteMåned!!, sisteMåned!!),
+                                       feilutbetaltBeløp = logiskPeriodeBeløp))
+        }
         return resultat.toList()
     }
 

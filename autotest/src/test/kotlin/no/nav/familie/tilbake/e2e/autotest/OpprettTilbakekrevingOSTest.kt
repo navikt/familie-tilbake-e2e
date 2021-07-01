@@ -2,19 +2,20 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
-import no.nav.familie.tilbake.e2e.domene.dto.Aktsomhet
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingssteg
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsstegstatus
-import no.nav.familie.tilbake.e2e.domene.dto.Foreldelsesvurderingstype
-import no.nav.familie.tilbake.e2e.domene.dto.Hendelsestype
-import no.nav.familie.tilbake.e2e.domene.dto.Hendelsesundertype
-import no.nav.familie.tilbake.e2e.domene.dto.KodeStatusKrav
-import no.nav.familie.tilbake.e2e.domene.dto.SærligGrunn
-import no.nav.familie.tilbake.e2e.domene.dto.Venteårsak
-import no.nav.familie.tilbake.e2e.domene.dto.Vilkårsvurderingsresultat
-import no.nav.familie.tilbake.e2e.domene.FamilieTilbakeKlient
-import no.nav.familie.tilbake.e2e.domene.dto.Behandlingsresultatstype
+import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingssteg
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsstegstatus
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Foreldelsesvurderingstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsestype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsesundertype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Venteårsak
+import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
+import no.nav.familie.tilbake.e2e.klienter.FamilieTilbakeKlient
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsresultatstype
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
+import no.nav.familie.tilbake.e2e.felles.Scenario
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -28,27 +29,30 @@ import kotlin.random.Random
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
 
-    private val fagsystem = Fagsystem.EF
-    private val ytelsestype = Ytelsestype.OVERGANGSSTØNAD
-
     private lateinit var saksbehandler: Saksbehandler
-    private lateinit var eksternFagsakId: String
-    private lateinit var eksternBrukId: String
+    private lateinit var scenario: Scenario
+
+    private val fagsystem: Fagsystem = Fagsystem.EF
+    private val ytelsestype: Ytelsestype = Ytelsestype.OVERGANGSSTØNAD
 
     @BeforeEach
     fun setup() {
         saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient)
+        scenario = Scenario(eksternFagsakId = Random.nextInt(1000000, 9999999).toString(),
+                            eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
+                            fagsystem = fagsystem,
+                            ytelsestype = ytelsestype,
+                            personIdent = "12345678901",
+                            enhetId = "0106",
+                            enhetsnavn = "NAV Fredrikstad")
     }
 
     @Test
     fun `Tilbakekreving med varsel, gjenoppta, kravgrunnlag med foreldelse, vilkårsvurdering simpel uaktsomhet delvis tilbakebetaling`() {
         with(saksbehandler) {
-            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            eksternBrukId = saksbehandler.opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                                fagsystem = fagsystem,
-                                                                ytelsestype = ytelsestype,
-                                                                varsel = true,
-                                                                verge = false)
+            saksbehandler.opprettTilbakekreving(scenario = scenario,
+                                                varsel = true,
+                                                verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             Thread.sleep(10_000)
@@ -87,12 +91,9 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Tilbakekreving uten varsel, SPER melding, ENDR melding, vilkårsvurdering god tro`() {
         with(saksbehandler) {
-            eksternFagsakId = Random.nextInt(1000000, 9999999).toString()
-            eksternBrukId = opprettTilbakekreving(eksternFagsakId = eksternFagsakId,
-                                                  fagsystem = fagsystem,
-                                                  ytelsestype = ytelsestype,
-                                                  varsel = false,
-                                                  verge = false)
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = false,
+                                  verge = false)
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
@@ -131,4 +132,44 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.DELVIS_TILBAKEBETALING)
         }
     }
+
+    @Test
+    fun `Tilbakekreving med varsel, skatt, vilkårsvurdering forsett med renter`() {
+        with(saksbehandler) {
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = true,
+                                  verge = false)
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
+            Thread.sleep(10_000)
+
+            taBehandlingAvVent()
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
+            opprettKravgrunnlag(status = KodeStatusKrav.NY,
+                                antallPerioder = 3,
+                                skattProsent = BigDecimal(10),
+                                under4rettsgebyr = false,
+                                muligforeldelse = false)
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            behandleFakta(Hendelsestype.EF_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
+                                     aktsomhet = Aktsomhet.FORSETT)
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            beregn()
+
+            behandleForeslåVedtak()
+            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
+        }
+    }
+
 }
