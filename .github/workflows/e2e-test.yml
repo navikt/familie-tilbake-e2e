@@ -38,6 +38,12 @@ jobs:
           HISTORIKK_CLIENT_SECRET: ${{ secrets.SAK_CLIENT_SECRET }}
         run: |
           cd e2e; ./e2e.sh
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-cache-${{ hashFiles('pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-cache-
       - name: Kjør tester (e2e)
         env:
           GITHUB_USERNAME: x-access-token
