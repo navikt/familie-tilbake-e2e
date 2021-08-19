@@ -50,5 +50,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TILBAKE_CLIENT_ID: ${{ secrets.TILBAKE_CLIENT_ID }}
           TILBAKE_CLIENT_SECRET: ${{ secrets.TILBAKE_CLIENT_SECRET }}
+          HISTORIKK_CLIENT_ID: ${{ secrets.HISTORIKK_CLIENT_ID }}
+          HISTORIKK_CLIENT_SECRET: ${{ secrets.HISTORIKK_CLIENT_SECRET }}
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         run: cd autotest; mvn --settings .m2/maven-settings.xml -Dtest="**" test
