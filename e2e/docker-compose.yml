@@ -2,6 +2,7 @@ version: "3"
 services:
   familie-mock-server:
     image: docker.pkg.github.com/navikt/familie-mock-server:latest
+#    image: familie-mock-server:latest
     ports:
       - 1337:1337
   # For Azure
@@ -14,6 +15,14 @@ services:
     image: docker.pkg.github.com/navikt/nav-auth-mock/nav-auth-mock
     ports:
       - 8200:8200
+#  postgres-historikk:
+#    image: postgres:12
+#    environment:
+#      POSTGRES_USER: familie
+#      POSTGRES_DB: familie-historikk
+#      POSTGRES_PASSWORD: familie-pwd
+#    ports:
+#      - 5433:5432
   postgres-tilbake:
     image: postgres:11
     environment:
@@ -25,6 +34,7 @@ services:
   familie-integrasjoner:
     restart: always
     image: docker.pkg.github.com/navikt/familie-integrasjoner/familie-integrasjoner:latest
+#    image: familie-integrasjoner:latest
     depends_on:
       - familie-mock-server
       - mock-oauth2-server
@@ -40,21 +50,42 @@ services:
       AAD_GRAPH_SCOPE: ${INTEGRASJONER_AAD_GRAPH_SCOPE}
     ports:
       - 8085:8085
+#  familie-historikk:
+#    restart: always
+#    image: docker.pkg.github.com/navikt/familie-historikk/familie-historikk:latest
+#    image: familie-historikk:latest
+#    depends_on:
+#      - postgres-historikk
+#      - mock-oauth2-server
+#      - nav-auth-mock
+#    environment:
+#      SPRING_PROFILES_ACTIVE: ${ENV}
+#      APPD_ENABLED: 0
+#      AZURE_APP_CLIENT_ID: ${HISTORIKK_CLIENT_ID}
+#      HISTORIKK_CLIENT_ID: ${HISTORIKK_CLIENT_ID}
+#      HISTORIKK_CLIENT_SECRET: ${HISTORIKK_CLIENT_SECRET}
+#      FAMILIE_TILBAKE_FRONTEND_CLIENT_ID=: ${FAMILIE_TILBAKE_FRONTEND_CLIENT_ID}
+#    ports:
+#      - 8050:8050
   familie-tilbake:
     restart: always
-#    image: docker.pkg.github.com/navikt/familie-tilbake/familie-tilbake:latest
-    image: familie-tilbake:latest
+    image: docker.pkg.github.com/navikt/familie-tilbake/familie-tilbake:latest
+#    image: familie-tilbake:latest
     depends_on:
       - postgres-tilbake
       - mock-oauth2-server
       - familie-integrasjoner
       - nav-auth-mock
+#      - familie-historikk
     environment:
       SPRING_PROFILES_ACTIVE: ${ENV}
       APPD_ENABLED: 0
-      TILBAKE_CLIENT_ID: ${TILBAKE_CLIENT_ID}
-      BA_SAK_CLIENT_ID: ${BA_SAK_CLIENT_ID}
       FAMILIE_INTEGRASJONER_SCOPE: ${INTEGRASJONER_SCOPE}
+      AZURE_APP_CLIENT_ID: ${TILBAKE_CLIENT_ID}
+      TILBAKE_CLIENT_ID: ${TILBAKE_CLIENT_ID}
+      TILBAKE_CLIENT_SECRET: ${TILBAKE_CLIENT_SECRET}
+#      FAMILIE_HISTORIKK_SCOPE: ${HISTORIKK_SCOPE}
+      BA_SAK_CLIENT_ID: ${BA_SAK_CLIENT_ID}
       FAMILIE_TILBAKE_FRONTEND_CLIENT_ID=: ${FAMILIE_TILBAKE_FRONTEND_CLIENT_ID}
     ports:
       - 8030:8030

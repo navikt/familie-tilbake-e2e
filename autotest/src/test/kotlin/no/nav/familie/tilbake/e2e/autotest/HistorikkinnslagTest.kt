@@ -2,9 +2,13 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
+import no.nav.familie.tilbake.e2e.felles.Saksbehandler
+import no.nav.familie.tilbake.e2e.felles.Scenario
 import no.nav.familie.tilbake.e2e.klienter.FamilieHistorikkKlient
 import no.nav.familie.tilbake.e2e.klienter.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
+import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
+import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsresultatstype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingssteg
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsstegstatus
@@ -13,12 +17,9 @@ import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Foreldelsesvurderi
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsestype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeStatusKrav
-import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Venteårsak
-import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
-import no.nav.familie.tilbake.e2e.felles.Saksbehandler
-import no.nav.familie.tilbake.e2e.felles.Scenario
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,6 +29,7 @@ import kotlin.random.Random
 
 @SpringBootTest(classes = [ApplicationConfig::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Disabled("Trenger Kafka, så kan bare kjøres lokalt")
 class HistorikkinnslagTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient,
                            @Autowired val familieHistorikkKlient: FamilieHistorikkKlient
 ) {
@@ -74,7 +76,7 @@ class HistorikkinnslagTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKl
 
             Thread.sleep(10_000)
 
-            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
             Thread.sleep(10_000)
@@ -106,7 +108,7 @@ class HistorikkinnslagTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKl
 
             Thread.sleep(10_000)
 
-            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
 

@@ -42,11 +42,19 @@ import java.time.LocalDate
 class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                     private val familieHistorikkKlient: FamilieHistorikkKlient? = null) {
 
+
+    companion object {
+
+        const val SAKSBEHANDLER_IDENT = "Z994619" // Denne må oppdateres når bruker går ut i IDA
+        const val BESLUTTER_IDENT = "Z994623" // Denne må oppdateres når bruker går ut i IDA
+    }
+
     private lateinit var gjeldendeBehandling: GjeldendeBehandling
 
     fun opprettTilbakekreving(scenario: Scenario,
                               varsel: Boolean,
                               verge: Boolean,
+                              saksbehandlerIdent: String = SAKSBEHANDLER_IDENT,
                               sumFeilutbetaling: BigDecimal? = null) {
         val data = TilbakekrevingData(eksternFagsakId = scenario.eksternFagsakId,
                                       eksternBehandlingId = scenario.eksternBehandlingId,
@@ -57,7 +65,8 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                                       enhetsnavn = scenario.enhetsnavn,
                                       varsel = varsel,
                                       verge = verge,
-                                      sumFeilutbetaling = sumFeilutbetaling).lag()
+                                      sumFeilutbetaling = sumFeilutbetaling,
+                                      saksbehandlerIdent = saksbehandlerIdent!!).lag()
 
         val eksternBrukId = requireNotNull(familieTilbakeKlient.opprettTilbakekreving(data = data).data)
         { "Det oppstod en feil under opprettelse av tilbakekreving" }
