@@ -20,7 +20,7 @@ detviskalfinne="docker.pkg.github.com/navikt/$appsombyggeslokalt/$appsombyggeslo
 
 echo "${dockercompose/$detviskalfinne/$appversjonlokalt}" | docker-compose -f - up -d --force-recreate
 
-while [[ $(curl -s -X GET "http://localhost:8089/internal/health") == "" ]]; do
+while [[ $(curl -s -X GET "http://localhost:8030/internal/health") == "" ]]; do
     echo "venter på oppstart av tilbake / integrasjoner"
     sleep 1
 done
