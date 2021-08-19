@@ -59,7 +59,7 @@ services:
 #      - mock-oauth2-server
 #      - nav-auth-mock
 #    environment:
-#      SPRING_PROFILES_ACTIVE: ${ENV}
+#      SPRING_PROFILES_ACTIVE: e2e
 #      APPD_ENABLED: 0
 #      AZURE_APP_CLIENT_ID: ${HISTORIKK_CLIENT_ID}
 #      HISTORIKK_CLIENT_ID: ${HISTORIKK_CLIENT_ID}
@@ -78,7 +78,7 @@ services:
       - nav-auth-mock
 #      - familie-historikk
     environment:
-      SPRING_PROFILES_ACTIVE: ${ENV}
+      SPRING_PROFILES_ACTIVE: e2e
       APPD_ENABLED: 0
       FAMILIE_INTEGRASJONER_SCOPE: ${INTEGRASJONER_SCOPE}
       AZURE_APP_CLIENT_ID: ${TILBAKE_CLIENT_ID}
