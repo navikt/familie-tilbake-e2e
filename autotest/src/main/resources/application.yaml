@@ -17,9 +17,21 @@ no.nav.security.jwt:
           client-id: ${TILBAKE_CLIENT_ID}
           client-secret: ${TILBAKE_CLIENT_SECRET}
           client-auth-method: client_secret_basic
+      familie-historikk:
+        resource-url: ${FAMILIE_HISTORIKK_API_URL}
+        token-endpoint-url: http://localhost:1111/v2.0/token
+        grant-type: client_credentials
+        scope: ${FAMILIE_HISTORIKK_SCOPE}
+        authentication:
+          client-id: ${TILBAKE_CLIENT_ID}
+          client-secret: ${TILBAKE_CLIENT_SECRET}
+          client-auth-method: client_secret_basic
 
 FAMILIE_TILBAKE_API_URL: http://localhost:8030
-FAMILIE_TILBAKE_SCOPE: api://dd201057-70b9-4641-b358-1668207826be/.default
+FAMILIE_TILBAKE_SCOPE: api://${TILBAKE_CLIENT_ID}/.default
+FAMILIE_HISTORIKK_API_URL: http://localhost:8050
+FAMILIE_HISTORIKK_SCOPE: api://${HISTORIKK_CLIENT_ID}/.default
+TILBAKE_CLIENT_ID: ${TILBAKE_CLIENT_ID}
 
 logging:
   level:
