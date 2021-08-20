@@ -1,6 +1,6 @@
 name: E2E tester for familie-tilbake
 
-on: [push]
+on: [push, workflow_dispatch]
 
 jobs:
   build:
