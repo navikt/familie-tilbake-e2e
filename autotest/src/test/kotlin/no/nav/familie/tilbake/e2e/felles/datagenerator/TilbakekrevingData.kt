@@ -24,7 +24,8 @@ class TilbakekrevingData(val eksternFagsakId: String,
                          val enhetsnavn: String,
                          val varsel: Boolean,
                          val verge: Boolean,
-                         val sumFeilutbetaling: BigDecimal? = null) {
+                         val sumFeilutbetaling: BigDecimal? = null,
+                         val saksbehandlerIdent: String) {
 
     fun lag(): OpprettTilbakekrevingRequest {
         return OpprettTilbakekrevingRequest(fagsystem = fagsystem,
@@ -32,7 +33,7 @@ class TilbakekrevingData(val eksternFagsakId: String,
                                             eksternFagsakId = eksternFagsakId,
                                             eksternId = eksternBehandlingId ?: Random.nextInt(1000000, 9999999).toString(),
                                             personIdent = personIdent,
-                                            saksbehandlerIdent = "VL",
+                                            saksbehandlerIdent = saksbehandlerIdent,
                                             behandlingstype = Behandlingstype.TILBAKEKREVING,
                                             språkkode = Språkkode.NB,
                                             enhetId = enhetId,

@@ -2,22 +2,23 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
+import no.nav.familie.tilbake.e2e.felles.Saksbehandler
+import no.nav.familie.tilbake.e2e.felles.Scenario
+import no.nav.familie.tilbake.e2e.klienter.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
+import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
+import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsresultatstype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingssteg
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsstegstatus
-import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeStatusKrav
-import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Venteårsak
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Dokumentmalstype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Foreldelsesvurderingstype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsestype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsesundertype
-import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
-import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
-import no.nav.familie.tilbake.e2e.klienter.FamilieTilbakeKlient
-import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Dokumentmalstype
-import no.nav.familie.tilbake.e2e.felles.Saksbehandler
-import no.nav.familie.tilbake.e2e.felles.Scenario
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeStatusKrav
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Venteårsak
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
@@ -62,13 +63,13 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 4,
+                                antallPerioder = 3,
                                 under4rettsgebyr = false,
-                                muligforeldelse = false)
+                                muligforeldelse = false, periodelengde = 6)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             // Ikke mulig foreldelse, steget skal derfor være autoutført
-            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
@@ -82,10 +83,11 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
             beregn()
 
+            endreAnsvarligSaksbehandler(Saksbehandler.SAKSBEHANDLER_IDENT)
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
         }
@@ -110,7 +112,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                 muligforeldelse = true)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
             behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
@@ -123,11 +125,12 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                                              SærligGrunn.STØRRELSE_BELØP,
                                                              SærligGrunn.ANNET))
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+            endreAnsvarligSaksbehandler(Saksbehandler.SAKSBEHANDLER_IDENT)
 
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
         }
@@ -161,7 +164,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             // Ikke mulig foreldelse, foreldelsessteget skal derfor være autoutført
-            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
@@ -175,15 +178,16 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = false)
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.TILBAKEFØRT)
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
+            endreAnsvarligSaksbehandler(Saksbehandler.SAKSBEHANDLER_IDENT)
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.INGEN_TILBAKEBETALING)
         }
@@ -204,11 +208,11 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
             opprettKravgrunnlag(status = KodeStatusKrav.NY,
                                 antallPerioder = 2,
-                                under4rettsgebyr = true,
-                                muligforeldelse = true)
+                                under4rettsgebyr = false,
+                                muligforeldelse = false)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
             behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
@@ -237,7 +241,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                 muligforeldelse = true)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
             // Alle perioder er foreldet, vilkårsvurdering skal derfor være autoutført
@@ -248,7 +252,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingISteg(Behandlingssteg.IVERKSETT_VEDTAK, Behandlingsstegstatus.KLAR)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.INGEN_TILBAKEBETALING)
@@ -283,7 +287,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                 muligforeldelse = true)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
             behandleForeldelse(Foreldelsesvurderingstype.TILLEGGSFRIST)
@@ -296,7 +300,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
         }
@@ -316,7 +320,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                 muligforeldelse = true)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
             // Alle perioder er foreldet, vilkårsvurdering skal derfor være autoutført
@@ -332,13 +336,14 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.DELVIS_TILBAKEBETALING)
         }
     }
 
     @Test
+    @Disabled("Kan bare kjøres lokalt, med mocket IntegrasjonerClient i familie-tilbake")
     fun `Manuell bestilling og forhåndsvisning av brev`() {
         with(saksbehandler) {
             opprettTilbakekreving(scenario = scenario,
@@ -376,7 +381,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
             taBehandlingAvVent()
 
-            behandleFakta(Hendelsestype.BA_ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
             behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
@@ -392,7 +397,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler = "nyAnsvarligSaksbehandler")
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
         }
