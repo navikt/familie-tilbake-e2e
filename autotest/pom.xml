@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <kotlin.version>1.5.0</kotlin.version>
+        <kotlin.version>1.5.21</kotlin.version>
         <felles.version>1.20210518103651_47c02a6</felles.version>
         <kontrakter.version>2.0_20210811154304_a9ff916</kontrakter.version>
 
