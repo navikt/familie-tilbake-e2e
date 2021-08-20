@@ -43,14 +43,30 @@ data class FaktainfoDto(val revurderingsårsak: String,
  */
 
 enum class Hendelsestype {
-
-    BA_ANNET,
-    EF_ANNET,
-    KS_ANNET
+    ANNET,
+    BOR_MED_SØKER,
+    BOSATT_I_RIKET,
+    LOVLIG_OPPHOLD,
+    DØDSFALL,
+    DELT_BOSTED,
+    BARNS_ALDER,
 }
 
 enum class Hendelsesundertype {
-    ANNET_FRITEKST
+
+    ANNET_FRITEKST,
+    BOR_IKKE_MED_BARN,
+    BARN_FLYTTET_FRA_NORGE,
+    BRUKER_FLYTTET_FRA_NORGE,
+    BARN_BOR_IKKE_I_NORGE,
+    BRUKER_BOR_IKKE_I_NORGE,
+    UTEN_OPPHOLDSTILLATELSE,
+    BARN_DØD,
+    BRUKER_DØD,
+    ENIGHET_OM_OPPHØR_DELT_BOSTED,
+    UENIGHET_OM_OPPHØR_DELT_BOSTED,
+    BARN_OVER_18_ÅR,
+    BARN_OVER_6_ÅR
 }
 
 enum class Tilbakekrevingsvalg {

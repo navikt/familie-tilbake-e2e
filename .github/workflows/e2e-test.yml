@@ -1,0 +1,56 @@
+name: E2E tester for familie-tilbake
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Login to Github Package Registry
+        env:
+          DOCKER_USERNAME: x-access-token
+          DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin docker.pkg.github.com
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@ab80d026d4753220c4243394c07c7d80f9638d06
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Start apper
+        if: "!contains(github.event.head_commit.message, 'e2e skip')"
+        env:
+          INTEGRASJONER_CLIENT_ID: ${{ secrets.INTEGRASJONER_CLIENT_ID }}
+          INTEGRASJONER_CLIENT_SECRET: ${{ secrets.INTEGRASJONER_CLIENT_SECRET }}
+          INTEGRASJONER_INFOTRYGD_KS_SCOPE: ${{ secrets.INTEGRASJONER_INFOTRYGD_KS_SCOPE }}
+          INTEGRASJONER_AAD_GRAPH_SCOPE: ${{ secrets.INTEGRASJONER_AAD_GRAPH_SCOPE }}
+          TILBAKE_CLIENT_ID: ${{ secrets.TILBAKE_CLIENT_ID }}
+          TILBAKE_CLIENT_SECRET: ${{ secrets.TILBAKE_CLIENT_SECRET }}
+          TILBAKE_FRONTEND_CLIENT_ID: ${{ secrets.TILBAKE_FRONTEND_CLIENT_ID }}
+          INTEGRASJONER_SCOPE: ${{ secrets.INTEGRASJONER_SCOPE }}
+          HISTORIKK_CLIENT_ID: ${{ secrets.HISTORIKK_CLIENT_ID }}
+          HISTORIKK_CLIENT_SECRET: ${{ secrets.HISTORIKK_CLIENT_SECRET }}
+        run: |
+          cd e2e; ./e2e.sh
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-cache-${{ hashFiles('pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-cache-
+      - name: Kjør tester (e2e)
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TILBAKE_CLIENT_ID: ${{ secrets.TILBAKE_CLIENT_ID }}
+          TILBAKE_CLIENT_SECRET: ${{ secrets.TILBAKE_CLIENT_SECRET }}
+          HISTORIKK_CLIENT_ID: ${{ secrets.HISTORIKK_CLIENT_ID }}
+          HISTORIKK_CLIENT_SECRET: ${{ secrets.HISTORIKK_CLIENT_SECRET }}
+        if: "!contains(github.event.head_commit.message, 'e2e skip')"
+        run: cd autotest; mvn --settings .m2/maven-settings.xml -Dtest="**" test
