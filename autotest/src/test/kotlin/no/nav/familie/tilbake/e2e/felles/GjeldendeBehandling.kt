@@ -19,4 +19,6 @@ data class GjeldendeBehandling(val eksternFagsakId: String,
                                var vedtakId: BigInteger? = null,
                                var kravgrunnlagId: BigInteger? = null,
                                var feilutbetaltePerioder: List<LogiskPeriode>? = null,
-                               var historikkinnslag: MutableList<TilbakekrevingHistorikkinnslagstype> = mutableListOf())
+                               var historikkinnslag: MutableList<TilbakekrevingHistorikkinnslagstype> = mutableListOf(),
+                               var revurderingBehandlingId: String? = null,
+                               var revurderingEksternId: String? = null)

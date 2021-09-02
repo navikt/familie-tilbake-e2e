@@ -1,6 +1,7 @@
 package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.Fagsystem
+import no.nav.familie.kontrakter.felles.tilbakekreving.Behandlingsårsakstype
 import no.nav.familie.kontrakter.felles.tilbakekreving.Vergetype
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
@@ -51,7 +52,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
-    fun `Tilbakekreving med varsel, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling`() {
+    fun `Tilbakekreving med varsel, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling, revurdering, ingen tilbakekreving`() {
         with(saksbehandler) {
             opprettTilbakekreving(scenario = scenario,
                                   varsel = true,
@@ -91,6 +92,27 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
+
+            opprettRevurdering(scenario, Behandlingsårsakstype.REVURDERING_OPPLYSNINGER_OM_VILKÅR)
+
+            erRevurderingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            behandleFaktaRevurdering(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
+
+            erRevurderingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+            erRevurderingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurderingRevurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
+                                                beløpErIBehold = false)
+            erRevurderingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandlerRevurdering(Saksbehandler.SAKSBEHANDLER_IDENT)
+            behandleForeslåVedtakRevurdering()
+            erRevurderingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandlerRevurdering(Saksbehandler.BESLUTTER_IDENT)
+            behandleFatteVedtakRevurdering(godkjent = true)
+            erRevurderingAvsluttet(resultat = Behandlingsresultatstype.INGEN_TILBAKEBETALING)
         }
     }
 

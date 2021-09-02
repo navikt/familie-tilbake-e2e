@@ -24,6 +24,7 @@ import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.HenleggDto
 import no.nav.familie.tilbake.e2e.klienter.dto.HentVilkårsvurderingDto
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.TotrinnsvurderingDto
 import no.nav.familie.tilbake.e2e.klienter.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.OpprettRevurderingDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import org.springframework.beans.factory.annotation.Qualifier
@@ -225,6 +226,12 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
 
     fun opprettManuellBehandling(data: OpprettManueltTilbakekrevingRequest): Ressurs<String> {
         val uri = URI.create("$familieTilbakeApiUrl/api/behandling//manuelt/task/v1")
+
+        return postForEntity(uri, data)
+    }
+
+    fun opprettRevurdering(data: OpprettRevurderingDto): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/revurdering/v1")
 
         return postForEntity(uri, data)
     }
