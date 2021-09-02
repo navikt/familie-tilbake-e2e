@@ -217,6 +217,12 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return getForEntity(uri)
     }
 
+    fun publiserFagsystembehandling(data: OpprettManueltTilbakekrevingRequest): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/autotest/publiser/fagsystemsbehandling")
+
+        return postForEntity(uri, data)
+    }
+
     fun opprettManuellBehandling(data: OpprettManueltTilbakekrevingRequest): Ressurs<String> {
         val uri = URI.create("$familieTilbakeApiUrl/api/behandling//manuelt/task/v1")
 

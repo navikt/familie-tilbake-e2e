@@ -40,6 +40,7 @@ import no.nav.familie.tilbake.e2e.felles.utils.LogiskPeriodeUtil.utledLogiskPeri
 import no.nav.familie.tilbake.e2e.felles.utils.Vent
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.VergeDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.math.BigDecimal
@@ -105,31 +106,17 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                 "eksternBrukId: ${gjeldendeBehandling.eksternBrukId}")
     }
 
-    fun oppretManuellBehandling(scenario: Scenario,
-                                status: KodeStatusKrav,
-                                antallPerioder: Int,
-                                under4rettsgebyr: Boolean,
-                                muligforeldelse: Boolean) {
+    fun oppretManuellBehandling(scenario: Scenario, detaljertMelding: DetaljertKravgrunnlagMelding) {
+        val manuellTilbakekrevingRequest = OpprettManueltTilbakekrevingRequest(eksternFagsakId = scenario.eksternFagsakId,
+                                                       ytelsestype = scenario.ytelsestype,
+                                                       eksternId = scenario.eksternBehandlingId)
+        familieTilbakeKlient.opprettManuellBehandling(manuellTilbakekrevingRequest)
 
-        val detaljertMelding = opprettKravgrunnlagForManueltOpprettelse(scenario = scenario,
-                                                                        status = status,
-                                                                        antallPerioder = antallPerioder,
-                                                                        under4rettsgebyr = under4rettsgebyr,
-                                                                        muligforeldelse = muligforeldelse)
+        Thread.sleep(2_000)
 
-        Thread.sleep(10_000)
+        familieTilbakeKlient.publiserFagsystembehandling(manuellTilbakekrevingRequest)
 
-        val kanOppretteManueltResponse = familieTilbakeKlient.kanBehandlingOpprettesManuelt(ytelsestype = scenario.ytelsestype,
-                                                                                            eksternFagsakId = scenario.eksternFagsakId)
-
-        assertTrue(kanOppretteManueltResponse.status == Ressurs.Status.SUKSESS, "Kallet kan opprette feilet")
-        assertTrue(kanOppretteManueltResponse.data!!.kanBehandlingOpprettes, "Kan ikke opprette behandling manuelt")
-
-        familieTilbakeKlient.opprettManuellBehandling(OpprettManueltTilbakekrevingRequest(eksternFagsakId = scenario.eksternFagsakId,
-                                                                                          ytelsestype = scenario.ytelsestype,
-                                                                                          eksternId = scenario.eksternBehandlingId))
-
-        Thread.sleep(10_000)
+        Thread.sleep(5_000)
 
         val fagsak = familieTilbakeKlient.hentFagsak(fagsystem = scenario.fagsystem, eksternFagsakId = scenario.eksternFagsakId)
 
@@ -230,6 +217,16 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         println("Sendte inn ${status} kravgrunnlag med eksternFagsakId: ${scenario.eksternFagsakId} " +
                 "på ytelsestype: ${scenario.fagsystem}")
         return data
+    }
+
+    fun kanBehandlingOpprettesManuelt(scenario: Scenario) {
+        val kanOppretteManueltResponse =
+                familieTilbakeKlient.kanBehandlingOpprettesManuelt(ytelsestype = scenario.ytelsestype,
+                                                                   eksternFagsakId = scenario.eksternFagsakId)
+
+        assertTrue(kanOppretteManueltResponse.status == Ressurs.Status.SUKSESS, "Kallet kan opprette feilet")
+        assertTrue(kanOppretteManueltResponse.data!!.kanBehandlingOpprettes,
+                              "Kan ikke opprette behandling manuelt")
     }
 
     fun opprettStatusmelding(status: KodeStatusKrav) {

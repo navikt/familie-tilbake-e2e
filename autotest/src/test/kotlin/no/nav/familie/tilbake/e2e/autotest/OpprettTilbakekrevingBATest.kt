@@ -261,16 +261,43 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
-    @Disabled
-    fun `Opprett tilbakekrevingsbehandling manuelt`() {
+    fun `Opprett tilbakekrevingsbehandling manuelt, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling`() {
         with(saksbehandler) {
-            oppretManuellBehandling(scenario = scenario,
-                                    status = KodeStatusKrav.NY,
-                                    antallPerioder = 1,
-                                    under4rettsgebyr = false,
-                                    muligforeldelse = false)
+            val detaljertMelding = opprettKravgrunnlagForManueltOpprettelse(scenario = scenario,
+                                                                            status = KodeStatusKrav.NY,
+                                                                            antallPerioder = 2,
+                                                                            under4rettsgebyr = false,
+                                                                            muligforeldelse = false)
+
+            Thread.sleep(2_000)
+
+            kanBehandlingOpprettesManuelt(scenario)
+            oppretManuellBehandling(scenario = scenario, detaljertMelding = detaljertMelding)
 
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            // Ikke mulig foreldelse, steget skal derfor være autoutført
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                                     aktsomhet = Aktsomhet.FORSETT,
+                                     andelTilbakekreves = BigDecimal(100),
+                                     særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET,
+                                                             SærligGrunn.STØRRELSE_BELØP,
+                                                             SærligGrunn.ANNET))
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            beregn()
+
+            endreAnsvarligSaksbehandler(Saksbehandler.SAKSBEHANDLER_IDENT)
+            behandleForeslåVedtak()
+            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
         }
     }
 
