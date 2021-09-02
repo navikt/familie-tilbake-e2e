@@ -269,7 +269,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                                                             under4rettsgebyr = false,
                                                                             muligforeldelse = false)
 
-            Thread.sleep(2_000)
+            Thread.sleep(5_000)
 
             kanBehandlingOpprettesManuelt(scenario)
             oppretManuellBehandling(scenario = scenario, detaljertMelding = detaljertMelding)
