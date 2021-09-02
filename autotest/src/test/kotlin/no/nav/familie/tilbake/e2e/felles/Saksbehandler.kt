@@ -112,7 +112,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                                                        eksternId = scenario.eksternBehandlingId)
         familieTilbakeKlient.opprettManuellBehandling(manuellTilbakekrevingRequest)
 
-        Thread.sleep(5_000)
+        Thread.sleep(10_000)
 
         familieTilbakeKlient.publiserFagsystembehandling(manuellTilbakekrevingRequest)
 
