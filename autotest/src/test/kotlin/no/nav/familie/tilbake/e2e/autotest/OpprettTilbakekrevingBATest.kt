@@ -283,7 +283,6 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
-    @Disabled
     fun `Opprett tilbakekrevingsbehandling manuelt, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling`() {
         with(saksbehandler) {
             val detaljertMelding = opprettKravgrunnlagForManueltOpprettelse(scenario = scenario,
