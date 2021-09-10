@@ -4,7 +4,10 @@ import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.ForhåndsvisVarselbrevRequest
+import no.nav.familie.kontrakter.felles.tilbakekreving.KanBehandlingOpprettesManueltRespons
+import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettManueltTilbakekrevingRequest
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
+import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.AvsnittDto
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.BehandlingDto
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.FagsakDto
@@ -21,6 +24,7 @@ import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.HenleggDto
 import no.nav.familie.tilbake.e2e.klienter.dto.HentVilkårsvurderingDto
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.TotrinnsvurderingDto
 import no.nav.familie.tilbake.e2e.klienter.dto.felles.PeriodeDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.OpprettRevurderingDto
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus
 import org.springframework.beans.factory.annotation.Qualifier
@@ -140,7 +144,8 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     }
 
     fun endreAnsvarligSaksbehandler(behandlingId: String, nyAnsvarligSaksbehandler: String): Ressurs<String> {
-        val uri = URI.create("$familieTilbakeApiUrl//api/autotest/behandling/$behandlingId/endre/saksbehandler/$nyAnsvarligSaksbehandler")
+        val uri =
+                URI.create("$familieTilbakeApiUrl//api/autotest/behandling/$behandlingId/endre/saksbehandler/$nyAnsvarligSaksbehandler")
 
         return putForEntity(uri, "")
     }
@@ -187,5 +192,46 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return getForEntity(uri)
     }
 
-    // TODO: Implementer manuell opprettelse av behandling
+    fun opprettVerge(behandlingId: String): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/v1/$behandlingId/verge")
+
+        return postForEntity(uri, "")
+    }
+
+    fun fjernVerge(behandlingId: String): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/v1/$behandlingId/verge")
+
+        return putForEntity(uri, "")
+    }
+
+    fun hentVerge(behandlingId: String): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/v1/$behandlingId/verge")
+
+        return getForEntity(uri)
+    }
+
+    fun kanBehandlingOpprettesManuelt(ytelsestype: Ytelsestype, eksternFagsakId: String): Ressurs<KanBehandlingOpprettesManueltRespons> {
+        val uri =
+                URI.create("$familieTilbakeApiUrl/api/ytelsestype/$ytelsestype/fagsak/$eksternFagsakId/kanBehandlingOpprettesManuelt/v1")
+
+        return getForEntity(uri)
+    }
+
+    fun publiserFagsystembehandling(data: OpprettManueltTilbakekrevingRequest): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/autotest/publiser/fagsystemsbehandling")
+
+        return postForEntity(uri, data)
+    }
+
+    fun opprettManuellBehandling(data: OpprettManueltTilbakekrevingRequest): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/manuelt/task/v1")
+
+        return postForEntity(uri, data)
+    }
+
+    fun opprettRevurdering(data: OpprettRevurderingDto): Ressurs<String> {
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/revurdering/v1")
+
+        return postForEntity(uri, data)
+    }
 }

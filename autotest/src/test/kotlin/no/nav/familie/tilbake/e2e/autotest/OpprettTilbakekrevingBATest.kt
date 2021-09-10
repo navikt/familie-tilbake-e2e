@@ -1,6 +1,8 @@
 package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.Fagsystem
+import no.nav.familie.kontrakter.felles.tilbakekreving.Behandlingsårsakstype
+import no.nav.familie.kontrakter.felles.tilbakekreving.Vergetype
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
 import no.nav.familie.tilbake.e2e.felles.Scenario
@@ -50,7 +52,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
-    fun `Tilbakekreving med varsel, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling`() {
+    fun `Tilbakekreving med varsel, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling, revurdering, ingen tilbakekreving`() {
         with(saksbehandler) {
             opprettTilbakekreving(scenario = scenario,
                                   varsel = true,
@@ -90,6 +92,27 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
+
+            opprettRevurdering(scenario, Behandlingsårsakstype.REVURDERING_OPPLYSNINGER_OM_VILKÅR)
+
+            erRevurderingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            behandleFaktaRevurdering(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
+
+            erRevurderingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+            erRevurderingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurderingRevurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
+                                                beløpErIBehold = false)
+            erRevurderingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandlerRevurdering(Saksbehandler.SAKSBEHANDLER_IDENT)
+            behandleForeslåVedtakRevurdering()
+            erRevurderingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandlerRevurdering(Saksbehandler.BESLUTTER_IDENT)
+            behandleFatteVedtakRevurdering(godkjent = true)
+            erRevurderingAvsluttet(resultat = Behandlingsresultatstype.INGEN_TILBAKEBETALING)
         }
     }
 
@@ -259,19 +282,46 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
         }
     }
 
-    /** TODO: Fortsette å utvikle testen når funk kommer i familie-tilbake
     @Test
-    fun `Opprett tilbakekrevingsbehandling manuelt`() {
+    fun `Opprett tilbakekrevingsbehandling manuelt, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling`() {
         with(saksbehandler) {
-            opprettKravgrunnlagUtenBehandling(status = KodeStatusKrav.NY,
-                                              fagsystem = Fagsystem.BA,
-                                              ytelsestype = Ytelsestype.BARNETRYGD,
-                                              eksternFagsakId = eksternFagsakId,
-                                              antallPerioder = 1,
-                                              under4rettsgebyr = false,
-                                              muligforeldelse = false)
+            val detaljertMelding = opprettKravgrunnlagForManueltOpprettelse(scenario = scenario,
+                                                                            status = KodeStatusKrav.NY,
+                                                                            antallPerioder = 2,
+                                                                            under4rettsgebyr = false,
+                                                                            muligforeldelse = false)
+
+            Thread.sleep(5_000)
+
+            kanBehandlingOpprettesManuelt(scenario)
+            oppretManuellBehandling(scenario = scenario, detaljertMelding = detaljertMelding)
+
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            // Ikke mulig foreldelse, steget skal derfor være autoutført
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                                     aktsomhet = Aktsomhet.FORSETT,
+                                     andelTilbakekreves = BigDecimal(100),
+                                     særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET,
+                                                             SærligGrunn.STØRRELSE_BELØP,
+                                                             SærligGrunn.ANNET))
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            beregn()
+
+            endreAnsvarligSaksbehandler(Saksbehandler.SAKSBEHANDLER_IDENT)
+            behandleForeslåVedtak()
+            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
         }
-    }*/
+    }
 
     @Test
     fun `Tilbakekreving uten varsel, tilleggsfrist for foreldelse, uaktsomhet forsett`() {
@@ -318,6 +368,9 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                                 antallPerioder = 1,
                                 under4rettsgebyr = false,
                                 muligforeldelse = true)
+
+            // Behandlingen opprettes med verge, så steget er autoutført og behandlingen er på FAKTA-steget
+            erBehandlingISteg(Behandlingssteg.VERGE, Behandlingsstegstatus.AUTOUTFØRT)
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
@@ -339,6 +392,55 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.DELVIS_TILBAKEBETALING)
+        }
+    }
+
+    @Test
+    fun `Tilbakekreving oppretter og fjerner verge, vilkårsvurdering grov uaktsomhet, delvis tilbakekreving`() {
+        with(saksbehandler) {
+            opprettTilbakekreving(scenario = scenario,
+                                  varsel = false,
+                                  verge = false)
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
+            opprettKravgrunnlag(status = KodeStatusKrav.NY,
+                                antallPerioder = 1,
+                                under4rettsgebyr = false,
+                                muligforeldelse = false)
+
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            opprettVerge()
+
+            erBehandlingISteg(Behandlingssteg.VERGE, Behandlingsstegstatus.KLAR)
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.TILBAKEFØRT)
+
+            behandleVerge(type = Vergetype.ADVOKAT, navn = "Advokat Advokatesen", orgNr = "987654321")
+
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+
+            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                                     aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
+                                     særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
+                                     andelTilbakekreves = BigDecimal(50))
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            fjernVerge()
+
+            erBehandlingISteg(Behandlingssteg.VERGE, Behandlingsstegstatus.TILBAKEFØRT)
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            behandleForeslåVedtak()
+            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.DELVIS_TILBAKEBETALING, vergeFjernet = true)
         }
     }
 
