@@ -210,7 +210,6 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
         return getForEntity(uri)
     }
 
-    // TODO: Implementer manuell opprettelse av behandling
     fun kanBehandlingOpprettesManuelt(ytelsestype: Ytelsestype, eksternFagsakId: String): Ressurs<KanBehandlingOpprettesManueltRespons> {
         val uri =
                 URI.create("$familieTilbakeApiUrl/api/ytelsestype/$ytelsestype/fagsak/$eksternFagsakId/kanBehandlingOpprettesManuelt/v1")
@@ -225,7 +224,7 @@ class FamilieTilbakeKlient(@Value("\${FAMILIE_TILBAKE_API_URL}") private val fam
     }
 
     fun opprettManuellBehandling(data: OpprettManueltTilbakekrevingRequest): Ressurs<String> {
-        val uri = URI.create("$familieTilbakeApiUrl/api/behandling//manuelt/task/v1")
+        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/manuelt/task/v1")
 
         return postForEntity(uri, data)
     }
