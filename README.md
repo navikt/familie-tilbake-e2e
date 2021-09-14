@@ -14,7 +14,7 @@ Testriggen kan kjøre på ekstern server og lokalt. Lokalt kan man erstatte ett 
 ###Tips
 For effektiv utvikling kan disse kommandoene være nyttige:
 
-* For mer effektivt bygg: mvn clean install -Dmaven.test.skip=true
+* For mer effektivt bygg: mvn clean install -DskipTests
 * For å hente informasjon om docker containerne som kjører: docker ps
 * For logger fra de ulike appene: docker logs <docker-id> -f
 
