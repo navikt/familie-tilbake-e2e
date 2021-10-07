@@ -24,7 +24,7 @@ services:
 #    ports:
 #      - 5433:5432
   postgres-tilbake:
-    image: postgres:11
+    image: postgres:12
     environment:
       POSTGRES_USER: familie
       POSTGRES_DB: familie-tilbake
