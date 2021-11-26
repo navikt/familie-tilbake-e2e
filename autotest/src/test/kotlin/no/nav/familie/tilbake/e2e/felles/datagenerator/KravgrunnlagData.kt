@@ -85,8 +85,8 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         // Finner startdato for første periode, hvor periodene har 1 måned mellomrom
         val antallMånederTilbake = antallPerioder * periodelengde + antallPerioder - 1
         var startdato = LocalDate.now()
-            .minusMonths(antallMånederTilbake.toLong())
-            .withDayOfMonth(1)
+                .minusMonths(antallMånederTilbake.toLong())
+                .withDayOfMonth(1)
 
         // Første periode må starte minst 3 år tilbake i tid dersom det skal være mulig foreldelse
         if (muligForeldelse) {
@@ -101,10 +101,10 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         }
 
         val beløpPrMåned = feilutbetaltBeløp
-            .divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
+                .divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
 
         // Finner skattbeløp
-        val skattIProsent = when(ytelsestype) {
+        val skattIProsent = when (ytelsestype) {
             Ytelsestype.BARNETRYGD -> BigDecimal.ZERO.setScale(2)
             else -> skattProsent
         }
@@ -116,7 +116,8 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                     periode = PeriodeDto()
                     periode.fom = startdato
                     periode.tom = startdato.withDayOfMonth(startdato.lengthOfMonth())
-                    belopSkattMnd = beløpPrMåned.multiply(skattIProsent).divide(BigDecimal(100)).setScale(2)
+                    belopSkattMnd = beløpPrMåned.multiply(skattIProsent)
+                            .divide(BigDecimal(100)).setScale(0, RoundingMode.DOWN)
                     tilbakekrevingsBelop.addAll(utledTilbakekrevingsbelop(beløpPrMåned, ytelsestype, skattIProsent))
                 }
 
