@@ -663,6 +663,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                     lagreHistorikkinnslag((TilbakekrevingHistorikkinnslagstype.KORRIGERT_VARSELBREV_SENDT_TIL_VERGE))
                 }
             }
+            else -> RuntimeException("Malen $dokumentmalstype er ikke støttet")
         }
 
         println("Bestilte brev $dokumentmalstype for behandling ${gjeldendeBehandling.behandlingId}")
