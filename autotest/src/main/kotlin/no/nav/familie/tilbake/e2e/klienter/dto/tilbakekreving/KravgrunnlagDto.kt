@@ -15,7 +15,10 @@ enum class KodeKlasse {
     BATRSMA,
     EFOG,
     EFBT,
-    EFSP
+    EFSP,
+    KL_KODE_JUST_BA,
+    KL_KODE_JUST_EFOG,
+    KL_KODE_JUST_PEN
 }
 
 enum class TypeKlasse {

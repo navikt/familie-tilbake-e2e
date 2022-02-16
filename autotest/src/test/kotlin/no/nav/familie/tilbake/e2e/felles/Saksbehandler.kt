@@ -151,7 +151,8 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                             muligforeldelse: Boolean,
                             periodelengde: Int = 3,
                             skattProsent: BigDecimal = BigDecimal.ZERO,
-                            sumFeilutbetaling: BigDecimal = BigDecimal(20000)) {
+                            sumFeilutbetaling: BigDecimal = BigDecimal(20000),
+                            medJustering: Boolean? = false) {
 
         val data = KravgrunnlagData(status = status,
                                     ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype)
@@ -169,14 +170,15 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                                         "EksternBehandlingId ikke definert. " +
                                         "Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
                                     },
-                                    personIdent = gjeldendeBehandling.personIdent,
-                                    enhetId = gjeldendeBehandling.enhetId,
                                     antallPerioder = antallPerioder,
                                     under4rettsgebyr = under4rettsgebyr,
                                     muligforeldelse = muligforeldelse,
                                     periodeLengde = periodelengde,
+                                    personIdent = gjeldendeBehandling.personIdent,
+                                    enhetId = gjeldendeBehandling.enhetId,
                                     skattProsent = skattProsent,
-                                    sumFeilutbetaling = sumFeilutbetaling).lag()
+                                    sumFeilutbetaling = sumFeilutbetaling,
+                                    medJustering = medJustering!!).lag()
 
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = data)
 
@@ -200,19 +202,21 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
                                                  muligforeldelse: Boolean,
                                                  periodelengde: Int = 3,
                                                  skattProsent: BigDecimal = BigDecimal.ZERO,
-                                                 sumFeilutbetaling: BigDecimal = BigDecimal(20000)): DetaljertKravgrunnlagMelding {
+                                                 sumFeilutbetaling: BigDecimal = BigDecimal(20000),
+                                                 medJustering: Boolean = false): DetaljertKravgrunnlagMelding {
         val data = KravgrunnlagData(status = status,
                                     ytelsestype = scenario.ytelsestype,
                                     eksternFagsakId = scenario.eksternFagsakId,
                                     eksternBehandlingId = scenario.eksternBehandlingId,
-                                    personIdent = scenario.personIdent,
-                                    enhetId = scenario.enhetId,
                                     antallPerioder = antallPerioder,
                                     under4rettsgebyr = under4rettsgebyr,
                                     muligforeldelse = muligforeldelse,
                                     periodeLengde = periodelengde,
+                                    personIdent = scenario.personIdent,
+                                    enhetId = scenario.enhetId,
                                     skattProsent = skattProsent,
-                                    sumFeilutbetaling = sumFeilutbetaling).lag()
+                                    sumFeilutbetaling = sumFeilutbetaling,
+                                    medJustering = medJustering).lag()
 
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = data)
 

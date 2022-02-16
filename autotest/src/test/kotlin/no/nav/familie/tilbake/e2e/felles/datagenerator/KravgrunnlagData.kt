@@ -18,18 +18,21 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
-class KravgrunnlagData(val status: KodeStatusKrav,
-                       val ytelsestype: Ytelsestype,
-                       val eksternFagsakId: String,
-                       val eksternBehandlingId: String,
-                       val antallPerioder: Int,
-                       val under4rettsgebyr: Boolean,
-                       val muligforeldelse: Boolean,
-                       val periodeLengde: Int,
-                       val personIdent: String,
-                       val enhetId: String,
-                       val skattProsent: BigDecimal,
-                       val sumFeilutbetaling: BigDecimal) {
+class KravgrunnlagData(
+    val status: KodeStatusKrav,
+    val ytelsestype: Ytelsestype,
+    val eksternFagsakId: String,
+    val eksternBehandlingId: String,
+    val antallPerioder: Int,
+    val under4rettsgebyr: Boolean,
+    val muligforeldelse: Boolean,
+    val periodeLengde: Int,
+    val personIdent: String,
+    val enhetId: String,
+    val skattProsent: BigDecimal,
+    val sumFeilutbetaling: BigDecimal,
+    val medJustering: Boolean
+) {
 
     // TODO: Vil trenge å kunne sette kontrollfelt tilbake i tid for at den plukkes av auto-opprett batch
     private val finalKontrollfelt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"))
@@ -54,13 +57,18 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                 this.kontrollfelt = finalKontrollfelt
                 this.saksbehId = "VL"
                 this.referanse = eksternBehandlingId
-                this.tilbakekrevingsPeriode.addAll(utledTilbakekrevingsPerioder(antallPerioder = antallPerioder,
-                                                                                under4rettsgebyr = under4rettsgebyr,
-                                                                                muligForeldelse = muligforeldelse,
-                                                                                ytelsestype = ytelsestype,
-                                                                                periodelengde = periodeLengde,
-                                                                                skattProsent = skattProsent,
-                                                                                sumFeilutbetaling = sumFeilutbetaling))
+                this.tilbakekrevingsPeriode.addAll(
+                    utledTilbakekrevingsPerioder(
+                        antallPerioder = antallPerioder,
+                        under4rettsgebyr = under4rettsgebyr,
+                        muligForeldelse = muligforeldelse,
+                        ytelsestype = ytelsestype,
+                        periodelengde = periodeLengde,
+                        skattProsent = skattProsent,
+                        sumFeilutbetaling = sumFeilutbetaling,
+                        medJustering = medJustering
+                    )
+                )
             }
         }
     }
@@ -75,18 +83,21 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         }
     }
 
-    private fun utledTilbakekrevingsPerioder(antallPerioder: Int,
-                                             under4rettsgebyr: Boolean,
-                                             muligForeldelse: Boolean,
-                                             ytelsestype: Ytelsestype,
-                                             periodelengde: Int,
-                                             skattProsent: BigDecimal,
-                                             sumFeilutbetaling: BigDecimal): List<DetaljertKravgrunnlagPeriodeDto> {
+    private fun utledTilbakekrevingsPerioder(
+        antallPerioder: Int,
+        under4rettsgebyr: Boolean,
+        muligForeldelse: Boolean,
+        ytelsestype: Ytelsestype,
+        periodelengde: Int,
+        skattProsent: BigDecimal,
+        sumFeilutbetaling: BigDecimal,
+        medJustering: Boolean
+    ): List<DetaljertKravgrunnlagPeriodeDto> {
         // Finner startdato for første periode, hvor periodene har 1 måned mellomrom
         val antallMånederTilbake = antallPerioder * periodelengde + antallPerioder - 1
         var startdato = LocalDate.now()
-                .minusMonths(antallMånederTilbake.toLong())
-                .withDayOfMonth(1)
+            .minusMonths(antallMånederTilbake.toLong())
+            .withDayOfMonth(1)
 
         // Første periode må starte minst 3 år tilbake i tid dersom det skal være mulig foreldelse
         if (muligForeldelse) {
@@ -101,7 +112,7 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         }
 
         val beløpPrMåned = feilutbetaltBeløp
-                .divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
+            .divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
 
         // Finner skattbeløp
         val skattIProsent = when (ytelsestype) {
@@ -117,8 +128,8 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                     periode.fom = startdato
                     periode.tom = startdato.withDayOfMonth(startdato.lengthOfMonth())
                     belopSkattMnd = beløpPrMåned.multiply(skattIProsent)
-                            .divide(BigDecimal(100)).setScale(0, RoundingMode.DOWN)
-                    tilbakekrevingsBelop.addAll(utledTilbakekrevingsbelop(beløpPrMåned, ytelsestype, skattIProsent))
+                        .divide(BigDecimal(100)).setScale(0, RoundingMode.DOWN)
+                    tilbakekrevingsBelop.addAll(utledTilbakekrevingsbelop(beløpPrMåned, ytelsestype, skattIProsent, medJustering))
                 }
 
                 tilbakekrevingsperiodeList.add(kravgrunnlagPeriode)
@@ -130,15 +141,20 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         return tilbakekrevingsperiodeList
     }
 
-    private fun utledTilbakekrevingsbelop(beløpPrMnd: BigDecimal,
-                                          ytelsestype: Ytelsestype,
-                                          skattIProsent: BigDecimal): Collection<DetaljertKravgrunnlagBelopDto> {
+    private fun utledTilbakekrevingsbelop(
+        beløpPrMnd: BigDecimal,
+        ytelsestype: Ytelsestype,
+        skattIProsent: BigDecimal,
+        medJustering: Boolean = false
+    ): Collection<DetaljertKravgrunnlagBelopDto> {
         val ytelKodeKlasse: KodeKlasse
         val feilKodeKlasse: KodeKlasse
+        val justKodeKlasse: KodeKlasse
         when (ytelsestype) {
             Ytelsestype.BARNETRYGD -> {
                 ytelKodeKlasse = KodeKlasse.BATR
                 feilKodeKlasse = KodeKlasse.KL_KODE_FEIL_BA
+                justKodeKlasse = KodeKlasse.KL_KODE_JUST_BA
             }
             Ytelsestype.KONTANTSTØTTE -> {
                 throw Exception("Kontantstøtte ikke implementert enda")
@@ -146,14 +162,17 @@ class KravgrunnlagData(val status: KodeStatusKrav,
             Ytelsestype.OVERGANGSSTØNAD -> {
                 ytelKodeKlasse = KodeKlasse.EFOG
                 feilKodeKlasse = KodeKlasse.KL_KODE_FEIL_EFOG
+                justKodeKlasse = KodeKlasse.KL_KODE_JUST_EFOG
             }
             Ytelsestype.SKOLEPENGER -> {
                 ytelKodeKlasse = KodeKlasse.EFSP
                 feilKodeKlasse = KodeKlasse.KL_KODE_FEIL_PEN
+                justKodeKlasse = KodeKlasse.KL_KODE_JUST_PEN
             }
             Ytelsestype.BARNETILSYN -> {
                 ytelKodeKlasse = KodeKlasse.EFBT
                 feilKodeKlasse = KodeKlasse.KL_KODE_FEIL_PEN
+                justKodeKlasse = KodeKlasse.KL_KODE_JUST_PEN
             }
         }
         val tilbakekrevingsBelopList: MutableList<DetaljertKravgrunnlagBelopDto> = mutableListOf()
@@ -178,6 +197,18 @@ class KravgrunnlagData(val status: KodeStatusKrav,
             skattProsent = skattIProsent.setScale(2)
         }
         tilbakekrevingsBelopList.add(tilbakekrevingsbelopFeil)
+        if (medJustering) {
+            val tilbakekrevingsbelopJust = DetaljertKravgrunnlagBelopDto().apply {
+                kodeKlasse = justKodeKlasse.name
+                typeKlasse = TypeKlasseDto.JUST
+                belopOpprUtbet = BigDecimal.ZERO.setScale(2)
+                belopNy = BigDecimal(100).setScale(2)
+                belopTilbakekreves = BigDecimal.ZERO.setScale(2)
+                belopUinnkrevd = BigDecimal.ZERO.setScale(2)
+                skattProsent = BigDecimal.ZERO.setScale(2)
+            }
+            tilbakekrevingsBelopList.add(tilbakekrevingsbelopJust)
+        }
 
         return tilbakekrevingsBelopList
     }
