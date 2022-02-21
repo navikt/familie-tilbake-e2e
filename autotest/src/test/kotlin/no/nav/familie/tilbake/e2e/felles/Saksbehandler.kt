@@ -153,13 +153,13 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
         val data = KravgrunnlagData(status = status,
                                     ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype) {
-                                        "Ytelsestype ikke definert. " + "Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
+                                        "Ytelsestype er ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
                                     },
                                     eksternFagsakId = requireNotNull(gjeldendeBehandling.eksternFagsakId) {
-                                        "EksternFagsakId ikke definert. " + "Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
+                                        "EksternFagsakId  er ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
                                     },
                                     eksternBehandlingId = requireNotNull(gjeldendeBehandling.eksternBehandlingId) {
-                                        "EksternBehandlingId ikke definert. " + "Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
+                                        "EksternBehandlingId er ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
                                     },
                                     antallPerioder = antallPerioder,
                                     under4rettsgebyr = under4rettsgebyr,
@@ -182,7 +182,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.KRAVGRUNNLAG_MOTTATT)
         lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_GJENOPPTATT)
 
-        println("Sendte inn $status kravgrunnlag med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId} " + "på ytelsestype: ${gjeldendeBehandling.fagsystem}")
+        println("Sendte inn $status kravgrunnlag med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId} på ytelsestype: ${gjeldendeBehandling.ytelsestype}")
     }
 
     fun opprettKravgrunnlagForManueltOpprettelse(scenario: Scenario,
@@ -210,7 +210,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = data)
 
-        println("Sendte inn $status kravgrunnlag med eksternFagsakId: ${scenario.eksternFagsakId} " + "på ytelsestype: ${scenario.fagsystem}")
+        println("Sendte inn $status kravgrunnlag med eksternFagsakId: ${scenario.eksternFagsakId} på ytelsestype: ${scenario.ytelsestype}")
         return data
     }
 
@@ -249,10 +249,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun opprettStatusmelding(status: KodeStatusKrav) {
         val data = StatusmeldingData(status = status,
-                                     kravgrunnlagVedtakId = requireNotNull(gjeldendeBehandling.vedtakId) { "VedtakId ikke definert. Opprett kravgrunnlag først." },
-                                     ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype) { "Ytelsestype ikke definert. Opprett kravgrunnlag først." },
-                                     eksternFagsakId = requireNotNull(gjeldendeBehandling.eksternFagsakId) { "EksternFagsakId ikke definert. Opprett kravgrunnlag først." },
-                                     eksternBehandlingId = requireNotNull(gjeldendeBehandling.eksternBehandlingId) { "EksternBehandlingId ikke definert. Opprett kravgrunnlag først." }).lag()
+                                     kravgrunnlagVedtakId = requireNotNull(gjeldendeBehandling.vedtakId) { "VedtakId er ikke definert. Opprett kravgrunnlag først." },
+                                     ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype) { "Ytelsestype er ikke definert. Opprett kravgrunnlag først." },
+                                     eksternFagsakId = requireNotNull(gjeldendeBehandling.eksternFagsakId) { "EksternFagsakId er ikke definert. Opprett kravgrunnlag først." },
+                                     eksternBehandlingId = requireNotNull(gjeldendeBehandling.eksternBehandlingId) { "EksternBehandlingId er ikke definert. Opprett kravgrunnlag først." }).lag()
 
         familieTilbakeKlient.opprettStatusmelding(statusmelding = data)
 
