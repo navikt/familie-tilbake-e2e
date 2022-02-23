@@ -29,10 +29,11 @@ class ForhåndsvisVarselbrevData(val behandlendeEnhetId: String = "0106",
                                             behandlendeEnhetsNavn = behandlendeEnhetsNavn,
                                             eksternFagsakId = eksternFagsakId,
                                             fagsystem = fagsystem,
-                                            feilutbetaltePerioderDto =
-                                            FeilutbetaltePerioderDto(sumFeilutbetaling = sumFeilutbetaling,
-                                                                     perioder = perioder.map { Periode(fom = it.fom,
-                                                                                                       tom = it.tom) }),
+                                            feilutbetaltePerioderDto = FeilutbetaltePerioderDto(sumFeilutbetaling = sumFeilutbetaling,
+                                                                                                perioder = perioder.map {
+                                                                                                    Periode(fom = it.fom,
+                                                                                                            tom = it.tom)
+                                                                                                }),
                                             ident = ident,
                                             saksbehandlerIdent = saksbehandlerIdent,
                                             språkkode = språkkode,
@@ -44,11 +45,7 @@ class ForhåndsvisVarselbrevData(val behandlendeEnhetId: String = "0106",
 
     private fun utledVerge(harVerge: Boolean): Verge? {
         return if (harVerge) {
-            Verge(gyldigFom = LocalDate.now().minusYears(2).withDayOfMonth(1),
-                  gyldigTom = LocalDate.now().plusYears(1).withDayOfMonth(15),
-                  vergetype = Vergetype.ADVOKAT,
-                  navn = "Jens Pettersen",
-                  organisasjonsnummer = "987654321")
+            Verge(vergetype = Vergetype.ADVOKAT, navn = "Jens Pettersen", organisasjonsnummer = "987654321")
         } else {
             null
         }

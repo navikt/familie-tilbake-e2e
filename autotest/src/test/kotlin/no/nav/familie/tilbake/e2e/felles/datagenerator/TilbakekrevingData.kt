@@ -58,25 +58,20 @@ class TilbakekrevingData(val eksternFagsakId: String,
         return if (varsel) {
             Varsel(varseltekst = "Automatisk varseltekst fra Autotest",
                    sumFeilutbetaling = sumFeilutbetaling ?: BigDecimal(8124),
-                   perioder = arrayListOf(
-                           Periode(fom = LocalDate.now().minusMonths(5).withDayOfMonth(1),
-                                   tom = LocalDate.now()
-                                           .minusMonths(5)
-                                           .withDayOfMonth(LocalDate.now().minusMonths(5).lengthOfMonth())),
-                           Periode(fom = LocalDate.now().minusMonths(3).withDayOfMonth(1),
-                                   tom = LocalDate.now()
-                                           .minusMonths(3)
-                                           .withDayOfMonth(LocalDate.now().minusMonths(3).lengthOfMonth()))))
+                   perioder = arrayListOf(Periode(fom = LocalDate.now().minusMonths(5).withDayOfMonth(1),
+                                                  tom = LocalDate.now()
+                                                          .minusMonths(5)
+                                                          .withDayOfMonth(LocalDate.now().minusMonths(5).lengthOfMonth())),
+                                          Periode(fom = LocalDate.now().minusMonths(3).withDayOfMonth(1),
+                                                  tom = LocalDate.now()
+                                                          .minusMonths(3)
+                                                          .withDayOfMonth(LocalDate.now().minusMonths(3).lengthOfMonth()))))
         } else null
     }
 
     private fun utledVerge(verge: Boolean): Verge? {
         return if (verge) {
-            Verge(gyldigFom = LocalDate.now().minusYears(2).withDayOfMonth(1),
-                  gyldigTom = LocalDate.now().plusYears(1).withDayOfMonth(15),
-                  vergetype = Vergetype.ADVOKAT,
-                  navn = "Jens Pettersen",
-                  organisasjonsnummer = "987654321")
+            Verge(vergetype = Vergetype.ADVOKAT, navn = "Jens Pettersen", organisasjonsnummer = "987654321")
         } else null
     }
 }
