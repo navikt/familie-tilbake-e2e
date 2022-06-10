@@ -30,8 +30,9 @@ import kotlin.random.Random
 @SpringBootTest(classes = [ApplicationConfig::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Disabled("Trenger Kafka, så kan bare kjøres lokalt")
-class HistorikkinnslagTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient,
-                           @Autowired val familieHistorikkKlient: FamilieHistorikkKlient
+class HistorikkinnslagTest(
+    @Autowired val familieTilbakeKlient: FamilieTilbakeKlient,
+    @Autowired val familieHistorikkKlient: FamilieHistorikkKlient
 ) {
 
     private lateinit var saksbehandler: Saksbehandler
@@ -42,23 +43,29 @@ class HistorikkinnslagTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKl
 
     @BeforeEach
     fun setup() {
-        saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient,
-                                      familieHistorikkKlient = familieHistorikkKlient)
-        scenario = Scenario(eksternFagsakId = Random.nextInt(1000000, 9999999).toString(),
-                            eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
-                            fagsystem = fagsystem,
-                            ytelsestype = ytelsestype,
-                            personIdent = "12345678901",
-                            enhetId = "0106",
-                            enhetsnavn = "NAV Fredrikstad")
+        saksbehandler = Saksbehandler(
+            familieTilbakeKlient = familieTilbakeKlient,
+            familieHistorikkKlient = familieHistorikkKlient
+        )
+        scenario = Scenario(
+            eksternFagsakId = Random.nextInt(1000000, 9999999).toString(),
+            eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
+            fagsystem = fagsystem,
+            ytelsestype = ytelsestype,
+            personIdent = "12345678901",
+            enhetId = "0106",
+            enhetsnavn = "NAV Fredrikstad"
+        )
     }
 
     @Test
     fun `Historikkinnslag lagres for tilbakekreving med varsel, verge, mulig foreldelse, bestilling av brev`() {
         with(saksbehandler) {
-            opprettTilbakekreving(scenario = scenario,
-                                  varsel = true,
-                                  verge = true)
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = true,
+                verge = true
+            )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             Thread.sleep(10_000)
@@ -68,10 +75,12 @@ class HistorikkinnslagTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKl
 
             Thread.sleep(10_000)
 
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 4,
-                                under4rettsgebyr = false,
-                                muligforeldelse = true)
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 4,
+                under4rettsgebyr = false,
+                muligforeldelse = true
+            )
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             Thread.sleep(10_000)
@@ -86,13 +95,17 @@ class HistorikkinnslagTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKl
 
             Thread.sleep(10_000)
 
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
-                                     aktsomhet = Aktsomhet.FORSETT,
-                                     andelTilbakekreves = BigDecimal(100),
-                                     særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET,
-                                                             SærligGrunn.STØRRELSE_BELØP,
-                                                             SærligGrunn.ANNET),
-                                     ileggRenter = true)
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                aktsomhet = Aktsomhet.FORSETT,
+                andelTilbakekreves = BigDecimal(100),
+                særligeGrunner = listOf(
+                    SærligGrunn.GRAD_AV_UAKTSOMHET,
+                    SærligGrunn.STØRRELSE_BELØP,
+                    SærligGrunn.ANNET
+                ),
+                ileggRenter = true
+            )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             Thread.sleep(10_000)

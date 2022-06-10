@@ -6,17 +6,22 @@ import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.HentFaktaDto
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.VurdertFaktaFeilutbetaltPeriodeDto
 
-class BehandleFaktaData(val hentFaktaResponse: HentFaktaDto,
-                        val hendelsestype: Hendelsestype,
-                        val hendelsesundertype: Hendelsesundertype
+class BehandleFaktaData(
+    val hentFaktaResponse: HentFaktaDto,
+    val hendelsestype: Hendelsestype,
+    val hendelsesundertype: Hendelsesundertype
 ) {
 
     fun lag(): FaktaDto {
-        return FaktaDto(begrunnelse = "Automatisk begrunnelse fra Autotest",
-                        feilutbetaltePerioder = hentFaktaResponse.feilutbetaltePerioder.map {
-                            VurdertFaktaFeilutbetaltPeriodeDto(periode = it.periode,
-                                                               hendelsestype = hendelsestype,
-                                                               hendelsesundertype = hendelsesundertype)
-                        })
+        return FaktaDto(
+            begrunnelse = "Automatisk begrunnelse fra Autotest",
+            feilutbetaltePerioder = hentFaktaResponse.feilutbetaltePerioder.map {
+                VurdertFaktaFeilutbetaltPeriodeDto(
+                    periode = it.periode,
+                    hendelsestype = hendelsestype,
+                    hendelsesundertype = hendelsesundertype
+                )
+            }
+        )
     }
 }

@@ -20,8 +20,11 @@ object Vent {
             try {
                 Thread.sleep(500)
             } catch (e: InterruptedException) {
-                throw RuntimeException("Async venting interrupted ut etter ${ChronoUnit.SECONDS.between(start, LocalDateTime.now())}" +
-                                       " sekunder fordi: ${errorMessageProducer.get()}", e)
+                throw RuntimeException(
+                    "Async venting interrupted ut etter ${ChronoUnit.SECONDS.between(start, LocalDateTime.now())}" +
+                        " sekunder fordi: ${errorMessageProducer.get()}",
+                    e
+                )
             }
         }
     }

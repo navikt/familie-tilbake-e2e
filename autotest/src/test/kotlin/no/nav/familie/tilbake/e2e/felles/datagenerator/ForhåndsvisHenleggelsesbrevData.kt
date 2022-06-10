@@ -6,7 +6,9 @@ import java.util.UUID
 class ForhåndsvisHenleggelsesbrevData(val behandlingId: String) {
 
     fun lag(): ForhåndsvisningHenleggelsesbrevDto {
-        return ForhåndsvisningHenleggelsesbrevDto(behandlingId = UUID.fromString(behandlingId),
-                                                  fritekst = "Fritekst fra Autotest")
+        return ForhåndsvisningHenleggelsesbrevDto(
+            behandlingId = UUID.fromString(behandlingId),
+            fritekst = "Fritekst fra Autotest"
+        )
     }
 }

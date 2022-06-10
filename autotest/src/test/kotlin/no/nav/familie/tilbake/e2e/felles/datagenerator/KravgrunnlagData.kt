@@ -18,19 +18,21 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
 
-class KravgrunnlagData(val status: KodeStatusKrav,
-                       val ytelsestype: Ytelsestype,
-                       val eksternFagsakId: String,
-                       val eksternBehandlingId: String,
-                       val antallPerioder: Int,
-                       val under4rettsgebyr: Boolean,
-                       val muligforeldelse: Boolean,
-                       val periodeLengde: Int,
-                       val personIdent: String,
-                       val enhetId: String,
-                       val skattProsent: BigDecimal,
-                       val sumFeilutbetaling: BigDecimal,
-                       val medJustering: Boolean) {
+class KravgrunnlagData(
+    val status: KodeStatusKrav,
+    val ytelsestype: Ytelsestype,
+    val eksternFagsakId: String,
+    val eksternBehandlingId: String,
+    val antallPerioder: Int,
+    val under4rettsgebyr: Boolean,
+    val muligforeldelse: Boolean,
+    val periodeLengde: Int,
+    val personIdent: String,
+    val enhetId: String,
+    val skattProsent: BigDecimal,
+    val sumFeilutbetaling: BigDecimal,
+    val medJustering: Boolean
+) {
 
     // TODO: Vil trenge å kunne sette kontrollfelt tilbake i tid for at den plukkes av auto-opprett batch
     private val finalKontrollfelt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS"))
@@ -55,14 +57,18 @@ class KravgrunnlagData(val status: KodeStatusKrav,
                 this.kontrollfelt = finalKontrollfelt
                 this.saksbehId = "VL"
                 this.referanse = eksternBehandlingId
-                this.tilbakekrevingsPeriode.addAll(utledTilbakekrevingsPerioder(antallPerioder = antallPerioder,
-                                                                                under4rettsgebyr = under4rettsgebyr,
-                                                                                muligForeldelse = muligforeldelse,
-                                                                                ytelsestype = ytelsestype,
-                                                                                periodelengde = periodeLengde,
-                                                                                skattProsent = skattProsent,
-                                                                                sumFeilutbetaling = sumFeilutbetaling,
-                                                                                medJustering = medJustering))
+                this.tilbakekrevingsPeriode.addAll(
+                    utledTilbakekrevingsPerioder(
+                        antallPerioder = antallPerioder,
+                        under4rettsgebyr = under4rettsgebyr,
+                        muligForeldelse = muligforeldelse,
+                        ytelsestype = ytelsestype,
+                        periodelengde = periodeLengde,
+                        skattProsent = skattProsent,
+                        sumFeilutbetaling = sumFeilutbetaling,
+                        medJustering = medJustering
+                    )
+                )
             }
         }
     }
@@ -77,14 +83,16 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         }
     }
 
-    private fun utledTilbakekrevingsPerioder(antallPerioder: Int,
-                                             under4rettsgebyr: Boolean,
-                                             muligForeldelse: Boolean,
-                                             ytelsestype: Ytelsestype,
-                                             periodelengde: Int,
-                                             skattProsent: BigDecimal,
-                                             sumFeilutbetaling: BigDecimal,
-                                             medJustering: Boolean): List<DetaljertKravgrunnlagPeriodeDto> {
+    private fun utledTilbakekrevingsPerioder(
+        antallPerioder: Int,
+        under4rettsgebyr: Boolean,
+        muligForeldelse: Boolean,
+        ytelsestype: Ytelsestype,
+        periodelengde: Int,
+        skattProsent: BigDecimal,
+        sumFeilutbetaling: BigDecimal,
+        medJustering: Boolean
+    ): List<DetaljertKravgrunnlagPeriodeDto> {
         // Finner startdato for første periode, hvor periodene har 1 måned mellomrom
         val antallMånederTilbake = antallPerioder * periodelengde + antallPerioder - 1
         var startdato = LocalDate.now().minusMonths(antallMånederTilbake.toLong()).withDayOfMonth(1)
@@ -102,7 +110,7 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         }
 
         val beløpPrMåned =
-                feilutbetaltBeløp.divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
+            feilutbetaltBeløp.divide(BigDecimal(antallPerioder).multiply(BigDecimal(periodelengde)), RoundingMode.DOWN)
 
         // Finner skattbeløp
         val skattIProsent = when (ytelsestype) {
@@ -130,10 +138,12 @@ class KravgrunnlagData(val status: KodeStatusKrav,
         return tilbakekrevingsperiodeList
     }
 
-    private fun utledTilbakekrevingsbelop(beløpPrMnd: BigDecimal,
-                                          ytelsestype: Ytelsestype,
-                                          skattIProsent: BigDecimal,
-                                          medJustering: Boolean = false): Collection<DetaljertKravgrunnlagBelopDto> {
+    private fun utledTilbakekrevingsbelop(
+        beløpPrMnd: BigDecimal,
+        ytelsestype: Ytelsestype,
+        skattIProsent: BigDecimal,
+        medJustering: Boolean = false
+    ): Collection<DetaljertKravgrunnlagBelopDto> {
         val ytelKodeKlasse: KodeKlasse
         val feilKodeKlasse: KodeKlasse
         val justKodeKlasse: KodeKlasse

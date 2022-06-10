@@ -42,21 +42,25 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @BeforeEach
     fun setup() {
         saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient)
-        scenario = Scenario(eksternFagsakId = Random.nextInt(1000000, 9999999).toString(),
-                            eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
-                            fagsystem = fagsystem,
-                            ytelsestype = ytelsestype,
-                            personIdent = "12345678901",
-                            enhetId = "0106",
-                            enhetsnavn = "NAV Fredrikstad")
+        scenario = Scenario(
+            eksternFagsakId = Random.nextInt(1000000, 9999999).toString(),
+            eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
+            fagsystem = fagsystem,
+            ytelsestype = ytelsestype,
+            personIdent = "12345678901",
+            enhetId = "0106",
+            enhetsnavn = "NAV Fredrikstad"
+        )
     }
 
     @Test
     fun `Tilbakekreving med varsel, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling, revurdering, ingen tilbakekreving`() {
         with(saksbehandler) {
-            opprettTilbakekreving(scenario = scenario,
-                                  varsel = true,
-                                  verge = false)
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = true,
+                verge = false
+            )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             Thread.sleep(10_000)
@@ -64,10 +68,12 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             taBehandlingAvVent()
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 3,
-                                under4rettsgebyr = false,
-                                muligforeldelse = false, periodelengde = 6)
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 3,
+                under4rettsgebyr = false,
+                muligforeldelse = false, periodelengde = 6
+            )
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             // Ikke mulig foreldelse, steget skal derfor være autoutført
@@ -75,12 +81,16 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
-                                     aktsomhet = Aktsomhet.FORSETT,
-                                     andelTilbakekreves = BigDecimal(100),
-                                     særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET,
-                                                             SærligGrunn.STØRRELSE_BELØP,
-                                                             SærligGrunn.ANNET))
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                aktsomhet = Aktsomhet.FORSETT,
+                andelTilbakekreves = BigDecimal(100),
+                særligeGrunner = listOf(
+                    SærligGrunn.GRAD_AV_UAKTSOMHET,
+                    SærligGrunn.STØRRELSE_BELØP,
+                    SærligGrunn.ANNET
+                )
+            )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             beregn()
@@ -102,8 +112,10 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             erRevurderingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
             erRevurderingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-            behandleVilkårsvurderingRevurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
-                                                beløpErIBehold = false)
+            behandleVilkårsvurderingRevurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
+                beløpErIBehold = false
+            )
             erRevurderingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             endreAnsvarligSaksbehandlerRevurdering(Saksbehandler.SAKSBEHANDLER_IDENT)
@@ -119,9 +131,11 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Tilbakekreving med varsel, kravgrunnlag med foreldelse, ikke foreldet, vilkårsvurdering simpel uaktsomhet full tilbakebetaling småbeløp`() {
         with(saksbehandler) {
-            opprettTilbakekreving(scenario = scenario,
-                                  varsel = true,
-                                  verge = false)
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = true,
+                verge = false
+            )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             Thread.sleep(10_000)
@@ -129,10 +143,12 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             taBehandlingAvVent()
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 4,
-                                under4rettsgebyr = false,
-                                muligforeldelse = true)
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 4,
+                under4rettsgebyr = false,
+                muligforeldelse = true
+            )
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
@@ -141,12 +157,16 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
-                                     aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
-                                     andelTilbakekreves = BigDecimal(100),
-                                     særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET,
-                                                             SærligGrunn.STØRRELSE_BELØP,
-                                                             SærligGrunn.ANNET))
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
+                andelTilbakekreves = BigDecimal(100),
+                særligeGrunner = listOf(
+                    SærligGrunn.GRAD_AV_UAKTSOMHET,
+                    SærligGrunn.STØRRELSE_BELØP,
+                    SærligGrunn.ANNET
+                )
+            )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
             endreAnsvarligSaksbehandler(Saksbehandler.SAKSBEHANDLER_IDENT)
 
@@ -162,16 +182,20 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Tilbakekreving uten varsel, kravgrunnlag, SPER-melding, ENDR-melding, vilkårsvurdering simpel uaktsomhet 22-15 6 ledd, ingen tilbakekreving`() {
         with(saksbehandler) {
-            opprettTilbakekreving(scenario = scenario,
-                                  varsel = false,
-                                  verge = false)
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = false,
+                verge = false
+            )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 4,
-                                periodelengde = 2,
-                                under4rettsgebyr = true,
-                                muligforeldelse = false)
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 4,
+                periodelengde = 2,
+                under4rettsgebyr = true,
+                muligforeldelse = false
+            )
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             opprettStatusmelding(KodeStatusKrav.SPER)
@@ -191,11 +215,12 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
-                                     aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
-                                     særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING),
-                                     tilbakekrevSmåbeløp = false)
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
+                aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
+                særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING),
+                tilbakekrevSmåbeløp = false
+            )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             behandleForeslåVedtak()
@@ -219,9 +244,11 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Tilbakekreving behandles så langt det er mulig før iverksetting, vilkårsvurdering god tro, så AVSL-melding og henleggelse`() {
         with(saksbehandler) {
-            opprettTilbakekreving(scenario = scenario,
-                                  varsel = true,
-                                  verge = false)
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = true,
+                verge = false
+            )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             Thread.sleep(10_000)
@@ -229,17 +256,21 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             taBehandlingAvVent()
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 2,
-                                under4rettsgebyr = false,
-                                muligforeldelse = false)
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 2,
+                under4rettsgebyr = false,
+                muligforeldelse = false
+            )
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
-                                     beløpTilbakekreves = BigDecimal(4400.0))
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
+                beløpTilbakekreves = BigDecimal(4400.0)
+            )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             behandleForeslåVedtak()
@@ -253,15 +284,19 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Tilbakekreving med alle perioder foreldet`() {
         with(saksbehandler) {
-            opprettTilbakekreving(scenario = scenario,
-                                  varsel = false,
-                                  verge = false)
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = false,
+                verge = false
+            )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 2,
-                                under4rettsgebyr = false,
-                                muligforeldelse = true)
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 2,
+                under4rettsgebyr = false,
+                muligforeldelse = true
+            )
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
@@ -285,11 +320,13 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Opprett tilbakekrevingsbehandling manuelt, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling`() {
         with(saksbehandler) {
-            val detaljertMelding = opprettKravgrunnlagForManueltOpprettelse(scenario = scenario,
-                                                                            status = KodeStatusKrav.NY,
-                                                                            antallPerioder = 2,
-                                                                            under4rettsgebyr = false,
-                                                                            muligforeldelse = false)
+            val detaljertMelding = opprettKravgrunnlagForManueltOpprettelse(
+                scenario = scenario,
+                status = KodeStatusKrav.NY,
+                antallPerioder = 2,
+                under4rettsgebyr = false,
+                muligforeldelse = false
+            )
 
             Thread.sleep(5_000)
 
@@ -303,12 +340,16 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
-                                     aktsomhet = Aktsomhet.FORSETT,
-                                     andelTilbakekreves = BigDecimal(100),
-                                     særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET,
-                                                             SærligGrunn.STØRRELSE_BELØP,
-                                                             SærligGrunn.ANNET))
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                aktsomhet = Aktsomhet.FORSETT,
+                andelTilbakekreves = BigDecimal(100),
+                særligeGrunner = listOf(
+                    SærligGrunn.GRAD_AV_UAKTSOMHET,
+                    SærligGrunn.STØRRELSE_BELØP,
+                    SærligGrunn.ANNET
+                )
+            )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             beregn()
@@ -326,15 +367,19 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Tilbakekreving uten varsel, tilleggsfrist for foreldelse, uaktsomhet forsett`() {
         with(saksbehandler) {
-            opprettTilbakekreving(scenario = scenario,
-                                  varsel = false,
-                                  verge = false)
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = false,
+                verge = false
+            )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 1,
-                                under4rettsgebyr = false,
-                                muligforeldelse = true)
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 1,
+                under4rettsgebyr = false,
+                muligforeldelse = true
+            )
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
@@ -343,8 +388,10 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeldelse(Foreldelsesvurderingstype.TILLEGGSFRIST)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
-                                     aktsomhet = Aktsomhet.FORSETT)
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                aktsomhet = Aktsomhet.FORSETT
+            )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             behandleForeslåVedtak()
@@ -359,15 +406,19 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Tilbakekreving med verge, vilkårsvurdering grov uaktsomhet, delvis tilbakekreving`() {
         with(saksbehandler) {
-            opprettTilbakekreving(scenario = scenario,
-                                  varsel = false,
-                                  verge = true)
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = false,
+                verge = true
+            )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 1,
-                                under4rettsgebyr = false,
-                                muligforeldelse = true)
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 1,
+                under4rettsgebyr = false,
+                muligforeldelse = true
+            )
 
             // Behandlingen opprettes med verge, så steget er autoutført og behandlingen er på FAKTA-steget
             erBehandlingISteg(Behandlingssteg.VERGE, Behandlingsstegstatus.AUTOUTFØRT)
@@ -380,10 +431,12 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
-                                     aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
-                                     særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
-                                     andelTilbakekreves = BigDecimal(50))
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
+                særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
+                andelTilbakekreves = BigDecimal(50)
+            )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             behandleForeslåVedtak()
@@ -398,15 +451,19 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @Test
     fun `Tilbakekreving oppretter og fjerner verge, vilkårsvurdering grov uaktsomhet, delvis tilbakekreving`() {
         with(saksbehandler) {
-            opprettTilbakekreving(scenario = scenario,
-                                  varsel = false,
-                                  verge = false)
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = false,
+                verge = false
+            )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 1,
-                                under4rettsgebyr = false,
-                                muligforeldelse = false)
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 1,
+                under4rettsgebyr = false,
+                muligforeldelse = false
+            )
 
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
@@ -424,10 +481,12 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
 
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
-                                     aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
-                                     særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
-                                     andelTilbakekreves = BigDecimal(50))
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
+                særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
+                andelTilbakekreves = BigDecimal(50)
+            )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
             fjernVerge()
@@ -448,9 +507,11 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @Disabled("Kan bare kjøres lokalt, med mocket IntegrasjonerClient i familie-tilbake")
     fun `Manuell bestilling og forhåndsvisning av brev`() {
         with(saksbehandler) {
-            opprettTilbakekreving(scenario = scenario,
-                                  varsel = true,
-                                  verge = false)
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = true,
+                verge = false
+            )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
             Thread.sleep(10_000)
@@ -458,10 +519,12 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             taBehandlingAvVent()
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
 
-            opprettKravgrunnlag(status = KodeStatusKrav.NY,
-                                antallPerioder = 1,
-                                under4rettsgebyr = false,
-                                muligforeldelse = true)
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 1,
+                under4rettsgebyr = false,
+                muligforeldelse = true
+            )
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
             bestillBrev(Dokumentmalstype.INNHENT_DOKUMENTASJON)
@@ -489,12 +552,16 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
 
-            behandleVilkårsvurdering(vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
-                                     aktsomhet = Aktsomhet.FORSETT,
-                                     andelTilbakekreves = BigDecimal(100),
-                                     særligeGrunner = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET,
-                                                             SærligGrunn.STØRRELSE_BELØP,
-                                                             SærligGrunn.ANNET))
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                aktsomhet = Aktsomhet.FORSETT,
+                andelTilbakekreves = BigDecimal(100),
+                særligeGrunner = listOf(
+                    SærligGrunn.GRAD_AV_UAKTSOMHET,
+                    SærligGrunn.STØRRELSE_BELØP,
+                    SærligGrunn.ANNET
+                )
+            )
 
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
@@ -504,5 +571,4 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
         }
     }
-
 }

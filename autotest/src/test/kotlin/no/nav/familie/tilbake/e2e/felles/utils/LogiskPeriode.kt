@@ -14,10 +14,13 @@ object LogiskPeriodeUtil {
     fun utledLogiskPeriodeFraKravgrunnlag(detaljertKravgrunnlag: DetaljertKravgrunnlagDto): List<LogiskPeriode> {
         return utledLogiskPeriode(
             detaljertKravgrunnlag.tilbakekrevingsPeriode.associate { tilbakekrevingsPeriode ->
-                Periode(fom = tilbakekrevingsPeriode.periode.fom,
-                        tom = tilbakekrevingsPeriode.periode.tom) to
-                        tilbakekrevingsPeriode.tilbakekrevingsBelop.sumOf { it.belopTilbakekreves }
-            }.toSortedMap())
+                Periode(
+                    fom = tilbakekrevingsPeriode.periode.fom,
+                    tom = tilbakekrevingsPeriode.periode.tom
+                ) to
+                    tilbakekrevingsPeriode.tilbakekrevingsBelop.sumOf { it.belopTilbakekreves }
+            }.toSortedMap()
+        )
     }
 
     fun utledLogiskPeriode(feilutbetalingPrPeriode: SortedMap<Periode, BigDecimal>): List<LogiskPeriode> {
@@ -31,8 +34,12 @@ object LogiskPeriodeUtil {
                 sisteMåned = periode.tom
             } else {
                 if (harOppholdMellom(sisteMåned!!, periode.fom)) {
-                    resultat.add(LogiskPeriode(PeriodeDto(førsteMåned!!, sisteMåned),
-                                               feilutbetaltBeløp = logiskPeriodeBeløp))
+                    resultat.add(
+                        LogiskPeriode(
+                            PeriodeDto(førsteMåned!!, sisteMåned),
+                            feilutbetaltBeløp = logiskPeriodeBeløp
+                        )
+                    )
                     førsteMåned = periode.fom
                     logiskPeriodeBeløp = BigDecimal.ZERO
                 }
@@ -41,8 +48,12 @@ object LogiskPeriodeUtil {
             logiskPeriodeBeløp = logiskPeriodeBeløp.add(feilutbetaltBeløp)
         }
         if (BigDecimal.ZERO.compareTo(logiskPeriodeBeløp) != 0) {
-            resultat.add(LogiskPeriode(periode = PeriodeDto(førsteMåned!!, sisteMåned!!),
-                                       feilutbetaltBeløp = logiskPeriodeBeløp))
+            resultat.add(
+                LogiskPeriode(
+                    periode = PeriodeDto(førsteMåned!!, sisteMåned!!),
+                    feilutbetaltBeløp = logiskPeriodeBeløp
+                )
+            )
         }
         return resultat.toList()
     }

@@ -11,36 +11,44 @@ import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.klienter.dto.felles.PeriodeDto
 import java.time.LocalDate
 
-class ForhåndsvisVarselbrevData(val behandlendeEnhetId: String = "0106",
-                                val behandlendeEnhetsNavn: String = "NAV Fredrikstad",
-                                val eksternFagsakId: String,
-                                val fagsystem: Fagsystem,
-                                val perioder: List<PeriodeDto>,
-                                val ident: String = "31079221655",
-                                val saksbehandlerIdent: String = "VL",
-                                val språkkode: Språkkode = Språkkode.NB,
-                                val vedtaksdato: LocalDate = LocalDate.now(),
-                                val verge: Boolean,
-                                val ytelsestype: Ytelsestype,
-                                val sumFeilutbetaling: Long) {
+class ForhåndsvisVarselbrevData(
+    val behandlendeEnhetId: String = "0106",
+    val behandlendeEnhetsNavn: String = "NAV Fredrikstad",
+    val eksternFagsakId: String,
+    val fagsystem: Fagsystem,
+    val perioder: List<PeriodeDto>,
+    val ident: String = "31079221655",
+    val saksbehandlerIdent: String = "VL",
+    val språkkode: Språkkode = Språkkode.NB,
+    val vedtaksdato: LocalDate = LocalDate.now(),
+    val verge: Boolean,
+    val ytelsestype: Ytelsestype,
+    val sumFeilutbetaling: Long
+) {
 
     fun lag(): ForhåndsvisVarselbrevRequest {
-        return ForhåndsvisVarselbrevRequest(behandlendeEnhetId = behandlendeEnhetId,
-                                            behandlendeEnhetsNavn = behandlendeEnhetsNavn,
-                                            eksternFagsakId = eksternFagsakId,
-                                            fagsystem = fagsystem,
-                                            feilutbetaltePerioderDto = FeilutbetaltePerioderDto(sumFeilutbetaling = sumFeilutbetaling,
-                                                                                                perioder = perioder.map {
-                                                                                                    Periode(fom = it.fom,
-                                                                                                            tom = it.tom)
-                                                                                                }),
-                                            ident = ident,
-                                            saksbehandlerIdent = saksbehandlerIdent,
-                                            språkkode = språkkode,
-                                            varseltekst = "Varseltekst fra Autotest",
-                                            vedtaksdato = vedtaksdato,
-                                            verge = utledVerge(verge),
-                                            ytelsestype = ytelsestype)
+        return ForhåndsvisVarselbrevRequest(
+            behandlendeEnhetId = behandlendeEnhetId,
+            behandlendeEnhetsNavn = behandlendeEnhetsNavn,
+            eksternFagsakId = eksternFagsakId,
+            fagsystem = fagsystem,
+            feilutbetaltePerioderDto = FeilutbetaltePerioderDto(
+                sumFeilutbetaling = sumFeilutbetaling,
+                perioder = perioder.map {
+                    Periode(
+                        fom = it.fom,
+                        tom = it.tom
+                    )
+                }
+            ),
+            ident = ident,
+            saksbehandlerIdent = saksbehandlerIdent,
+            språkkode = språkkode,
+            varseltekst = "Varseltekst fra Autotest",
+            vedtaksdato = vedtaksdato,
+            verge = utledVerge(verge),
+            ytelsestype = ytelsestype
+        )
     }
 
     private fun utledVerge(harVerge: Boolean): Verge? {
