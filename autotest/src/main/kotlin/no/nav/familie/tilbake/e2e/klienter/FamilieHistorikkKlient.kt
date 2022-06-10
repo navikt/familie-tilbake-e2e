@@ -10,13 +10,15 @@ import org.springframework.web.client.RestOperations
 import java.net.URI
 
 @Service
-class FamilieHistorikkKlient(@Value("\${FAMILIE_HISTORIKK_API_URL}") private val familieHistorikkApiUrl: String,
-                             @Qualifier("azure") private val restOperations: RestOperations)
-    : AbstractRestClient(restOperations, "familie-historikk") {
+class FamilieHistorikkKlient(
+    @Value("\${FAMILIE_HISTORIKK_API_URL}") private val familieHistorikkApiUrl: String,
+    @Qualifier("azure") private val restOperations: RestOperations
+) :
+    AbstractRestClient(restOperations, "familie-historikk") {
 
-        fun hentHistorikkinnslag(applikasjon: String, behandlingId: String): Ressurs<List<HistorikkinnslagDto>> {
-            val uri = URI.create("$familieHistorikkApiUrl/api/historikk/applikasjon/$applikasjon/behandling/$behandlingId")
+    fun hentHistorikkinnslag(applikasjon: String, behandlingId: String): Ressurs<List<HistorikkinnslagDto>> {
+        val uri = URI.create("$familieHistorikkApiUrl/api/historikk/applikasjon/$applikasjon/behandling/$behandlingId")
 
-            return getForEntity(uri)
-        }
+        return getForEntity(uri)
+    }
 }

@@ -7,11 +7,13 @@ import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto
 import java.math.BigInteger
 
-class StatusmeldingData(val kravgrunnlagVedtakId: BigInteger,
-                        val status: KodeStatusKrav,
-                        val ytelsestype: Ytelsestype,
-                        val eksternFagsakId: String,
-                        val eksternBehandlingId: String) {
+class StatusmeldingData(
+    val kravgrunnlagVedtakId: BigInteger,
+    val status: KodeStatusKrav,
+    val ytelsestype: Ytelsestype,
+    val eksternFagsakId: String,
+    val eksternBehandlingId: String
+) {
 
     fun lag(): EndringKravOgVedtakstatus {
         return EndringKravOgVedtakstatus().also { endringKravOgVedtakstatus ->

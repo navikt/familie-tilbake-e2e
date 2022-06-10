@@ -48,8 +48,10 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
 
-class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
-                    private val familieHistorikkKlient: FamilieHistorikkKlient? = null) {
+class Saksbehandler(
+    private val familieTilbakeKlient: FamilieTilbakeKlient,
+    private val familieHistorikkKlient: FamilieHistorikkKlient? = null
+) {
 
     companion object {
 
@@ -59,40 +61,48 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     private lateinit var gjeldendeBehandling: GjeldendeBehandling
 
-    fun opprettTilbakekreving(scenario: Scenario,
-                              varsel: Boolean,
-                              verge: Boolean,
-                              saksbehandlerIdent: String = SAKSBEHANDLER_IDENT,
-                              sumFeilutbetaling: BigDecimal? = null) {
-        val data = TilbakekrevingData(eksternFagsakId = scenario.eksternFagsakId,
-                                      eksternBehandlingId = scenario.eksternBehandlingId,
-                                      fagsystem = scenario.fagsystem,
-                                      ytelsestype = scenario.ytelsestype,
-                                      personIdent = scenario.personIdent,
-                                      enhetId = scenario.enhetId,
-                                      enhetsnavn = scenario.enhetsnavn,
-                                      varsel = varsel,
-                                      verge = verge,
-                                      sumFeilutbetaling = sumFeilutbetaling,
-                                      saksbehandlerIdent = saksbehandlerIdent).lag()
+    fun opprettTilbakekreving(
+        scenario: Scenario,
+        varsel: Boolean,
+        verge: Boolean,
+        saksbehandlerIdent: String = SAKSBEHANDLER_IDENT,
+        sumFeilutbetaling: BigDecimal? = null
+    ) {
+        val data = TilbakekrevingData(
+            eksternFagsakId = scenario.eksternFagsakId,
+            eksternBehandlingId = scenario.eksternBehandlingId,
+            fagsystem = scenario.fagsystem,
+            ytelsestype = scenario.ytelsestype,
+            personIdent = scenario.personIdent,
+            enhetId = scenario.enhetId,
+            enhetsnavn = scenario.enhetsnavn,
+            varsel = varsel,
+            verge = verge,
+            sumFeilutbetaling = sumFeilutbetaling,
+            saksbehandlerIdent = saksbehandlerIdent
+        ).lag()
 
         val eksternBrukId =
-                requireNotNull(familieTilbakeKlient.opprettTilbakekreving(data = data).data) { "Det oppstod en feil under opprettelse av tilbakekreving" }
+            requireNotNull(familieTilbakeKlient.opprettTilbakekreving(data = data).data) { "Det oppstod en feil under opprettelse av tilbakekreving" }
 
-        val behandlingId = hentBehandlingId(fagsystem = scenario.fagsystem,
-                                            eksternFagsakId = scenario.eksternFagsakId,
-                                            eksternBrukId = eksternBrukId)
+        val behandlingId = hentBehandlingId(
+            fagsystem = scenario.fagsystem,
+            eksternFagsakId = scenario.eksternFagsakId,
+            eksternBrukId = eksternBrukId
+        )
 
-        gjeldendeBehandling = GjeldendeBehandling(eksternFagsakId = scenario.eksternFagsakId,
-                                                  eksternBrukId = eksternBrukId,
-                                                  behandlingId = behandlingId,
-                                                  eksternBehandlingId = scenario.eksternBehandlingId,
-                                                  fagsystem = scenario.fagsystem,
-                                                  ytelsestype = scenario.ytelsestype,
-                                                  personIdent = scenario.personIdent,
-                                                  enhetId = scenario.enhetId,
-                                                  enhetsnavn = scenario.enhetsnavn,
-                                                  harVerge = verge)
+        gjeldendeBehandling = GjeldendeBehandling(
+            eksternFagsakId = scenario.eksternFagsakId,
+            eksternBrukId = eksternBrukId,
+            behandlingId = behandlingId,
+            eksternBehandlingId = scenario.eksternBehandlingId,
+            fagsystem = scenario.fagsystem,
+            ytelsestype = scenario.ytelsestype,
+            personIdent = scenario.personIdent,
+            enhetId = scenario.enhetId,
+            enhetsnavn = scenario.enhetsnavn,
+            harVerge = verge
+        )
 
         lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_OPPRETTET)
         if (varsel) {
@@ -107,9 +117,11 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
     }
 
     fun oppretManuellBehandling(scenario: Scenario, detaljertMelding: DetaljertKravgrunnlagMelding) {
-        val manuellTilbakekrevingRequest = OpprettManueltTilbakekrevingRequest(eksternFagsakId = scenario.eksternFagsakId,
-                                                                               ytelsestype = scenario.ytelsestype,
-                                                                               eksternId = scenario.eksternBehandlingId)
+        val manuellTilbakekrevingRequest = OpprettManueltTilbakekrevingRequest(
+            eksternFagsakId = scenario.eksternFagsakId,
+            ytelsestype = scenario.ytelsestype,
+            eksternId = scenario.eksternBehandlingId
+        )
         familieTilbakeKlient.opprettManuellBehandling(manuellTilbakekrevingRequest)
 
         Thread.sleep(2_500)
@@ -125,51 +137,57 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
         val behandling = fagsak.data!!.behandlinger.elementAt(0)
 
-        gjeldendeBehandling = GjeldendeBehandling(eksternFagsakId = scenario.eksternFagsakId,
-                                                  eksternBehandlingId = scenario.eksternBehandlingId,
-                                                  fagsystem = scenario.fagsystem,
-                                                  ytelsestype = scenario.ytelsestype,
-                                                  personIdent = scenario.personIdent,
-                                                  enhetId = scenario.enhetId,
-                                                  enhetsnavn = scenario.enhetsnavn,
-                                                  eksternBrukId = behandling.eksternBrukId.toString(),
-                                                  behandlingId = behandling.behandlingId.toString(),
-                                                  harVerge = false,
-                                                  kravgrunnlagId = detaljertMelding.detaljertKravgrunnlag.kravgrunnlagId,
-                                                  vedtakId = detaljertMelding.detaljertKravgrunnlag.vedtakId,
-                                                  feilutbetaltePerioder = utledLogiskPeriodeFraKravgrunnlag(detaljertKravgrunnlag = detaljertMelding.detaljertKravgrunnlag))
+        gjeldendeBehandling = GjeldendeBehandling(
+            eksternFagsakId = scenario.eksternFagsakId,
+            eksternBehandlingId = scenario.eksternBehandlingId,
+            fagsystem = scenario.fagsystem,
+            ytelsestype = scenario.ytelsestype,
+            personIdent = scenario.personIdent,
+            enhetId = scenario.enhetId,
+            enhetsnavn = scenario.enhetsnavn,
+            eksternBrukId = behandling.eksternBrukId.toString(),
+            behandlingId = behandling.behandlingId.toString(),
+            harVerge = false,
+            kravgrunnlagId = detaljertMelding.detaljertKravgrunnlag.kravgrunnlagId,
+            vedtakId = detaljertMelding.detaljertKravgrunnlag.vedtakId,
+            feilutbetaltePerioder = utledLogiskPeriodeFraKravgrunnlag(detaljertKravgrunnlag = detaljertMelding.detaljertKravgrunnlag)
+        )
 
         println("Opprettet behandling med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId} og " + "eksternBrukId: ${gjeldendeBehandling.eksternBrukId}")
     }
 
-    fun opprettKravgrunnlag(status: KodeStatusKrav,
-                            antallPerioder: Int = 2,
-                            under4rettsgebyr: Boolean,
-                            muligforeldelse: Boolean,
-                            periodelengde: Int = 3,
-                            skattProsent: BigDecimal = BigDecimal.ZERO,
-                            sumFeilutbetaling: BigDecimal = BigDecimal(20000),
-                            medJustering: Boolean? = false) {
+    fun opprettKravgrunnlag(
+        status: KodeStatusKrav,
+        antallPerioder: Int = 2,
+        under4rettsgebyr: Boolean,
+        muligforeldelse: Boolean,
+        periodelengde: Int = 3,
+        skattProsent: BigDecimal = BigDecimal.ZERO,
+        sumFeilutbetaling: BigDecimal = BigDecimal(20000),
+        medJustering: Boolean? = false
+    ) {
 
-        val data = KravgrunnlagData(status = status,
-                                    ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype) {
-                                        "Ytelsestype er ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
-                                    },
-                                    eksternFagsakId = requireNotNull(gjeldendeBehandling.eksternFagsakId) {
-                                        "EksternFagsakId  er ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
-                                    },
-                                    eksternBehandlingId = requireNotNull(gjeldendeBehandling.eksternBehandlingId) {
-                                        "EksternBehandlingId er ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
-                                    },
-                                    antallPerioder = antallPerioder,
-                                    under4rettsgebyr = under4rettsgebyr,
-                                    muligforeldelse = muligforeldelse,
-                                    periodeLengde = periodelengde,
-                                    personIdent = gjeldendeBehandling.personIdent,
-                                    enhetId = gjeldendeBehandling.enhetId,
-                                    skattProsent = skattProsent,
-                                    sumFeilutbetaling = sumFeilutbetaling,
-                                    medJustering = medJustering!!).lag()
+        val data = KravgrunnlagData(
+            status = status,
+            ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype) {
+                "Ytelsestype er ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
+            },
+            eksternFagsakId = requireNotNull(gjeldendeBehandling.eksternFagsakId) {
+                "EksternFagsakId  er ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
+            },
+            eksternBehandlingId = requireNotNull(gjeldendeBehandling.eksternBehandlingId) {
+                "EksternBehandlingId er ikke definert. Opprett behandling først eller bruk opprettKravgrunnlagForManueltOpprettelse."
+            },
+            antallPerioder = antallPerioder,
+            under4rettsgebyr = under4rettsgebyr,
+            muligforeldelse = muligforeldelse,
+            periodeLengde = periodelengde,
+            personIdent = gjeldendeBehandling.personIdent,
+            enhetId = gjeldendeBehandling.enhetId,
+            skattProsent = skattProsent,
+            sumFeilutbetaling = sumFeilutbetaling,
+            medJustering = medJustering!!
+        ).lag()
 
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = data)
 
@@ -185,28 +203,32 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         println("Sendte inn $status kravgrunnlag med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId} på ytelsestype: ${gjeldendeBehandling.ytelsestype}")
     }
 
-    fun opprettKravgrunnlagForManueltOpprettelse(scenario: Scenario,
-                                                 status: KodeStatusKrav,
-                                                 antallPerioder: Int = 2,
-                                                 under4rettsgebyr: Boolean,
-                                                 muligforeldelse: Boolean,
-                                                 periodelengde: Int = 3,
-                                                 skattProsent: BigDecimal = BigDecimal.ZERO,
-                                                 sumFeilutbetaling: BigDecimal = BigDecimal(20000),
-                                                 medJustering: Boolean = false): DetaljertKravgrunnlagMelding {
-        val data = KravgrunnlagData(status = status,
-                                    ytelsestype = scenario.ytelsestype,
-                                    eksternFagsakId = scenario.eksternFagsakId,
-                                    eksternBehandlingId = scenario.eksternBehandlingId,
-                                    antallPerioder = antallPerioder,
-                                    under4rettsgebyr = under4rettsgebyr,
-                                    muligforeldelse = muligforeldelse,
-                                    periodeLengde = periodelengde,
-                                    personIdent = scenario.personIdent,
-                                    enhetId = scenario.enhetId,
-                                    skattProsent = skattProsent,
-                                    sumFeilutbetaling = sumFeilutbetaling,
-                                    medJustering = medJustering).lag()
+    fun opprettKravgrunnlagForManueltOpprettelse(
+        scenario: Scenario,
+        status: KodeStatusKrav,
+        antallPerioder: Int = 2,
+        under4rettsgebyr: Boolean,
+        muligforeldelse: Boolean,
+        periodelengde: Int = 3,
+        skattProsent: BigDecimal = BigDecimal.ZERO,
+        sumFeilutbetaling: BigDecimal = BigDecimal(20000),
+        medJustering: Boolean = false
+    ): DetaljertKravgrunnlagMelding {
+        val data = KravgrunnlagData(
+            status = status,
+            ytelsestype = scenario.ytelsestype,
+            eksternFagsakId = scenario.eksternFagsakId,
+            eksternBehandlingId = scenario.eksternBehandlingId,
+            antallPerioder = antallPerioder,
+            under4rettsgebyr = under4rettsgebyr,
+            muligforeldelse = muligforeldelse,
+            periodeLengde = periodelengde,
+            personIdent = scenario.personIdent,
+            enhetId = scenario.enhetId,
+            skattProsent = skattProsent,
+            sumFeilutbetaling = sumFeilutbetaling,
+            medJustering = medJustering
+        ).lag()
 
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = data)
 
@@ -215,10 +237,15 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
     }
 
     fun opprettRevurdering(scenario: Scenario, behandlingsårsakstype: Behandlingsårsakstype) {
-        val respons = familieTilbakeKlient.opprettRevurdering(OpprettRevurderingDto(ytelsestype = scenario.ytelsestype,
-                                                                                    originalBehandlingId = UUID.fromString(
-                                                                                            gjeldendeBehandling.behandlingId),
-                                                                                    årsakstype = behandlingsårsakstype))
+        val respons = familieTilbakeKlient.opprettRevurdering(
+            OpprettRevurderingDto(
+                ytelsestype = scenario.ytelsestype,
+                originalBehandlingId = UUID.fromString(
+                    gjeldendeBehandling.behandlingId
+                ),
+                årsakstype = behandlingsårsakstype
+            )
+        )
         assertTrue(respons.status == Ressurs.Status.SUKSESS, "Kallet for å opprette revurdering feilet")
         val revurderingEksternBrukId = respons.data
 
@@ -228,8 +255,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
         val revurdering = fagsak.data!!.behandlinger.find { it.eksternBrukId.toString() == revurderingEksternBrukId }
 
-        assertNotNull(revurdering,
-                      "Fann ikke revurderingen med eksterBrukId $revurderingEksternBrukId på fagsak ${scenario.eksternFagsakId}")
+        assertNotNull(
+            revurdering,
+            "Fann ikke revurderingen med eksterBrukId $revurderingEksternBrukId på fagsak ${scenario.eksternFagsakId}"
+        )
 
         gjeldendeBehandling.apply {
             gjeldendeBehandling.revurderingEksternId = revurderingEksternBrukId
@@ -240,19 +269,23 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
     }
 
     fun kanBehandlingOpprettesManuelt(scenario: Scenario) {
-        val kanOppretteManueltResponse = familieTilbakeKlient.kanBehandlingOpprettesManuelt(ytelsestype = scenario.ytelsestype,
-                                                                                            eksternFagsakId = scenario.eksternFagsakId)
+        val kanOppretteManueltResponse = familieTilbakeKlient.kanBehandlingOpprettesManuelt(
+            ytelsestype = scenario.ytelsestype,
+            eksternFagsakId = scenario.eksternFagsakId
+        )
 
         assertTrue(kanOppretteManueltResponse.status == Ressurs.Status.SUKSESS, "Kallet kan opprette feilet")
         assertTrue(kanOppretteManueltResponse.data!!.kanBehandlingOpprettes, "Kan ikke opprette behandling manuelt")
     }
 
     fun opprettStatusmelding(status: KodeStatusKrav) {
-        val data = StatusmeldingData(status = status,
-                                     kravgrunnlagVedtakId = requireNotNull(gjeldendeBehandling.vedtakId) { "VedtakId er ikke definert. Opprett kravgrunnlag først." },
-                                     ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype) { "Ytelsestype er ikke definert. Opprett kravgrunnlag først." },
-                                     eksternFagsakId = requireNotNull(gjeldendeBehandling.eksternFagsakId) { "EksternFagsakId er ikke definert. Opprett kravgrunnlag først." },
-                                     eksternBehandlingId = requireNotNull(gjeldendeBehandling.eksternBehandlingId) { "EksternBehandlingId er ikke definert. Opprett kravgrunnlag først." }).lag()
+        val data = StatusmeldingData(
+            status = status,
+            kravgrunnlagVedtakId = requireNotNull(gjeldendeBehandling.vedtakId) { "VedtakId er ikke definert. Opprett kravgrunnlag først." },
+            ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype) { "Ytelsestype er ikke definert. Opprett kravgrunnlag først." },
+            eksternFagsakId = requireNotNull(gjeldendeBehandling.eksternFagsakId) { "EksternFagsakId er ikke definert. Opprett kravgrunnlag først." },
+            eksternBehandlingId = requireNotNull(gjeldendeBehandling.eksternBehandlingId) { "EksternBehandlingId er ikke definert. Opprett kravgrunnlag først." }
+        ).lag()
 
         familieTilbakeKlient.opprettStatusmelding(statusmelding = data)
 
@@ -279,10 +312,12 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun behandleFakta(behandlingId: String, hendelsestype: Hendelsestype, hendelsesundertype: Hendelsesundertype) {
         val hentFaktaResponse =
-                requireNotNull(familieTilbakeKlient.hentFakta(behandlingId).data) { "Kunne ikke hente data for behandling av fakta" }
-        val data = BehandleFaktaData(hentFaktaResponse = hentFaktaResponse,
-                                     hendelsestype = hendelsestype,
-                                     hendelsesundertype = hendelsesundertype).lag()
+            requireNotNull(familieTilbakeKlient.hentFakta(behandlingId).data) { "Kunne ikke hente data for behandling av fakta" }
+        val data = BehandleFaktaData(
+            hentFaktaResponse = hentFaktaResponse,
+            hendelsestype = hendelsestype,
+            hendelsesundertype = hendelsesundertype
+        ).lag()
 
         familieTilbakeKlient.behandleSteg(behandlingId = behandlingId, data = data)
 
@@ -293,7 +328,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun behandleForeldelse(beslutning: Foreldelsesvurderingstype) {
         val hentForeldelseResponse =
-                requireNotNull(familieTilbakeKlient.hentForeldelse(gjeldendeBehandling.behandlingId).data) { "Kunne ikke hente data for behandling av foreldelse" }
+            requireNotNull(familieTilbakeKlient.hentForeldelse(gjeldendeBehandling.behandlingId).data) { "Kunne ikke hente data for behandling av foreldelse" }
         val data = BehandleForeldelseData(hentForeldelseResponse = hentForeldelseResponse, beslutning = beslutning).lag()
 
         familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId, data = data)
@@ -303,66 +338,78 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         println("Behandling ${gjeldendeBehandling.behandlingId} ble behandlet i steg foreldelse: beslutning $beslutning")
     }
 
-    fun behandleVilkårsvurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat,
-                                 aktsomhet: Aktsomhet? = null,
-                                 særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
-                                 beløpErIBehold: Boolean = true,
-                                 andelTilbakekreves: BigDecimal? = null,
-                                 beløpTilbakekreves: BigDecimal? = null,
-                                 tilbakekrevSmåbeløp: Boolean? = null,
-                                 ileggRenter: Boolean = false) {
-        behandleVilkårsvurdering(gjeldendeBehandling.behandlingId,
-                                 vilkårvurderingsresultat,
-                                 aktsomhet,
-                                 særligeGrunner,
-                                 beløpErIBehold,
-                                 andelTilbakekreves,
-                                 beløpTilbakekreves,
-                                 tilbakekrevSmåbeløp,
-                                 ileggRenter)
+    fun behandleVilkårsvurdering(
+        vilkårvurderingsresultat: Vilkårsvurderingsresultat,
+        aktsomhet: Aktsomhet? = null,
+        særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
+        beløpErIBehold: Boolean = true,
+        andelTilbakekreves: BigDecimal? = null,
+        beløpTilbakekreves: BigDecimal? = null,
+        tilbakekrevSmåbeløp: Boolean? = null,
+        ileggRenter: Boolean = false
+    ) {
+        behandleVilkårsvurdering(
+            gjeldendeBehandling.behandlingId,
+            vilkårvurderingsresultat,
+            aktsomhet,
+            særligeGrunner,
+            beløpErIBehold,
+            andelTilbakekreves,
+            beløpTilbakekreves,
+            tilbakekrevSmåbeløp,
+            ileggRenter
+        )
     }
 
-    fun behandleVilkårsvurderingRevurdering(vilkårvurderingsresultat: Vilkårsvurderingsresultat,
-                                            aktsomhet: Aktsomhet? = null,
-                                            særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
-                                            beløpErIBehold: Boolean = true,
-                                            andelTilbakekreves: BigDecimal? = null,
-                                            beløpTilbakekreves: BigDecimal? = null,
-                                            tilbakekrevSmåbeløp: Boolean? = null,
-                                            ileggRenter: Boolean = false) {
+    fun behandleVilkårsvurderingRevurdering(
+        vilkårvurderingsresultat: Vilkårsvurderingsresultat,
+        aktsomhet: Aktsomhet? = null,
+        særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
+        beløpErIBehold: Boolean = true,
+        andelTilbakekreves: BigDecimal? = null,
+        beløpTilbakekreves: BigDecimal? = null,
+        tilbakekrevSmåbeløp: Boolean? = null,
+        ileggRenter: Boolean = false
+    ) {
         assertNotNull(gjeldendeBehandling.revurderingBehandlingId, "Revurdering må være opprettet!")
-        behandleVilkårsvurdering(gjeldendeBehandling.revurderingBehandlingId!!,
-                                 vilkårvurderingsresultat,
-                                 aktsomhet,
-                                 særligeGrunner,
-                                 beløpErIBehold,
-                                 andelTilbakekreves,
-                                 beløpTilbakekreves,
-                                 tilbakekrevSmåbeløp,
-                                 ileggRenter)
+        behandleVilkårsvurdering(
+            gjeldendeBehandling.revurderingBehandlingId!!,
+            vilkårvurderingsresultat,
+            aktsomhet,
+            særligeGrunner,
+            beløpErIBehold,
+            andelTilbakekreves,
+            beløpTilbakekreves,
+            tilbakekrevSmåbeløp,
+            ileggRenter
+        )
     }
 
-    fun behandleVilkårsvurdering(behandlingId: String,
-                                 vilkårvurderingsresultat: Vilkårsvurderingsresultat,
-                                 aktsomhet: Aktsomhet? = null,
-                                 særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
-                                 beløpErIBehold: Boolean = true,
-                                 andelTilbakekreves: BigDecimal? = null,
-                                 beløpTilbakekreves: BigDecimal? = null,
-                                 tilbakekrevSmåbeløp: Boolean? = null,
-                                 ileggRenter: Boolean = false) {
+    fun behandleVilkårsvurdering(
+        behandlingId: String,
+        vilkårvurderingsresultat: Vilkårsvurderingsresultat,
+        aktsomhet: Aktsomhet? = null,
+        særligeGrunner: List<SærligGrunn> = listOf(SærligGrunn.GRAD_AV_UAKTSOMHET),
+        beløpErIBehold: Boolean = true,
+        andelTilbakekreves: BigDecimal? = null,
+        beløpTilbakekreves: BigDecimal? = null,
+        tilbakekrevSmåbeløp: Boolean? = null,
+        ileggRenter: Boolean = false
+    ) {
         val hentVilkårsvurderingResponse =
-                requireNotNull(familieTilbakeKlient.hentVilkårsvurdering(behandlingId).data) { "Kunne ikke hente data for behandling av vilkår" }
-        val data = BehandleVilkårsvurderingData(hentVilkårsvurderingResponse = hentVilkårsvurderingResponse,
-                                                vilkårvurderingsresultat = vilkårvurderingsresultat,
-                                                aktsomhet = aktsomhet,
-                                                særligeGrunner = særligeGrunner,
-                                                beløpErIBehold = beløpErIBehold,
-                                                andelTilbakekreves = andelTilbakekreves,
-                                                beløpTilbakekreves = beløpTilbakekreves,
-                                                tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
-                                                ileggRenter = ileggRenter,
-                                                ytelsestype = gjeldendeBehandling.ytelsestype).lag()
+            requireNotNull(familieTilbakeKlient.hentVilkårsvurdering(behandlingId).data) { "Kunne ikke hente data for behandling av vilkår" }
+        val data = BehandleVilkårsvurderingData(
+            hentVilkårsvurderingResponse = hentVilkårsvurderingResponse,
+            vilkårvurderingsresultat = vilkårvurderingsresultat,
+            aktsomhet = aktsomhet,
+            særligeGrunner = særligeGrunner,
+            beløpErIBehold = beløpErIBehold,
+            andelTilbakekreves = andelTilbakekreves,
+            beløpTilbakekreves = beløpTilbakekreves,
+            tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
+            ileggRenter = ileggRenter,
+            ytelsestype = gjeldendeBehandling.ytelsestype
+        ).lag()
 
         familieTilbakeKlient.behandleSteg(behandlingId = behandlingId, data = data)
 
@@ -382,7 +429,7 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun behandleForeslåVedtak(behandlingId: String) {
         val hentVedtakbrevtekstResponse =
-                requireNotNull(familieTilbakeKlient.hentVedtaksbrevtekst(behandlingId).data) { "Kunne ikke hente data for behandling av foreslå vedtak" }
+            requireNotNull(familieTilbakeKlient.hentVedtaksbrevtekst(behandlingId).data) { "Kunne ikke hente data for behandling av foreslå vedtak" }
         val data = BehandleForeslåVedtakData(hentVedtakbrevtekstResponse = hentVedtakbrevtekstResponse).lag()
 
         familieTilbakeKlient.behandleSteg(behandlingId = behandlingId, data = data)
@@ -404,9 +451,11 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun behandleFatteVedtak(behandlingId: String, godkjent: Boolean) {
         val hentTotrinnsvurderingerResponse =
-                requireNotNull(familieTilbakeKlient.hentTotrinnsvurderinger(behandlingId).data) { "Kunne ikke hente data for behandling av fatte vedtak" }
-        val data = BehandleFatteVedtakData(hentTotrinnsvurderingerResponse = hentTotrinnsvurderingerResponse,
-                                           godkjent = godkjent).lag()
+            requireNotNull(familieTilbakeKlient.hentTotrinnsvurderinger(behandlingId).data) { "Kunne ikke hente data for behandling av fatte vedtak" }
+        val data = BehandleFatteVedtakData(
+            hentTotrinnsvurderingerResponse = hentTotrinnsvurderingerResponse,
+            godkjent = godkjent
+        ).lag()
 
         familieTilbakeKlient.behandleSteg(behandlingId = behandlingId, data = data)
 
@@ -431,11 +480,15 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         } else {
             requireNotNull(ident) { "Fødselsnummer er obligatarisk for type $type" }
         }
-        val data = BehandleVergeData(verge = VergeDto(type = type,
-                                                      navn = navn,
-                                                      begrunnelse = "Begrunnelse fra autotest",
-                                                      ident = ident,
-                                                      orgNr = orgNr))
+        val data = BehandleVergeData(
+            verge = VergeDto(
+                type = type,
+                navn = navn,
+                begrunnelse = "Begrunnelse fra autotest",
+                ident = ident,
+                orgNr = orgNr
+            )
+        )
 
         familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId, data = data)
 
@@ -468,8 +521,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
          behandlinger ikke kan henlegges manuelt før etter 6 dager.
          Når manueltOpprettet Tilbakekreving er implementert i familie-tilbake kan denne metoden brukes i en test.
          */
-        val data = HenleggDto(behandlingsresultatstype = behandlingsresultat,
-                              begrunnelse = "Dette er en automatisk begrunnelse generert av autotest")
+        val data = HenleggDto(
+            behandlingsresultatstype = behandlingsresultat,
+            begrunnelse = "Dette er en automatisk begrunnelse generert av autotest"
+        )
         if (behandlingsresultat == Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_MED_BREV) {
             data.fritekst = "Dette er en automatisk fritekst generert av autotest"
         }
@@ -501,10 +556,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun erBehandlingPåVent(venteårsak: Venteårsak) {
         Vent.til({
-                     familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId).data?.behandlingsstegsinfo?.any {
-                         it.behandlingsstegstatus == Behandlingsstegstatus.VENTER && it.venteårsak == venteårsak
-                     }
-                 }, 30, "Behandling kom aldri i vent med årsak $venteårsak")
+            familieTilbakeKlient.hentBehandling(gjeldendeBehandling.behandlingId).data?.behandlingsstegsinfo?.any {
+                it.behandlingsstegstatus == Behandlingsstegstatus.VENTER && it.venteårsak == venteårsak
+            }
+        }, 30, "Behandling kom aldri i vent med årsak $venteårsak")
         println("Behandling ${gjeldendeBehandling.behandlingId} er bekreftet på vent med årsak $venteårsak")
     }
 
@@ -519,10 +574,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun erBehandlingISteg(behandlingId: String, behandlingssteg: Behandlingssteg, behandlingsstegstatus: Behandlingsstegstatus) {
         Vent.til({
-                     familieTilbakeKlient.hentBehandling(behandlingId).data?.behandlingsstegsinfo?.any {
-                         it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus
-                     }
-                 }, 30, "Behandlingen kom aldri i status $behandlingsstegstatus i steg $behandlingssteg")
+            familieTilbakeKlient.hentBehandling(behandlingId).data?.behandlingsstegsinfo?.any {
+                it.behandlingssteg == behandlingssteg && it.behandlingsstegstatus == behandlingsstegstatus
+            }
+        }, 30, "Behandlingen kom aldri i status $behandlingsstegstatus i steg $behandlingssteg")
         println("Behandling $behandlingId er bekreftet i " + "status $behandlingsstegstatus i steg $behandlingssteg")
     }
 
@@ -536,39 +591,55 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
     }
 
     fun erBehandlingAvsluttet(behandlingId: String, resultat: Behandlingsresultatstype, vergeFjernet: Boolean? = false) {
-        Vent.til({ familieTilbakeKlient.hentBehandling(behandlingId).data?.status == Behandlingsstatus.AVSLUTTET },
-                 30,
-                 "Behandlingen fikk aldri status AVSLUTTET")
+        Vent.til(
+            { familieTilbakeKlient.hentBehandling(behandlingId).data?.status == Behandlingsstatus.AVSLUTTET },
+            30,
+            "Behandlingen fikk aldri status AVSLUTTET"
+        )
         val behandling = requireNotNull(familieTilbakeKlient.hentBehandling(behandlingId).data)
-        val henlagttyper = listOf(Behandlingsresultatstype.HENLAGT,
-                                  Behandlingsresultatstype.HENLAGT_FEILOPPRETTET,
-                                  Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_MED_BREV,
-                                  Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_UTEN_BREV,
-                                  Behandlingsresultatstype.HENLAGT_TEKNISK_VEDLIKEHOLD,
-                                  Behandlingsresultatstype.HENLAGT_KRAVGRUNNLAG_NULLSTILT)
-        val iverksatttyper = listOf(Behandlingsresultatstype.INGEN_TILBAKEBETALING,
-                                    Behandlingsresultatstype.DELVIS_TILBAKEBETALING,
-                                    Behandlingsresultatstype.FULL_TILBAKEBETALING)
+        val henlagttyper = listOf(
+            Behandlingsresultatstype.HENLAGT,
+            Behandlingsresultatstype.HENLAGT_FEILOPPRETTET,
+            Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_MED_BREV,
+            Behandlingsresultatstype.HENLAGT_FEILOPPRETTET_UTEN_BREV,
+            Behandlingsresultatstype.HENLAGT_TEKNISK_VEDLIKEHOLD,
+            Behandlingsresultatstype.HENLAGT_KRAVGRUNNLAG_NULLSTILT
+        )
+        val iverksatttyper = listOf(
+            Behandlingsresultatstype.INGEN_TILBAKEBETALING,
+            Behandlingsresultatstype.DELVIS_TILBAKEBETALING,
+            Behandlingsresultatstype.FULL_TILBAKEBETALING
+        )
         when (resultat) {
             in henlagttyper -> {
-                assertTrue(behandling.erBehandlingHenlagt,
-                           "Behandling var i status AVSLUTTET med resultat $resultat men erBehandlingHenlagt verdi var FALSE")
-                assertTrue(behandling.behandlingsstegsinfo.filter {
-                    it.behandlingssteg != Behandlingssteg.VARSEL
-                }.all {
-                    it.behandlingsstegstatus == Behandlingsstegstatus.AVBRUTT
-                },
-                           "Behandling var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke i status AVBRUTT")
-                assertTrue(behandling.resultatstype == Behandlingsresultatstype.HENLAGT,
-                           "Forventet resultat: HENLAGT, Behandlingens resultat: ${behandling.resultatstype}")
+                assertTrue(
+                    behandling.erBehandlingHenlagt,
+                    "Behandling var i status AVSLUTTET med resultat $resultat men erBehandlingHenlagt verdi var FALSE"
+                )
+                assertTrue(
+                    behandling.behandlingsstegsinfo.filter {
+                        it.behandlingssteg != Behandlingssteg.VARSEL
+                    }.all {
+                        it.behandlingsstegstatus == Behandlingsstegstatus.AVBRUTT
+                    },
+                    "Behandling var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke i status AVBRUTT"
+                )
+                assertTrue(
+                    behandling.resultatstype == Behandlingsresultatstype.HENLAGT,
+                    "Forventet resultat: HENLAGT, Behandlingens resultat: ${behandling.resultatstype}"
+                )
             }
             in iverksatttyper -> {
-                assertTrue(behandling.behandlingsstegsinfo.all {
-                    it.behandlingsstegstatus == Behandlingsstegstatus.UTFØRT || it.behandlingsstegstatus == Behandlingsstegstatus.AUTOUTFØRT || (vergeFjernet!! && it.behandlingssteg == Behandlingssteg.VERGE && it.behandlingsstegstatus == Behandlingsstegstatus.TILBAKEFØRT)
-                },
-                           "Behandlingen var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke UTFØRT/AUTOUTFØRT")
-                assertTrue(behandling.resultatstype == resultat,
-                           "Forventet resultat: $resultat, Behandlingens resultat: ${behandling.resultatstype}")
+                assertTrue(
+                    behandling.behandlingsstegsinfo.all {
+                        it.behandlingsstegstatus == Behandlingsstegstatus.UTFØRT || it.behandlingsstegstatus == Behandlingsstegstatus.AUTOUTFØRT || (vergeFjernet!! && it.behandlingssteg == Behandlingssteg.VERGE && it.behandlingsstegstatus == Behandlingsstegstatus.TILBAKEFØRT)
+                    },
+                    "Behandlingen var i status AVSLUTTET med resultat $resultat men alle behandlingsstegene var ikke UTFØRT/AUTOUTFØRT"
+                )
+                assertTrue(
+                    behandling.resultatstype == resultat,
+                    "Forventet resultat: $resultat, Behandlingens resultat: ${behandling.resultatstype}"
+                )
             }
             else -> {
                 throw Exception("Behandling var i status AVSLUTTET men resultattypen angitt var ${behandling.resultatstype}" + " som ikke er et gyldig resultat for en avsluttet behandling")
@@ -589,9 +660,11 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun endreAnsvarligSaksbehandler(nyAnsvarligSaksbehandler: String, behandlingId: String) {
         Vent.til({
-                     familieTilbakeKlient.endreAnsvarligSaksbehandler(behandlingId = behandlingId,
-                                                                      nyAnsvarligSaksbehandler = nyAnsvarligSaksbehandler).status == Ressurs.Status.SUKSESS
-                 }, 30, "Kunne ikke endre saksbehandler")
+            familieTilbakeKlient.endreAnsvarligSaksbehandler(
+                behandlingId = behandlingId,
+                nyAnsvarligSaksbehandler = nyAnsvarligSaksbehandler
+            ).status == Ressurs.Status.SUKSESS
+        }, 30, "Kunne ikke endre saksbehandler")
     }
 
     fun bestillBrev(dokumentmalstype: Dokumentmalstype) {
@@ -625,8 +698,10 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
     }
 
     fun forhåndsvisVedtaksbrev() {
-        val data = ForhåndsvisVedtaksbrevBuilder(behandlingId = gjeldendeBehandling.behandlingId,
-                                                 perioder = gjeldendeBehandling.feilutbetaltePerioder?.map { it.periode }!!).lag()
+        val data = ForhåndsvisVedtaksbrevBuilder(
+            behandlingId = gjeldendeBehandling.behandlingId,
+            perioder = gjeldendeBehandling.feilutbetaltePerioder?.map { it.periode }!!
+        ).lag()
 
         familieTilbakeKlient.forhåndsvisVedtaksbrev(data = data)
 
@@ -636,20 +711,24 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
     fun forhåndsvisVarselbrev(vedtaksdato: LocalDate) {
         val hentBehandlingResponse = familieTilbakeKlient.hentBehandling(behandlingId = gjeldendeBehandling.behandlingId).data
 
-        val data = ForhåndsvisVarselbrevData(behandlendeEnhetId = gjeldendeBehandling.enhetId,
-                                             behandlendeEnhetsNavn = gjeldendeBehandling.enhetsnavn,
-                                             eksternFagsakId = gjeldendeBehandling.eksternFagsakId,
-                                             fagsystem = gjeldendeBehandling.fagsystem,
-                                             perioder = requireNotNull(gjeldendeBehandling.feilutbetaltePerioder?.map { it.periode }),
-                                             ident = gjeldendeBehandling.personIdent,
-                                             saksbehandlerIdent = requireNotNull(hentBehandlingResponse?.ansvarligSaksbehandler),
-                                             språkkode = Språkkode.NB,
-                                             vedtaksdato = vedtaksdato,
-                                             verge = gjeldendeBehandling.harVerge,
-                                             sumFeilutbetaling = requireNotNull(gjeldendeBehandling.feilutbetaltePerioder?.sumOf {
-                                                 it.feilutbetaltBeløp
-                                             }).toLong(),
-                                             ytelsestype = gjeldendeBehandling.ytelsestype).lag()
+        val data = ForhåndsvisVarselbrevData(
+            behandlendeEnhetId = gjeldendeBehandling.enhetId,
+            behandlendeEnhetsNavn = gjeldendeBehandling.enhetsnavn,
+            eksternFagsakId = gjeldendeBehandling.eksternFagsakId,
+            fagsystem = gjeldendeBehandling.fagsystem,
+            perioder = requireNotNull(gjeldendeBehandling.feilutbetaltePerioder?.map { it.periode }),
+            ident = gjeldendeBehandling.personIdent,
+            saksbehandlerIdent = requireNotNull(hentBehandlingResponse?.ansvarligSaksbehandler),
+            språkkode = Språkkode.NB,
+            vedtaksdato = vedtaksdato,
+            verge = gjeldendeBehandling.harVerge,
+            sumFeilutbetaling = requireNotNull(
+                gjeldendeBehandling.feilutbetaltePerioder?.sumOf {
+                    it.feilutbetaltBeløp
+                }
+            ).toLong(),
+            ytelsestype = gjeldendeBehandling.ytelsestype
+        ).lag()
 
         familieTilbakeKlient.forhåndsvisVarselbrev(data = data)
 
@@ -666,16 +745,18 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
 
     fun hentJournaldokument() {
         // TODO: Oppdater med reelle IDer når dette er implementert i familie-tilbake
-        familieTilbakeKlient.hentJournaldokument(behandlingId = gjeldendeBehandling.behandlingId,
-                                                 journalpostId = "jpId",
-                                                 dokumentId = "id")
+        familieTilbakeKlient.hentJournaldokument(
+            behandlingId = gjeldendeBehandling.behandlingId,
+            journalpostId = "jpId",
+            dokumentId = "id"
+        )
 
         println("Journaldokument hentet for behandling ${gjeldendeBehandling.behandlingId}")
     }
 
     fun beregn() {
         val data =
-                requireNotNull(gjeldendeBehandling.feilutbetaltePerioder?.map { it.periode }) { "Autotest mangler informasjon om perioder å beregne feilutbetalinger for" }
+            requireNotNull(gjeldendeBehandling.feilutbetaltePerioder?.map { it.periode }) { "Autotest mangler informasjon om perioder å beregne feilutbetalinger for" }
 
         familieTilbakeKlient.beregn(behandlingId = gjeldendeBehandling.behandlingId, data = data).data
 
@@ -684,15 +765,21 @@ class Saksbehandler(private val familieTilbakeKlient: FamilieTilbakeKlient,
         val forventetFeilutbetaling = gjeldendeBehandling.feilutbetaltePerioder?.sumOf { it.feilutbetaltBeløp }?.setScale(2)
         val beregnetFeilutbetaling = beregnedePerioder?.beregningsresultatsperioder?.sumOf { it.feilutbetaltBeløp }?.setScale(2)
 
-        assertTrue(beregnetFeilutbetaling == forventetFeilutbetaling,
-                   "Forventet resultat: $forventetFeilutbetaling, beregnet resultat: $beregnetFeilutbetaling")
+        assertTrue(
+            beregnetFeilutbetaling == forventetFeilutbetaling,
+            "Forventet resultat: $forventetFeilutbetaling, beregnet resultat: $beregnetFeilutbetaling"
+        )
 
         println("Beregnet feilutbetaling for behandling ${gjeldendeBehandling.behandlingId}")
     }
 
     fun verifiserHistorikkinnslag() {
-        val historikkinnslag = requireNotNull(familieHistorikkKlient?.hentHistorikkinnslag(applikasjon = "FAMILIE_TILBAKE",
-                                                                                           behandlingId = gjeldendeBehandling.eksternBrukId)?.data) { "Kunne ikke hente historikkinnsag" }
+        val historikkinnslag = requireNotNull(
+            familieHistorikkKlient?.hentHistorikkinnslag(
+                applikasjon = "FAMILIE_TILBAKE",
+                behandlingId = gjeldendeBehandling.eksternBrukId
+            )?.data
+        ) { "Kunne ikke hente historikkinnsag" }
 
         // Sjekker at det finnes historikkinnslag med forventet tittel
         val historikkinnslagTitler = historikkinnslag.map { it.tittel }
