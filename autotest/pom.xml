@@ -19,7 +19,7 @@
         <jvmTarget>17</jvmTarget>
         <kotlin.version>1.7.10</kotlin.version>
         <felles.version>1.20220811104902_c1860ff</felles.version>
-        <kontrakter.version>2.0_20220810200841_fb83674</kontrakter.version>
+        <kontrakter.version>2.0_20220811104906_7505ebf</kontrakter.version>
 
         <nav.security.version>2.1.3</nav.security.version>
     </properties>
