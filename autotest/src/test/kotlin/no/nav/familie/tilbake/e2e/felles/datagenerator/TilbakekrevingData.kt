@@ -4,6 +4,7 @@ import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.Språkkode
 import no.nav.familie.kontrakter.felles.tilbakekreving.Behandlingstype
 import no.nav.familie.kontrakter.felles.tilbakekreving.Faktainfo
+import no.nav.familie.kontrakter.felles.tilbakekreving.Institusjon
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
 import no.nav.familie.kontrakter.felles.tilbakekreving.Periode
 import no.nav.familie.kontrakter.felles.tilbakekreving.Tilbakekrevingsvalg
@@ -26,7 +27,8 @@ class TilbakekrevingData(
     val varsel: Boolean,
     val verge: Boolean,
     val sumFeilutbetaling: BigDecimal? = null,
-    val saksbehandlerIdent: String
+    val saksbehandlerIdent: String,
+    val institusjon: Boolean
 ) {
 
     fun lag(): OpprettTilbakekrevingRequest {
@@ -53,7 +55,8 @@ class TilbakekrevingData(
             ),
             varsel = utledVarsel(varsel, sumFeilutbetaling),
             manueltOpprettet = false,
-            verge = utledVerge(verge)
+            verge = utledVerge(verge),
+            institusjon = utledInstitusjon(institusjon)
         )
     }
 
@@ -88,6 +91,12 @@ class TilbakekrevingData(
     private fun utledVerge(verge: Boolean): Verge? {
         return if (verge) {
             Verge(vergetype = Vergetype.ADVOKAT, navn = "Jens Pettersen", organisasjonsnummer = "987654321")
+        } else null
+    }
+
+    private fun utledInstitusjon(institusjon: Boolean): Institusjon? {
+        return if (institusjon) {
+            Institusjon(organisasjonsnummer = "987654321", navn = "Testinstitusjon")
         } else null
     }
 }

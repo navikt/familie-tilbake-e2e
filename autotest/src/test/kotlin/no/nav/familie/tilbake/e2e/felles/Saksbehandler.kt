@@ -37,6 +37,7 @@ import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Foreldelsesvurderi
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsestype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Hendelsesundertype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.HenleggDto
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.InstitusjonDto
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeStatusKrav
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.OpprettRevurderingDto
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Venteårsak
@@ -66,7 +67,8 @@ class Saksbehandler(
         varsel: Boolean,
         verge: Boolean,
         saksbehandlerIdent: String = SAKSBEHANDLER_IDENT,
-        sumFeilutbetaling: BigDecimal? = null
+        sumFeilutbetaling: BigDecimal? = null,
+        institusjon: Boolean = false
     ) {
         val data = TilbakekrevingData(
             eksternFagsakId = scenario.eksternFagsakId,
@@ -79,7 +81,8 @@ class Saksbehandler(
             varsel = varsel,
             verge = verge,
             sumFeilutbetaling = sumFeilutbetaling,
-            saksbehandlerIdent = saksbehandlerIdent
+            saksbehandlerIdent = saksbehandlerIdent,
+            institusjon = institusjon
         ).lag()
 
         val eksternBrukId =
@@ -137,6 +140,9 @@ class Saksbehandler(
 
         val behandling = fagsak.data!!.behandlinger.elementAt(0)
 
+        val institusjon =
+            fagsak.data!!.institusjon?.let { InstitusjonDto(organisasjonsnummer = it.organisasjonsnummer, navn = it.navn) }
+
         gjeldendeBehandling = GjeldendeBehandling(
             eksternFagsakId = scenario.eksternFagsakId,
             eksternBehandlingId = scenario.eksternBehandlingId,
@@ -150,7 +156,8 @@ class Saksbehandler(
             harVerge = false,
             kravgrunnlagId = detaljertMelding.detaljertKravgrunnlag.kravgrunnlagId,
             vedtakId = detaljertMelding.detaljertKravgrunnlag.vedtakId,
-            feilutbetaltePerioder = utledLogiskPeriodeFraKravgrunnlag(detaljertKravgrunnlag = detaljertMelding.detaljertKravgrunnlag)
+            feilutbetaltePerioder = utledLogiskPeriodeFraKravgrunnlag(detaljertKravgrunnlag = detaljertMelding.detaljertKravgrunnlag),
+            institusjon = institusjon
         )
 
         println("Opprettet behandling med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId} og " + "eksternBrukId: ${gjeldendeBehandling.eksternBrukId}")
@@ -166,7 +173,6 @@ class Saksbehandler(
         sumFeilutbetaling: BigDecimal = BigDecimal(20000),
         medJustering: Boolean? = false
     ) {
-
         val data = KravgrunnlagData(
             status = status,
             ytelsestype = requireNotNull(gjeldendeBehandling.ytelsestype) {
