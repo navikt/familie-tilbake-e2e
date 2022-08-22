@@ -72,7 +72,8 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                 status = KodeStatusKrav.NY,
                 antallPerioder = 3,
                 under4rettsgebyr = false,
-                muligforeldelse = false, periodelengde = 6
+                muligforeldelse = false,
+                periodelengde = 6
             )
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
@@ -137,8 +138,6 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                 verge = false
             )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
-
-            Thread.sleep(10_000)
 
             taBehandlingAvVent()
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
@@ -562,6 +561,57 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                     SærligGrunn.ANNET
                 )
             )
+
+            behandleForeslåVedtak()
+            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
+        }
+    }
+
+    @Test
+    fun `Tilbakekreving institusjon fagsak, med varsel, kravgrunnlag med foreldelse, ikke foreldet, vilkårsvurdering simpel uaktsomhet full tilbakebetaling småbeløp`() {
+        with(saksbehandler) {
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = true,
+                verge = true,
+                institusjon = true
+            )
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
+            taBehandlingAvVent()
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 3,
+                periodelengde = 5,
+                under4rettsgebyr = false,
+                muligforeldelse = true
+            )
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
+
+            behandleForeldelse(Foreldelsesvurderingstype.IKKE_FORELDET)
+            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
+                andelTilbakekreves = BigDecimal(100),
+                særligeGrunner = listOf(
+                    SærligGrunn.GRAD_AV_UAKTSOMHET,
+                    SærligGrunn.STØRRELSE_BELØP,
+                    SærligGrunn.ANNET
+                )
+            )
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+            endreAnsvarligSaksbehandler(Saksbehandler.SAKSBEHANDLER_IDENT)
 
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)

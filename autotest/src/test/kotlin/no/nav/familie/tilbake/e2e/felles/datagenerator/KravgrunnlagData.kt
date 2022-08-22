@@ -1,6 +1,7 @@
 package no.nav.familie.tilbake.e2e.felles.datagenerator
 
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.InstitusjonDto
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeKlasse
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.KodeStatusKrav
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDto
@@ -31,7 +32,8 @@ class KravgrunnlagData(
     val enhetId: String,
     val skattProsent: BigDecimal,
     val sumFeilutbetaling: BigDecimal,
-    val medJustering: Boolean
+    val medJustering: Boolean,
+    val institusjon: InstitusjonDto? = null
 ) {
 
     // TODO: Vil trenge å kunne sette kontrollfelt tilbake i tid for at den plukkes av auto-opprett batch
@@ -49,8 +51,8 @@ class KravgrunnlagData(
                 this.vedtakIdOmgjort = BigInteger.ZERO
                 this.vedtakGjelderId = personIdent
                 this.typeGjelderId = TypeGjelderDto.PERSON
-                this.utbetalesTilId = personIdent
-                this.typeUtbetId = TypeGjelderDto.PERSON
+                this.utbetalesTilId = institusjon?.organisasjonsnummer ?: personIdent
+                this.typeUtbetId = if (institusjon != null) TypeGjelderDto.ORGANISASJON else TypeGjelderDto.PERSON
                 this.enhetAnsvarlig = enhetId
                 this.enhetBosted = enhetId
                 this.enhetBehandl = enhetId

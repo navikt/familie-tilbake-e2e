@@ -12,7 +12,8 @@ data class FagsakDto(
     val fagsystem: Fagsystem,
     val språkkode: Språkkode,
     val bruker: BrukerDto,
-    val behandlinger: Set<BehandlingsoppsummeringDto>
+    val behandlinger: Set<BehandlingsoppsummeringDto>,
+    val institusjon: InstitusjonDto? = null
 )
 
 data class BrukerDto(
@@ -27,6 +28,11 @@ data class BehandlingsoppsummeringDto(
     val eksternBrukId: UUID,
     val type: Behandlingstype,
     val status: Behandlingsstatus
+)
+
+data class InstitusjonDto(
+    val organisasjonsnummer: String,
+    val navn: String
 )
 
 enum class Fagsaksstatus {

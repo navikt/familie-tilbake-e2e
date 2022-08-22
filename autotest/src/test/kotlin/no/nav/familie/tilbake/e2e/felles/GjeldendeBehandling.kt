@@ -4,6 +4,7 @@ import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.felles.utils.LogiskPeriode
 import no.nav.familie.tilbake.e2e.klienter.dto.historikkinnslag.TilbakekrevingHistorikkinnslagstype
+import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.InstitusjonDto
 import java.math.BigInteger
 
 data class GjeldendeBehandling(
@@ -22,5 +23,6 @@ data class GjeldendeBehandling(
     var feilutbetaltePerioder: List<LogiskPeriode>? = null,
     var historikkinnslag: MutableList<TilbakekrevingHistorikkinnslagstype> = mutableListOf(),
     var revurderingBehandlingId: String? = null,
-    var revurderingEksternId: String? = null
+    var revurderingEksternId: String? = null,
+    var institusjon: InstitusjonDto? = null
 )
