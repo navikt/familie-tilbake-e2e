@@ -61,8 +61,11 @@ class TilbakekrevingData(
     }
 
     private fun utledTilbakekrevingsvalg(varsel: Boolean): Tilbakekrevingsvalg {
-        return if (varsel) Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_MED_VARSEL
-        else Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_UTEN_VARSEL
+        return if (varsel) {
+            Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_MED_VARSEL
+        } else {
+            Tilbakekrevingsvalg.OPPRETT_TILBAKEKREVING_UTEN_VARSEL
+        }
     }
 
     private fun utledVarsel(varsel: Boolean, sumFeilutbetaling: BigDecimal?): Varsel? {
@@ -85,18 +88,24 @@ class TilbakekrevingData(
                     )
                 )
             )
-        } else null
+        } else {
+            null
+        }
     }
 
     private fun utledVerge(verge: Boolean): Verge? {
         return if (verge) {
             Verge(vergetype = Vergetype.ADVOKAT, navn = "Jens Pettersen", organisasjonsnummer = "987654321")
-        } else null
+        } else {
+            null
+        }
     }
 
     private fun utledInstitusjon(institusjon: Boolean): Institusjon? {
         return if (institusjon) {
             Institusjon(organisasjonsnummer = "987654321", navn = "Testinstitusjon")
-        } else null
+        } else {
+            null
+        }
     }
 }

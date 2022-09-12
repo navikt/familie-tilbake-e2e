@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class TotrinnskontrollDto(
     @JsonProperty("@type")
     val type: String = "FATTE_VEDTAK",
-    val totrinnsvurderinger: List<VurdertTotrinnDto>,
+    val totrinnsvurderinger: List<VurdertTotrinnDto>
 )
 
 data class VurdertTotrinnDto(

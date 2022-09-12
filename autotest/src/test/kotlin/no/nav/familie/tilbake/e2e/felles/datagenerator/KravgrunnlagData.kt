@@ -52,7 +52,7 @@ class KravgrunnlagData(
                 this.vedtakGjelderId = personIdent
                 this.typeGjelderId = TypeGjelderDto.PERSON
                 this.utbetalesTilId = institusjon?.organisasjonsnummer ?: personIdent
-                this.typeUtbetId = if (institusjon != null) TypeGjelderDto.ORGANISASJON else TypeGjelderDto.PERSON
+                this.typeUtbetId = if (institusjon != null) TypeGjelderDto.SAMHANDLER else TypeGjelderDto.PERSON
                 this.enhetAnsvarlig = enhetId
                 this.enhetBosted = enhetId
                 this.enhetBehandl = enhetId

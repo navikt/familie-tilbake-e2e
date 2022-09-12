@@ -27,13 +27,13 @@ import kotlin.random.Random
 
 @SpringBootTest(classes = [ApplicationConfig::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
+class OpprettTilbakekrevingBTTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
 
     private lateinit var saksbehandler: Saksbehandler
     private lateinit var scenario: Scenario
 
     private val fagsystem: Fagsystem = Fagsystem.EF
-    private val ytelsestype: Ytelsestype = Ytelsestype.OVERGANGSSTØNAD
+    private val ytelsestype: Ytelsestype = Ytelsestype.BARNETILSYN
 
     @BeforeEach
     fun setup() {
