@@ -106,8 +106,12 @@ class BehandleVilkårsvurderingData(
             Aktsomhet.SIMPEL_UAKTSOMHET -> AktsomhetDto(
                 aktsomhet = aktsomhet,
                 andelTilbakekreves = andelTilbakekreves,
-                beløpTilbakekreves = if (andelTilbakekreves == null) beløpTilbakekreves
-                    ?: feilutbetaltBeløp else null,
+                beløpTilbakekreves = if (andelTilbakekreves == null) {
+                    beløpTilbakekreves
+                        ?: feilutbetaltBeløp
+                } else {
+                    null
+                },
                 ileggRenter = ileggRenter,
                 begrunnelse = BEGRUNNELSE,
                 særligeGrunnerTilReduksjon = (andelTilbakekreves != BigDecimal(100)),

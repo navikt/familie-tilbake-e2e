@@ -55,6 +55,8 @@ class BehandleForeslåVedtakData(val hentVedtakbrevtekstResponse: List<AvsnittDt
     ): String? {
         return if (underavsnittsliste.any { it.fritekstTillatt && it.underavsnittstype == underavsnittstype }) {
             "Automatisk vurdering fra Autotest for underavsnitt $underavsnittstype."
-        } else null
+        } else {
+            null
+        }
     }
 }

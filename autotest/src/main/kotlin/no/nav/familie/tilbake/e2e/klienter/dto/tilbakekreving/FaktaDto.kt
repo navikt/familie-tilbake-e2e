@@ -58,7 +58,7 @@ enum class Hendelsestype {
     LOVLIG_OPPHOLD,
     DØDSFALL,
     DELT_BOSTED,
-    BARNS_ALDER,
+    BARNS_ALDER
 }
 
 enum class Hendelsesundertype {
