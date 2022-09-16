@@ -104,7 +104,8 @@ class Saksbehandler(
             personIdent = scenario.personIdent,
             enhetId = scenario.enhetId,
             enhetsnavn = scenario.enhetsnavn,
-            harVerge = verge
+            harVerge = verge,
+            institusjon = data.institusjon?.let { InstitusjonDto(organisasjonsnummer = it.organisasjonsnummer, navn = it.navn) }
         )
 
         lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_OPPRETTET)
@@ -192,7 +193,8 @@ class Saksbehandler(
             enhetId = gjeldendeBehandling.enhetId,
             skattProsent = skattProsent,
             sumFeilutbetaling = sumFeilutbetaling,
-            medJustering = medJustering!!
+            medJustering = medJustering!!,
+            institusjon = gjeldendeBehandling.institusjon
         ).lag()
 
         familieTilbakeKlient.opprettKravgrunnlag(kravgrunnlag = data)
