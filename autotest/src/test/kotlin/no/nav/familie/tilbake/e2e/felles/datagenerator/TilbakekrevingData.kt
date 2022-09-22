@@ -103,7 +103,7 @@ class TilbakekrevingData(
 
     private fun utledInstitusjon(institusjon: Boolean): Institusjon? {
         return if (institusjon) {
-            Institusjon(organisasjonsnummer = "987654321", navn = "Testinstitusjon")
+            Institusjon(organisasjonsnummer = "987654321")
         } else {
             null
         }
