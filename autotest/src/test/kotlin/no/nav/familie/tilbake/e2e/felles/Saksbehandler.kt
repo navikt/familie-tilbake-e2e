@@ -105,7 +105,7 @@ class Saksbehandler(
             enhetId = scenario.enhetId,
             enhetsnavn = scenario.enhetsnavn,
             harVerge = verge,
-            institusjon = data.institusjon?.let { InstitusjonDto(organisasjonsnummer = it.organisasjonsnummer, navn = it.navn) }
+            institusjon = data.institusjon?.let { InstitusjonDto(organisasjonsnummer = it.organisasjonsnummer) }
         )
 
         lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_OPPRETTET)
@@ -141,8 +141,7 @@ class Saksbehandler(
 
         val behandling = fagsak.data!!.behandlinger.elementAt(0)
 
-        val institusjon =
-            fagsak.data!!.institusjon?.let { InstitusjonDto(organisasjonsnummer = it.organisasjonsnummer, navn = it.navn) }
+        val institusjon = fagsak.data!!.institusjon?.let { InstitusjonDto(organisasjonsnummer = it.organisasjonsnummer) }
 
         gjeldendeBehandling = GjeldendeBehandling(
             eksternFagsakId = scenario.eksternFagsakId,

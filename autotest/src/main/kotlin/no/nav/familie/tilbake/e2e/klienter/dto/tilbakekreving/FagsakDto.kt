@@ -31,8 +31,7 @@ data class BehandlingsoppsummeringDto(
 )
 
 data class InstitusjonDto(
-    val organisasjonsnummer: String,
-    val navn: String
+    val organisasjonsnummer: String
 )
 
 enum class Fagsaksstatus {
