@@ -7,14 +7,10 @@ Testriggen kan kjøre på ekstern server og lokalt. Lokalt kan man erstatte ett 
 
 ## Kjøre tester
 
-1. Legg inn secrets i e2e/.env. Hentes fra vault prod-fss/familie/default/familie-tilbake-e2e-env.
-2. I /e2e: Kjør opp miljøet med kommandoen: docker-compose up -d
-3. I /autotest: Kjør ønskede tester
-
-###Tips
+### Tips
 For effektiv utvikling kan disse kommandoene være nyttige:
 
-* For mer effektivt bygg: mvn clean install -DskipTests
+* For mer effektivt bygg: mvn verify -DskipTests
 * For å hente informasjon om docker containerne som kjører: docker ps
 * For logger fra de ulike appene: docker logs <docker-id> -f
 
@@ -22,6 +18,8 @@ For effektiv utvikling kan disse kommandoene være nyttige:
 
 Start familie-tilbake i IntelliJ som vanlig med CLIENT_ID og FAMILIE_TILBAKE_FRONTEND_CLIENT_ID for azuread familie-tilbake-lokal og familie-tilbake-frontend-lokal.
 
-Kjør testene med spring-profil "-Dspring.profiles.active=local". Hent TILBAKE_CLIENT_SECRET frå vault prod-fss/familie/default/familie-tilbake-e2e-env og legg det inn i Environment-variables for testen.
+Kjør testene med spring-profil "-Dspring.profiles.active=local". Hent TILBAKE_CLIENT_SECRET frå .env for familie-tilbake-frontend og legg det inn i Environment-variables for testen.
 
+Løsninga er nå tilgjengelig på http://localhost:8000/fagsystem/<system>/fagsak/<eksternFagsakId>/behandling/<eksternBrukId>/vilkaarsvurdering
 
+eksternFagsakid og eksternBrukId finner du i loggen for testkjøringa.
