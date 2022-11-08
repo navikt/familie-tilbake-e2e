@@ -7,6 +7,7 @@ import no.nav.familie.kontrakter.felles.tilbakekreving.Faktainfo
 import no.nav.familie.kontrakter.felles.tilbakekreving.Institusjon
 import no.nav.familie.kontrakter.felles.tilbakekreving.OpprettTilbakekrevingRequest
 import no.nav.familie.kontrakter.felles.tilbakekreving.Periode
+import no.nav.familie.kontrakter.felles.tilbakekreving.Regelverk
 import no.nav.familie.kontrakter.felles.tilbakekreving.Tilbakekrevingsvalg
 import no.nav.familie.kontrakter.felles.tilbakekreving.Varsel
 import no.nav.familie.kontrakter.felles.tilbakekreving.Verge
@@ -28,7 +29,8 @@ class TilbakekrevingData(
     val verge: Boolean,
     val sumFeilutbetaling: BigDecimal? = null,
     val saksbehandlerIdent: String,
-    val institusjon: Boolean
+    val institusjon: Boolean,
+    val regelverk: Regelverk
 ) {
 
     fun lag(): OpprettTilbakekrevingRequest {
@@ -56,7 +58,8 @@ class TilbakekrevingData(
             varsel = utledVarsel(varsel, sumFeilutbetaling),
             manueltOpprettet = false,
             verge = utledVerge(verge),
-            institusjon = utledInstitusjon(institusjon)
+            institusjon = utledInstitusjon(institusjon),
+            regelverk = regelverk
         )
     }
 

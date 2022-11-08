@@ -82,7 +82,8 @@ class Saksbehandler(
             verge = verge,
             sumFeilutbetaling = sumFeilutbetaling,
             saksbehandlerIdent = saksbehandlerIdent,
-            institusjon = institusjon
+            institusjon = institusjon,
+            regelverk = scenario.regelverk
         ).lag()
 
         val eksternBrukId =
