@@ -17,7 +17,7 @@
     <properties>
         <java.version>17</java.version>
         <jvmTarget>17</jvmTarget>
-        <kotlin.version>1.7.20</kotlin.version>
+        <kotlin.version>1.7.21</kotlin.version>
         <felles.version>1.20220930133126_14f75ec</felles.version>
         <kontrakter.version>2.0_20220928092558_a8a42e4</kontrakter.version>
 
