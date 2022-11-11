@@ -2,6 +2,7 @@ package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.tilbakekreving.Behandlingsårsakstype
+import no.nav.familie.kontrakter.felles.tilbakekreving.Regelverk
 import no.nav.familie.kontrakter.felles.tilbakekreving.Vergetype
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
@@ -619,6 +620,82 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
+        }
+    }
+
+    @Test
+    fun `Tilbakekreving under EØS-regelverket med varsel, kravgrunnlag uten foreldelse, vilkårsvurdering forsett, full tilbakebetaling, revurdering, ingen tilbakekreving`() {
+        with(saksbehandler) {
+            opprettTilbakekreving(
+                scenario = scenario.copy(regelverk = Regelverk.EØS),
+                varsel = true,
+                verge = false
+            )
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
+            Thread.sleep(10_000)
+
+            taBehandlingAvVent()
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 3,
+                under4rettsgebyr = false,
+                muligforeldelse = false,
+                periodelengde = 6
+            )
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            // Ikke mulig foreldelse, steget skal derfor være autoutført
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
+                aktsomhet = Aktsomhet.FORSETT,
+                andelTilbakekreves = BigDecimal(100),
+                særligeGrunner = listOf(
+                    SærligGrunn.GRAD_AV_UAKTSOMHET,
+                    SærligGrunn.STØRRELSE_BELØP,
+                    SærligGrunn.ANNET
+                )
+            )
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            beregn()
+
+            endreAnsvarligSaksbehandler(Saksbehandler.SAKSBEHANDLER_IDENT)
+            behandleForeslåVedtak()
+            erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
+            behandleFatteVedtak(godkjent = true)
+            erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
+
+            opprettRevurdering(scenario, Behandlingsårsakstype.REVURDERING_OPPLYSNINGER_OM_VILKÅR)
+
+            erRevurderingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            behandleFaktaRevurdering(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
+
+            erRevurderingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+            erRevurderingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurderingRevurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
+                beløpErIBehold = false
+            )
+            erRevurderingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandlerRevurdering(Saksbehandler.SAKSBEHANDLER_IDENT)
+            behandleForeslåVedtakRevurdering()
+            erRevurderingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            endreAnsvarligSaksbehandlerRevurdering(Saksbehandler.BESLUTTER_IDENT)
+            behandleFatteVedtakRevurdering(godkjent = true)
+            erRevurderingAvsluttet(resultat = Behandlingsresultatstype.INGEN_TILBAKEBETALING)
         }
     }
 }
