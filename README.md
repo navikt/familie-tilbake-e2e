@@ -23,3 +23,10 @@ Kjør testene med spring-profil "-Dspring.profiles.active=local". Hent TILBAKE_C
 Løsninga er nå tilgjengelig på http://localhost:8000/fagsystem/<system>/fagsak/<eksternFagsakId>/behandling/<eksternBrukId>/vilkaarsvurdering
 
 eksternFagsakid og eksternBrukId finner du i loggen for testkjøringa.
+
+## Opprett testdata for lokal utvikling
+- Kjør opp `familie-tilbake`, `familie-tilbake-frontend` og `familie-historikk`
+- Kjør testen `OpprettTilbakekrevingOsTest.Opprett dummy-test-data lokalt`
+- Den kommer til å feile fordi du må ha følgende satt:
+  - `-Dspring.profiles.active=local` i run-config 
+  - miljøvariabelen `TILBAKE_CLIENT_SECRET` satt (dette er secret som brukes av `familie-tilbake-frontend`, ikke backend-applikasjonen for å late som at testene kjører i kontekst av frontend)

@@ -119,6 +119,7 @@ class Saksbehandler(
         }
 
         println("Opprettet behandling med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId} og " + "eksternBrukId: ${gjeldendeBehandling.eksternBrukId}")
+        println("Lenke til behandlingen lokalt: http://localhost:8000/fagsystem/${scenario.fagsystem}/fagsak/${gjeldendeBehandling.eksternFagsakId}/behandling/${gjeldendeBehandling.eksternBrukId}")
     }
 
     fun oppretManuellBehandling(scenario: Scenario, detaljertMelding: DetaljertKravgrunnlagMelding) {

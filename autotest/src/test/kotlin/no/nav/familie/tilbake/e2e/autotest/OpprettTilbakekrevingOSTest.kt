@@ -191,4 +191,30 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
         }
     }
+
+    @Test
+    fun `Opprett dummy-test-data lokalt`() {
+        with(saksbehandler) {
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = true,
+                verge = false
+            )
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
+
+            Thread.sleep(10_000)
+
+            taBehandlingAvVent()
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 3,
+                skattProsent = BigDecimal(10),
+                under4rettsgebyr = false,
+                muligforeldelse = false
+            )
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+        }
+    }
 }
