@@ -30,3 +30,7 @@ eksternFagsakid og eksternBrukId finner du i loggen for testkjøringa.
 - Den kommer til å feile fordi du må ha følgende satt:
   - `-Dspring.profiles.active=local` i run-config 
   - miljøvariabelen `TILBAKE_CLIENT_SECRET` satt (dette er secret som brukes av `familie-tilbake-frontend`, ikke backend-applikasjonen for å late som at testene kjører i kontekst av frontend)
+
+Eksempel: 
+
+![dummy-data](https://user-images.githubusercontent.com/402915/204290705-75996d85-6967-427f-80f7-e3d6532527c7.png)
