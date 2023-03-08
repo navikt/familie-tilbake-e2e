@@ -1,7 +1,7 @@
 package no.nav.familie.tilbake.e2e.felles
 
 import no.nav.familie.kontrakter.felles.Fagsystem
-import no.nav.familie.kontrakter.felles.tilbakekreving.Regelverk
+import no.nav.familie.kontrakter.felles.Regelverk
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 
 data class Scenario(
