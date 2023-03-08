@@ -1,8 +1,8 @@
 package no.nav.familie.tilbake.e2e.autotest
 
 import no.nav.familie.kontrakter.felles.Fagsystem
+import no.nav.familie.kontrakter.felles.Regelverk
 import no.nav.familie.kontrakter.felles.tilbakekreving.Behandlingsårsakstype
-import no.nav.familie.kontrakter.felles.tilbakekreving.Regelverk
 import no.nav.familie.kontrakter.felles.tilbakekreving.Vergetype
 import no.nav.familie.kontrakter.felles.tilbakekreving.Ytelsestype
 import no.nav.familie.tilbake.e2e.felles.Saksbehandler
