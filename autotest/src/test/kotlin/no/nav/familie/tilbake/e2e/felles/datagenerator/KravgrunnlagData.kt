@@ -156,7 +156,9 @@ class KravgrunnlagData(
                 justKodeKlasse = KodeKlasse.KL_KODE_JUST_BA
             }
             Ytelsestype.KONTANTSTØTTE -> {
-                throw Exception("Kontantstøtte ikke implementert enda")
+                ytelKodeKlasse = KodeKlasse.KS
+                feilKodeKlasse = KodeKlasse.KL_KODE_FEIL_KS
+                justKodeKlasse = KodeKlasse.KL_KODE_JUST_KS
             }
             Ytelsestype.OVERGANGSSTØNAD -> {
                 ytelKodeKlasse = KodeKlasse.EFOG
