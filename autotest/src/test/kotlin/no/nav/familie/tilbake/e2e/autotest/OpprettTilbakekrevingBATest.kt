@@ -698,4 +698,52 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
             erRevurderingAvsluttet(resultat = Behandlingsresultatstype.INGEN_TILBAKEBETALING)
         }
     }
+
+    @Test
+    fun `Oppretter uavsluttet delvis tilbakekreving for bruk ved utvikling`() {
+        with(saksbehandler) {
+            opprettTilbakekreving(
+                scenario = scenario,
+                varsel = false,
+                verge = false
+            )
+            erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
+
+            opprettKravgrunnlag(
+                status = KodeStatusKrav.NY,
+                antallPerioder = 1,
+                under4rettsgebyr = false,
+                muligforeldelse = false
+            )
+
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            opprettVerge()
+
+            erBehandlingISteg(Behandlingssteg.VERGE, Behandlingsstegstatus.KLAR)
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.TILBAKEFØRT)
+
+            behandleVerge(type = Vergetype.ADVOKAT, navn = "Advokat Advokatesen", orgNr = "987654321")
+
+            erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
+
+            behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
+            erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.AUTOUTFØRT)
+
+            erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
+
+            behandleVilkårsvurdering(
+                vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+                aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
+                særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
+                andelTilbakekreves = BigDecimal(50)
+            )
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+
+            fjernVerge()
+
+            erBehandlingISteg(Behandlingssteg.VERGE, Behandlingsstegstatus.TILBAKEFØRT)
+            erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
+        }
+    }
 }
