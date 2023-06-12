@@ -700,6 +700,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
+    @Disabled("Kjøres kun lokalt for utvikling")
     fun `Oppretter uavsluttet delvis tilbakekreving for bruk ved utvikling`() {
         with(saksbehandler) {
             opprettTilbakekreving(
