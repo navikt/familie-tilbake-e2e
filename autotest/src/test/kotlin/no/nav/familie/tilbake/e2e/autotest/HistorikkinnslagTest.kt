@@ -68,12 +68,8 @@ class HistorikkinnslagTest(
             )
             erBehandlingPåVent(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING)
 
-            Thread.sleep(10_000)
-
             taBehandlingAvVent()
             erBehandlingPåVent(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)
-
-            Thread.sleep(10_000)
 
             opprettKravgrunnlag(
                 status = KodeStatusKrav.NY,
@@ -83,17 +79,11 @@ class HistorikkinnslagTest(
             )
             erBehandlingISteg(Behandlingssteg.FAKTA, Behandlingsstegstatus.KLAR)
 
-            Thread.sleep(10_000)
-
             behandleFakta(Hendelsestype.ANNET, Hendelsesundertype.ANNET_FRITEKST)
             erBehandlingISteg(Behandlingssteg.FORELDELSE, Behandlingsstegstatus.KLAR)
 
-            Thread.sleep(10_000)
-
             behandleForeldelse(beslutning = Foreldelsesvurderingstype.IKKE_FORELDET)
             erBehandlingISteg(Behandlingssteg.VILKÅRSVURDERING, Behandlingsstegstatus.KLAR)
-
-            Thread.sleep(10_000)
 
             behandleVilkårsvurdering(
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
@@ -108,24 +98,16 @@ class HistorikkinnslagTest(
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            Thread.sleep(10_000)
-
             bestillBrev(Dokumentmalstype.INNHENT_DOKUMENTASJON)
             taBehandlingAvVent()
-
-            Thread.sleep(10_000)
 
             beregn()
             behandleForeslåVedtak()
             erBehandlingISteg(Behandlingssteg.FATTE_VEDTAK, Behandlingsstegstatus.KLAR)
 
-            Thread.sleep(10_000)
-
             endreAnsvarligSaksbehandler(Saksbehandler.BESLUTTER_IDENT)
             behandleFatteVedtak(godkjent = true)
             erBehandlingAvsluttet(resultat = Behandlingsresultatstype.FULL_TILBAKEBETALING)
-
-            Thread.sleep(30_000)
 
             saksbehandler.verifiserHistorikkinnslag()
         }
