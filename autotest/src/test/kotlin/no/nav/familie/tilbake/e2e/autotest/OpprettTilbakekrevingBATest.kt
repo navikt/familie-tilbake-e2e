@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.IfProfileValue
 import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.random.Random
@@ -692,7 +693,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     }
 
     @Test
-    @Disabled("Kjøres kun lokalt for utvikling")
+    @IfProfileValue(name = "local", value = "local")
     fun `Oppretter uavsluttet delvis tilbakekreving for bruk ved utvikling`() {
         with(saksbehandler) {
             opprettTilbakekreving(
