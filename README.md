@@ -27,7 +27,7 @@ eksternFagsakid og eksternBrukId finner du i loggen for testkjøringa.
 ## Opprett testdata for lokal utvikling
 - Kjør opp `familie-tilbake`, `familie-tilbake-frontend` og `familie-historikk`
 - Sett nødvendig miljøvariabel (Krever at du er pålogget naisdevice og gcloud) `export TILBAKE_CLIENT_SECRET=$(kubectl -n teamfamilie get secret azuread-familie-tilbake-frontend-lokal -o json | jq '.data | map_values(@base64d)' | jq -r '.AZURE_APP_CLIENT_SECRET')`
-- Kjør test `mvn -e -Dspring.profiles.active=local test`. 
+- Kjør tester `mvn -e -Dspring.profiles.active=local test`. 
   - Evt så kan du slenge på hvilken test du vil kjøre:
   - Eksempel BA: `mvn -e -Dspring.profiles.active=local test -Dtest='OpprettTilbakekrevingBATest#Oppretter uavsluttet delvis tilbakekreving for bruk ved utvikling'`
   - Eksempel EF: `mvn -e -Dspring.profiles.active=local test -Dtest='OpprettTilbakekrevingOsTest.Opprett dummy-test-data lokalt'`
