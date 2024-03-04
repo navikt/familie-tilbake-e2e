@@ -14,16 +14,6 @@ For effektiv utvikling kan disse kommandoene være nyttige:
 * For å hente informasjon om docker containerne som kjører: docker ps
 * For logger fra de ulike appene: docker logs <docker-id> -f
 
-## Oppsett lokalt utviklingsmiljø
-
-Start familie-tilbake i IntelliJ som vanlig med CLIENT_ID og FAMILIE_TILBAKE_FRONTEND_CLIENT_ID for azuread familie-tilbake-lokal og familie-tilbake-frontend-lokal.
-
-Kjør testene med spring-profil "-Dspring.profiles.active=local". Hent TILBAKE_CLIENT_SECRET frå .env for familie-tilbake-frontend og legg det inn i Environment-variables for testen.
-
-Løsninga er nå tilgjengelig på http://localhost:8000/fagsystem/<system>/fagsak/<eksternFagsakId>/behandling/<eksternBrukId>/vilkaarsvurdering
-
-eksternFagsakid og eksternBrukId finner du i loggen for testkjøringa.
-
 ## Opprett testdata for lokal utvikling
 - Kjør opp `familie-tilbake`, `familie-tilbake-frontend` og `familie-historikk`
 - Sett nødvendig miljøvariabel (Krever at du er pålogget naisdevice og gcloud) `export TILBAKE_CLIENT_SECRET=$(kubectl -n teamfamilie get secret azuread-familie-tilbake-frontend-lokal -o json | jq '.data | map_values(@base64d)' | jq -r '.AZURE_APP_CLIENT_SECRET')`
@@ -31,6 +21,8 @@ eksternFagsakid og eksternBrukId finner du i loggen for testkjøringa.
   - Evt så kan du slenge på hvilken test du vil kjøre:
   - Eksempel BA: `mvn -e -Dspring.profiles.active=local test -Dtest='OpprettTilbakekrevingBATest#Oppretter uavsluttet delvis tilbakekreving for bruk ved utvikling'`
   - Eksempel EF: `mvn -e -Dspring.profiles.active=local test -Dtest='OpprettTilbakekrevingOsTest.Opprett dummy-test-data lokalt'`
+- Saken er nå tilgjengelig på `http://localhost:8000/fagsystem/<system>/fagsak/<eksternFagsakId>/behandling/<eksternBrukId>/vilkaarsvurdering`
+- eksternFagsakid og eksternBrukId finner du i loggen for testkjøringa.
 
 
 Eksempel: 
