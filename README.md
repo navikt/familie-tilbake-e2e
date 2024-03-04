@@ -23,8 +23,3 @@ For effektiv utvikling kan disse kommandoene være nyttige:
   - Eksempel EF: `mvn -e -Dspring.profiles.active=local test -Dtest='OpprettTilbakekrevingOsTest.Opprett dummy-test-data lokalt'`
 - Saken er nå tilgjengelig på `http://localhost:8000/fagsystem/<system>/fagsak/<eksternFagsakId>/behandling/<eksternBrukId>/vilkaarsvurdering`
 - eksternFagsakid og eksternBrukId finner du i loggen for testkjøringa.
-
-
-Eksempel: 
-
-![dummy-data](https://user-images.githubusercontent.com/402915/204290705-75996d85-6967-427f-80f7-e3d6532527c7.png)
