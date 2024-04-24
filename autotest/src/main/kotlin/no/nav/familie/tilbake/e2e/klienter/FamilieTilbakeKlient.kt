@@ -35,6 +35,7 @@ import java.io.StringWriter
 import java.net.URI
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
+import org.springframework.web.client.HttpServerErrorException
 
 @Service
 class FamilieTilbakeKlient(
@@ -121,10 +122,17 @@ class FamilieTilbakeKlient(
         return getForEntity(uri)
     }
 
-    fun behandleSteg(data: Any, behandlingId: String): Ressurs<String> {
-        val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/steg/v1")
-
-        return postForEntity(uri, data)
+    fun behandleSteg(data: Any, behandlingId: String, retry: Int = 1): Ressurs<String> {
+        try {
+            val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/steg/v1")
+            return postForEntity(uri, data)
+        } catch (httpServerErrorException: HttpServerErrorException) {
+            if (retry > 0) {
+                behandleSteg(data, behandlingId, retry - 1)
+            } else {
+                throw httpServerErrorException
+            }
+        }
     }
 
     fun settBehandlingPåVent(data: BehandlingPåVentDto, behandlingId: String): Ressurs<String> {
