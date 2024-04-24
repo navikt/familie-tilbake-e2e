@@ -128,7 +128,7 @@ class FamilieTilbakeKlient(
             return postForEntity(uri, data)
         } catch (httpServerErrorException: HttpServerErrorException) {
             if (retry > 0) {
-                behandleSteg(data, behandlingId, retry - 1)
+                return behandleSteg(data, behandlingId, retry - 1)
             } else {
                 throw httpServerErrorException
             }
