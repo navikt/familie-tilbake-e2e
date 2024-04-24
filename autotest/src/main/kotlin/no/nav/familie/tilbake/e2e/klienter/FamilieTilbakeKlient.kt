@@ -126,11 +126,13 @@ class FamilieTilbakeKlient(
         try {
             val uri = URI.create("$familieTilbakeApiUrl/api/behandling/$behandlingId/steg/v1")
             return postForEntity(uri, data)
-        } catch (httpServerErrorException: HttpServerErrorException) {
+        } catch (exception: Exception) {
+            println("Feilet kall mot behandle steg")
             if (retry > 0) {
+                println("Retryer kall mot behandle steg")
                 return behandleSteg(data, behandlingId, retry - 1)
             } else {
-                throw httpServerErrorException
+                throw exception
             }
         }
     }
