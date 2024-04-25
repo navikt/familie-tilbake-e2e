@@ -1,7 +1,8 @@
 version: "3"
 services:
   familie-mock-server:
-    image: ghcr.io/navikt/familie-mock-server/familie-mock-server:latest
+    image: europe-north1-docker.pkg.dev/nais-management-233d/teamfamilie/familie-mock-server:latest
+#    image: ghcr.io/navikt/familie-mock-server/familie-mock-server:latest
 #    image: familie-mock-server:latest
     ports:
       - 1337:1337
