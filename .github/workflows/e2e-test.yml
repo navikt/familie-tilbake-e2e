@@ -33,8 +33,8 @@ jobs:
       - name: Login to Google Artifact Repository
         uses: nais/login@v0
         with:
-          project_id: ${{ inputs.nais_management_project_id }}
-          identity_provider: ${{ inputs.nais_workload_identity_provider }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           team: teamfamilie
       - name: Start apper
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
