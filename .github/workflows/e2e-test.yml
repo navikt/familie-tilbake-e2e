@@ -30,6 +30,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Google Artifact Repository
+        uses: nais/login@v0
+        with:
+          project_id: ${{ inputs.nais_management_project_id }}
+          identity_provider: ${{ inputs.nais_workload_identity_provider }}
+          team: teamfamilie
       - name: Start apper
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         env:
