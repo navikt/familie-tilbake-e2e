@@ -62,7 +62,6 @@ jobs:
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         run: cd autotest; mvn --settings .m2/maven-settings.xml -Dtest="**" test
       - name: Samle Docker-logs ved feil
-        if: failure()
         uses: jwalton/gh-docker-logs@v2.0.1
         with:
           dest: './logs'
