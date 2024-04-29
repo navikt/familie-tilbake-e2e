@@ -2,6 +2,11 @@ name: E2E tester for familie-tilbake
 
 on: [push, workflow_dispatch]
 
+permissions:
+  contents: "write"
+  id-token: "write"
+  packages: "write"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,6 +30,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Google Artifact Repository
+        uses: nais/login@v0
+        with:
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          team: teamfamilie
       - name: Start apper
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         env:
