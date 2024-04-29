@@ -66,11 +66,9 @@ jobs:
         with:
           dest: './logs'
       - name: Tar logs
-        if: failure()
         run: tar cvzf ./logs.tgz ./logs
       - name: Laste opp logs til GitHub
         uses: actions/upload-artifact@master
-        if: failure()
         with:
           name: docker-logs-${{ github.run_number }}.tgz
           path: ./logs.tgz
