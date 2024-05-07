@@ -10,13 +10,14 @@ Testriggen kan kjøre på ekstern server og lokalt. Lokalt kan man erstatte ett 
 
 For effektiv utvikling kan disse kommandoene være nyttige:
 
-* For mer effektivt bygg: mvn verify -DskipTests
+* For mer effektivt bygg: `mvn verify -DskipTests`
 * For å hente informasjon om docker containerne som kjører: docker ps
 * For logger fra de ulike appene: docker logs <docker-id> -f
 
 ## Opprett testdata for lokal utvikling
 - Kjør opp `familie-tilbake`, `familie-tilbake-frontend` og `familie-historikk`
 - Sett nødvendig miljøvariabel (Krever at du er pålogget naisdevice og gcloud) `export TILBAKE_CLIENT_SECRET=$(kubectl -n teamfamilie get secret azuread-familie-tilbake-frontend-lokal -o json | jq '.data | map_values(@base64d)' | jq -r '.AZURE_APP_CLIENT_SECRET')`
+- Stå i autotest mappen `cd autotest`
 - Kjør tester `mvn -e -Dspring.profiles.active=local test`. 
   - Evt så kan du slenge på hvilken test du vil kjøre:
   - Eksempel BA: `mvn -e -Dspring.profiles.active=local test -Dtest='OpprettTilbakekrevingBATest#Oppretter uavsluttet delvis tilbakekreving for bruk ved utvikling'`
