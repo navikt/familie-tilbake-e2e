@@ -15,7 +15,7 @@ For effektiv utvikling kan disse kommandoene være nyttige:
 * For logger fra de ulike appene: docker logs <docker-id> -f
 
 ## Opprett testdata for lokal utvikling
-- Kjør opp `familie-tilbake`, `familie-tilbake-frontend` og `familie-historikk`
+- Kjør opp `familie-tilbake` og `familie-tilbake-frontend`
 - Gå inn i autotestmappa `cd autotest`
 - De neste stegene krever at du er pålogget naisdevice og gcloud
 - Kjør tester `source hent_tilbake_client_secret.sh && mvn -e -Dspring.profiles.active=local test`. 
