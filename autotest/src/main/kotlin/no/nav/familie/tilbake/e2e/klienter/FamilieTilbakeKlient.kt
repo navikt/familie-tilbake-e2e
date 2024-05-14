@@ -35,7 +35,6 @@ import java.io.StringWriter
 import java.net.URI
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.Marshaller
-import org.springframework.web.client.HttpServerErrorException
 
 @Service
 class FamilieTilbakeKlient(

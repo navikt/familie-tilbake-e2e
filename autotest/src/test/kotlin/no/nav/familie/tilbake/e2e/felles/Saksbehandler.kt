@@ -21,12 +21,10 @@ import no.nav.familie.tilbake.e2e.felles.datagenerator.StatusmeldingData
 import no.nav.familie.tilbake.e2e.felles.datagenerator.TilbakekrevingData
 import no.nav.familie.tilbake.e2e.felles.utils.LogiskPeriodeUtil.utledLogiskPeriodeFraKravgrunnlag
 import no.nav.familie.tilbake.e2e.felles.utils.Vent
-import no.nav.familie.tilbake.e2e.klienter.FamilieHistorikkKlient
 import no.nav.familie.tilbake.e2e.klienter.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
-import no.nav.familie.tilbake.e2e.klienter.dto.historikkinnslag.TilbakekrevingHistorikkinnslagstype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.BehandlingPåVentDto
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsresultatstype
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsstatus
@@ -51,7 +49,6 @@ import java.util.UUID
 
 class Saksbehandler(
     private val familieTilbakeKlient: FamilieTilbakeKlient,
-    private val familieHistorikkKlient: FamilieHistorikkKlient? = null
 ) {
 
     companion object {
@@ -108,15 +105,6 @@ class Saksbehandler(
             harVerge = verge,
             institusjon = data.institusjon?.let { InstitusjonDto(organisasjonsnummer = it.organisasjonsnummer) }
         )
-
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_OPPRETTET)
-        if (varsel) {
-            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_PÅ_VENT)
-            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VARSELBREV_SENDT)
-            if (verge) {
-                lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VARSELBREV_SENDT_TIL_VERGE)
-            }
-        }
 
         println("Opprettet behandling med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId} og " + "eksternBrukId: ${gjeldendeBehandling.eksternBrukId}")
         println("Lenke til behandlingen lokalt: http://localhost:8000/fagsystem/${scenario.fagsystem}/fagsak/${gjeldendeBehandling.eksternFagsakId}/behandling/${gjeldendeBehandling.eksternBrukId}")
@@ -205,9 +193,6 @@ class Saksbehandler(
             vedtakId = data.detaljertKravgrunnlag.vedtakId
             feilutbetaltePerioder = utledLogiskPeriodeFraKravgrunnlag(data.detaljertKravgrunnlag)
         }
-
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.KRAVGRUNNLAG_MOTTATT)
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_GJENOPPTATT)
 
         println("Sendte inn $status kravgrunnlag med eksternFagsakId: ${gjeldendeBehandling.eksternFagsakId} på ytelsestype: ${gjeldendeBehandling.ytelsestype}")
     }
@@ -330,8 +315,6 @@ class Saksbehandler(
 
         familieTilbakeKlient.behandleSteg(behandlingId = behandlingId, data = data)
 
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.FAKTA_VURDERT)
-
         println("Behandling $behandlingId ble behandlet i steg fakta: hendelsestype $hendelsestype, " + "hendelsesundertype $hendelsesundertype")
     }
 
@@ -341,8 +324,6 @@ class Saksbehandler(
         val data = BehandleForeldelseData(hentForeldelseResponse = hentForeldelseResponse, beslutning = beslutning).lag()
 
         familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId, data = data)
-
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.FORELDELSE_VURDERT)
 
         println("Behandling ${gjeldendeBehandling.behandlingId} ble behandlet i steg foreldelse: beslutning $beslutning")
     }
@@ -422,8 +403,6 @@ class Saksbehandler(
 
         familieTilbakeKlient.behandleSteg(behandlingId = behandlingId, data = data)
 
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VILKÅRSVURDERING_VURDERT)
-
         println("Behandling $behandlingId ble behandlet i steg vilkårsvurdering: " + "vilkårvurderingsresultat $vilkårvurderingsresultat")
     }
 
@@ -442,9 +421,6 @@ class Saksbehandler(
         val data = BehandleForeslåVedtakData(hentVedtakbrevtekstResponse = hentVedtakbrevtekstResponse).lag()
 
         familieTilbakeKlient.behandleSteg(behandlingId = behandlingId, data = data)
-
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.FORESLÅ_VEDTAK_VURDERT)
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_SENDT_TIL_BESLUTTER)
 
         println("Behandling $behandlingId ble behandlet i steg foreslå vedtak")
     }
@@ -468,18 +444,6 @@ class Saksbehandler(
 
         familieTilbakeKlient.behandleSteg(behandlingId = behandlingId, data = data)
 
-        if (godkjent) {
-            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VEDTAK_FATTET)
-            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_SENDT_TIL_BESLUTTER)
-            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VEDTAKSBREV_SENDT)
-            if (gjeldendeBehandling.harVerge) {
-                lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VEDTAKSBREV_SENDT_TIL_VERGE)
-            }
-            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_AVSLUTTET)
-        } else {
-            lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_SENDT_TILBAKE_TIL_SAKSBEHANDLER)
-        }
-
         println("Behandling $behandlingId ble behandlet i steg fatte vedtak: " + if (godkjent) "vedtak GODKJENT" else "vedtak UNDERKJENT")
     }
 
@@ -501,8 +465,6 @@ class Saksbehandler(
 
         familieTilbakeKlient.behandleSteg(behandlingId = gjeldendeBehandling.behandlingId, data = data)
 
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VERGE_OPPRETTET)
-
         println("Behandling ${gjeldendeBehandling.behandlingId} ble behandlet i steg Verge")
     }
 
@@ -512,15 +474,11 @@ class Saksbehandler(
         familieTilbakeKlient.settBehandlingPåVent(behandlingId = gjeldendeBehandling.behandlingId, data = data)
         erBehandlingPåVent(venteårsak)
 
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_PÅ_VENT)
-
         println("Behandling ${gjeldendeBehandling.behandlingId} satt på vent: $venteårsak med frist $tidsfrist")
     }
 
     fun taBehandlingAvVent() {
         familieTilbakeKlient.taBehandlingAvVent(gjeldendeBehandling.behandlingId)
-
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_GJENOPPTATT)
 
         println("Behandling ${gjeldendeBehandling.behandlingId} tatt av vent")
     }
@@ -540,8 +498,6 @@ class Saksbehandler(
 
         familieTilbakeKlient.henleggBehandling(behandlingId = gjeldendeBehandling.behandlingId, data = data)
 
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.BEHANDLING_HENLAGT)
-
         println("Behandling ${gjeldendeBehandling.behandlingId} ble henlagt: $behandlingsresultat")
     }
 
@@ -553,8 +509,6 @@ class Saksbehandler(
 
     fun fjernVerge() {
         familieTilbakeKlient.fjernVerge(gjeldendeBehandling.behandlingId)
-
-        lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VERGE_FJERNET)
 
         println("Fjernet verge på behandling ${gjeldendeBehandling.behandlingId}")
     }
@@ -681,28 +635,6 @@ class Saksbehandler(
 
         familieTilbakeKlient.bestillBrev(data = data)
 
-        when (dokumentmalstype) {
-            Dokumentmalstype.INNHENT_DOKUMENTASJON -> {
-                lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.INNHENT_DOKUMENTASJON_BREV_SENDT)
-                if (gjeldendeBehandling.harVerge) {
-                    lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.INNHENT_DOKUMENTASJON_BREV_SENDT_TIL_VERGE)
-                }
-            }
-            Dokumentmalstype.VARSEL -> {
-                lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VARSELBREV_SENDT)
-                if (gjeldendeBehandling.harVerge) {
-                    lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.VARSELBREV_SENDT_TIL_VERGE)
-                }
-            }
-            Dokumentmalstype.KORRIGERT_VARSEL -> {
-                lagreHistorikkinnslag(TilbakekrevingHistorikkinnslagstype.KORRIGERT_VARSELBREV_SENDT)
-                if (gjeldendeBehandling.harVerge) {
-                    lagreHistorikkinnslag((TilbakekrevingHistorikkinnslagstype.KORRIGERT_VARSELBREV_SENDT_TIL_VERGE))
-                }
-            }
-            else -> RuntimeException("Malen $dokumentmalstype er ikke støttet")
-        }
-
         println("Bestilte brev $dokumentmalstype for behandling ${gjeldendeBehandling.behandlingId}")
     }
 
@@ -780,27 +712,5 @@ class Saksbehandler(
         )
 
         println("Beregnet feilutbetaling for behandling ${gjeldendeBehandling.behandlingId}")
-    }
-
-    fun verifiserHistorikkinnslag() {
-        val historikkinnslag = requireNotNull(
-            familieHistorikkKlient?.hentHistorikkinnslag(
-                applikasjon = "FAMILIE_TILBAKE",
-                behandlingId = gjeldendeBehandling.eksternBrukId
-            )?.data
-        ) { "Kunne ikke hente historikkinnsag" }
-
-        // Sjekker at det finnes historikkinnslag med forventet tittel
-        val historikkinnslagTitler = historikkinnslag.map { it.tittel }
-
-        gjeldendeBehandling.historikkinnslag.forEach {
-            assertTrue(it.tittel in historikkinnslagTitler)
-        }
-
-        println("Verifiserte historikkinnslag for ${gjeldendeBehandling.behandlingId}")
-    }
-
-    private fun lagreHistorikkinnslag(innslag: TilbakekrevingHistorikkinnslagstype) {
-        gjeldendeBehandling.historikkinnslag.add(innslag)
     }
 }
