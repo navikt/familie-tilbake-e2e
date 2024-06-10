@@ -21,6 +21,6 @@ For effektiv utvikling kan disse kommandoene være nyttige:
 - Kjør tester `source hent_tilbake_client_secret.sh && mvn -e -Dspring.profiles.active=local test`. 
   - Evt så kan du slenge på hvilken test du vil kjøre:
   - Eksempel BA: `source hent_tilbake_client_secret.sh && mvn -e -Dspring.profiles.active=local test -Dtest='OpprettTilbakekrevingBATest#Oppretter uavsluttet delvis tilbakekreving for bruk ved utvikling'`
-  - Eksempel EF: `source hent_tilbake_client_secret.sh && mvn -e -Dspring.profiles.active=local test -Dtest='OpprettTilbakekrevingOsTest.Opprett dummy-test-data lokalt'`
+  - Eksempel EF: `source hent_tilbake_client_secret.sh && mvn -e -Dspring.profiles.active=local test -Dtest='OpprettTilbakekrevingOSTest#Opprett dummy-test-data lokalt'`
 - Saken er nå tilgjengelig på `http://localhost:8000/fagsystem/<system>/fagsak/<eksternFagsakId>/behandling/<eksternBrukId>/vilkaarsvurdering`
 - eksternFagsakid og eksternBrukId finner du i loggen for testkjøringa.
