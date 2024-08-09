@@ -12,8 +12,8 @@ else
   echo "starter e2e med $appsombyggeslokalt på versjon $appversjonlokalt "
 fi
 
-docker-compose pull --quiet
-docker-compose build
+docker compose pull --quiet
+docker compose build
 
 dockercompose=`cat docker-compose.yml`
 detviskalfinne="docker.pkg.github.com/navikt/$appsombyggeslokalt/$appsombyggeslokalt:latest"
