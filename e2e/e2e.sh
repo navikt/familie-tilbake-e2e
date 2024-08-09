@@ -12,13 +12,13 @@ else
   echo "starter e2e med $appsombyggeslokalt på versjon $appversjonlokalt "
 fi
 
-docker-compose pull --quiet
-docker-compose build
+docker compose pull --quiet
+docker compose build
 
 dockercompose=`cat docker-compose.yml`
 detviskalfinne="docker.pkg.github.com/navikt/$appsombyggeslokalt/$appsombyggeslokalt:latest"
 
-echo "${dockercompose/$detviskalfinne/$appversjonlokalt}" | docker-compose -f - up -d --force-recreate
+echo "${dockercompose/$detviskalfinne/$appversjonlokalt}" | docker compose -f - up -d --force-recreate
 
 while [[ $(curl -s -X GET "http://localhost:8030/internal/health") == "" ]]; do
     echo "venter på oppstart av tilbake / integrasjoner"
