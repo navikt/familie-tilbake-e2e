@@ -29,6 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.annotation.IfProfileValue
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 import kotlin.random.Random
 
 @SpringBootTest(classes = [ApplicationConfig::class])
@@ -44,15 +45,17 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
     @BeforeEach
     fun setup() {
         saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient)
+        val eksternBehandlingId = UUID.randomUUID().toString()
         scenario = Scenario(
             eksternFagsakId = Random.nextInt(1000000, 9999999).toString(),
-            eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
+            eksternBehandlingId = eksternBehandlingId,
             fagsystem = fagsystem,
             ytelsestype = ytelsestype,
             personIdent = "12345678901",
             enhetId = "0106",
             enhetsnavn = "NAV Fredrikstad"
         )
+        println("Ekstern behandlingId: $eksternBehandlingId")
     }
 
     @Test
@@ -324,6 +327,7 @@ class OpprettTilbakekrevingBATest(@Autowired val familieTilbakeKlient: FamilieTi
                 under4rettsgebyr = false,
                 muligforeldelse = false
             )
+            println("asdf: ${scenario.eksternBehandlingId}")
 
             Thread.sleep(5000)
 

@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 import kotlin.random.Random
 
 @SpringBootTest(classes = [ApplicationConfig::class])
@@ -40,7 +41,7 @@ class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTi
         saksbehandler = Saksbehandler(familieTilbakeKlient = familieTilbakeKlient)
         scenario = Scenario(
             eksternFagsakId = Random.nextInt(1000000, 9999999).toString(),
-            eksternBehandlingId = Random.nextInt(1000000, 9999999).toString(),
+            eksternBehandlingId = UUID.randomUUID().toString(),
             fagsystem = fagsystem,
             ytelsestype = ytelsestype,
             personIdent = "12345678901",
