@@ -53,6 +53,7 @@ data class UnderavsnittDto(
 enum class Avsnittstype {
     OPPSUMMERING,
     PERIODE,
+    SAMMENSLÅTT_PERIODE,
     TILLEGGSINFORMASJON
 }
 
