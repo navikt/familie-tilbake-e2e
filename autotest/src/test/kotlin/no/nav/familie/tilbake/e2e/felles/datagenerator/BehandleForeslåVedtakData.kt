@@ -16,7 +16,7 @@ class BehandleForeslåVedtakData(val hentVedtakbrevtekstResponse: List<AvsnittDt
             fritekstavsnitt = FritekstavsnittDto(
                 oppsummeringstekst = "Automatisk oppsummeringstekst fra Autotest.",
                 perioderMedTekst = hentVedtakbrevtekstResponse
-                    .filter { it.avsnittstype == Avsnittstype.PERIODE && it.fom != null && it.tom != null }
+                    .filter { (it.avsnittstype == Avsnittstype.PERIODE || it.avsnittstype == Avsnittstype.SAMMENSLÅTT_PERIODE) && it.fom != null && it.tom != null }
                     .map {
                         PeriodeMedTekstDto(
                             periode = PeriodeDto(

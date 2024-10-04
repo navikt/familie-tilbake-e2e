@@ -48,7 +48,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 class Saksbehandler(
-    private val familieTilbakeKlient: FamilieTilbakeKlient,
+    private val familieTilbakeKlient: FamilieTilbakeKlient
 ) {
 
     companion object {
