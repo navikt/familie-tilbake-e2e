@@ -21,7 +21,7 @@
         <felles.version>1.20221101085322_cc4d556</felles.version>
         <kontrakter.version>2.0_20230307154139_81a3d26</kontrakter.version>
 
-        <nav.security.version>2.1.8</nav.security.version>
+        <nav.security.version>5.0.11</nav.security.version>
     </properties>
 
     <dependencies>
