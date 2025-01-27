@@ -22,7 +22,7 @@ no.nav.security.jwt:
           client-auth-method: client_secret_basic
 
 FAMILIE_TILBAKE_API_URL: http://localhost:8030
-FAMILIE_TILBAKE_SCOPE: api://dev-gcp.teamfamilie.familie-tilbake-lokal/.default
+FAMILIE_TILBAKE_SCOPE: api://dev-gcp.tilbake.tilbakekreving-backend-lokal/.default
 TILBAKE_CLIENT_ID: d7d22abc-9619-428e-86df-872a60a03a98
 
 logging:

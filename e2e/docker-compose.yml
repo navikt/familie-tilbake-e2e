@@ -1,6 +1,6 @@
 services:
   familie-mock-server:
-    image: europe-north1-docker.pkg.dev/nais-management-233d/teamfamilie/familie-mock-server:latest
+    image: europe-north1-docker.pkg.dev/nais-management-233d/tilbake/familie-mock-server:latest
 #    image: ghcr.io/navikt/familie-mock-server/familie-mock-server:latest
 #    image: familie-mock-server:latest
     ports:
@@ -25,7 +25,7 @@ services:
       - 5432:5432
   familie-integrasjoner:
     restart: always
-    image: europe-north1-docker.pkg.dev/nais-management-233d/teamfamilie/familie-integrasjoner:latest
+    image: europe-north1-docker.pkg.dev/nais-management-233d/tilbake/familie-integrasjoner:latest
     depends_on:
       - familie-mock-server
       - mock-oauth2-server
@@ -44,7 +44,7 @@ services:
       - 8085:8085
   familie-tilbake:
     restart: always
-    image: europe-north1-docker.pkg.dev/nais-management-233d/teamfamilie/familie-tilbake:latest
+    image: europe-north1-docker.pkg.dev/nais-management-233d/tilbake/familie-tilbake:latest
 #    image: familie-tilbake:latest
     depends_on:
       - postgres-tilbake
