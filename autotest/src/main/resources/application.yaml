@@ -20,6 +20,8 @@ no.nav.security.jwt:
 
 FAMILIE_TILBAKE_API_URL: http://localhost:8030
 FAMILIE_TILBAKE_SCOPE: api://${TILBAKE_CLIENT_ID}/.default
+TILBAKE_CLIENT_ID: dev-gcp.tilbake.tilbakekreving-backend
+TILBAKE_CLIENT_SECRET: no_need_in_test
 
 logging:
   level:
