@@ -53,7 +53,6 @@ services:
       - mock-oauth2-server
       - familie-integrasjoner
       - nav-auth-mock
-    env_file: .local/famile-tilbake.env
     environment:
       SPRING_PROFILES_ACTIVE: e2e
       APPD_ENABLED: 0
