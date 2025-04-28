@@ -46,7 +46,7 @@ services:
   familie-tilbake:
     restart: always
     platform: linux/amd64
-    image: europe-north1-docker.pkg.dev/nais-management-233d/tilbake/familie-tilbake:2025.01.27-10.59-c5a441f
+    image: europe-north1-docker.pkg.dev/nais-management-233d/tilbake/familie-tilbake:latest
 #    image: familie-tilbake:latest
     depends_on:
       - postgres-tilbake
