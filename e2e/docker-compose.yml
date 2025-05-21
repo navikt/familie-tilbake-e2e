@@ -62,6 +62,8 @@ services:
       TILBAKE_CLIENT_SECRET: no_need_in_test
       INVALID_BA_SAK_CLIENT_ID: 1f4d13c7-cb63-48c4-b415-591403ab6c97
       LOGGING_LEVEL_NO_NAV_SECURITY: DEBUG
-
+      ainntekt:
+        scope: bogus
+        baseUrl: bogus
     ports:
       - 8030:8030
