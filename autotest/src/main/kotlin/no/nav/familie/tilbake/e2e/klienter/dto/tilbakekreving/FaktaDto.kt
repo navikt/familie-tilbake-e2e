@@ -24,7 +24,7 @@ data class VurdertFaktaFeilutbetaltPeriodeDto(
  * DTO-er relatert til hentFakta
  */
 data class HentFaktaDto(
-    val varsletBeløp: Int,
+    val varsletBeløp: Int?,
     val totalFeilutbetaltPeriode: PeriodeDto,
     val feilutbetaltePerioder: Set<FaktaFeilutbetaltPeriodeDto>,
     val totaltFeilutbetaltBeløp: Int,

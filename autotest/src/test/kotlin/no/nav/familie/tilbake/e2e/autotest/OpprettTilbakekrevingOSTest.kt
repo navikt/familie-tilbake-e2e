@@ -27,7 +27,9 @@ import kotlin.random.Random
 
 @SpringBootTest(classes = [ApplicationConfig::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OpprettTilbakekrevingOSTest(@Autowired val familieTilbakeKlient: FamilieTilbakeKlient) {
+class OpprettTilbakekrevingOSTest {
+    @Autowired
+    lateinit var familieTilbakeKlient: FamilieTilbakeKlient
 
     private lateinit var saksbehandler: Saksbehandler
     private lateinit var scenario: Scenario

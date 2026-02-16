@@ -5,8 +5,7 @@ import no.nav.familie.http.config.RestTemplateAzure
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.springframework.boot.SpringBootConfiguration
-import org.springframework.boot.autoconfigure.domain.EntityScan
-import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.Profile
 import org.springframework.web.client.RestTemplate
 
 @SpringBootConfiguration
-@EntityScan(ApplicationConfig.pakkenavn)
 @ComponentScan(ApplicationConfig.pakkenavn)
 @EnableJwtTokenValidation
 @EnableOAuth2Client(cacheEnabled = true)
@@ -36,7 +34,7 @@ class ApplicationConfig {
 
     class LocalINaisProxyCustomiser : INaisProxyCustomizer {
 
-        override fun customize(restTemplate: RestTemplate?) {
+        override fun customize(restTemplate: RestTemplate) {
             // Should do nothing
         }
     }

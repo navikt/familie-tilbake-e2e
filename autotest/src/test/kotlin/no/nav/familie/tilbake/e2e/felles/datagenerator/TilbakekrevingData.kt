@@ -59,7 +59,8 @@ class TilbakekrevingData(
             manueltOpprettet = false,
             verge = utledVerge(verge),
             institusjon = utledInstitusjon(institusjon),
-            regelverk = regelverk
+            regelverk = regelverk,
+            begrunnelseForTilbakekreving = null,
         )
     }
 

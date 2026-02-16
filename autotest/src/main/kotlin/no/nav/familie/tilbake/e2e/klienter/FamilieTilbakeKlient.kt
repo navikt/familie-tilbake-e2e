@@ -1,5 +1,7 @@
 package no.nav.familie.tilbake.e2e.klienter
 
+import jakarta.xml.bind.JAXBContext
+import jakarta.xml.bind.Marshaller
 import no.nav.familie.http.client.AbstractRestClient
 import no.nav.familie.kontrakter.felles.Fagsystem
 import no.nav.familie.kontrakter.felles.Ressurs
@@ -33,13 +35,11 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestOperations
 import java.io.StringWriter
 import java.net.URI
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.Marshaller
 
 @Service
 class FamilieTilbakeKlient(
-    @Value("\${FAMILIE_TILBAKE_API_URL}") private val familieTilbakeApiUrl: String,
-    @Qualifier("azure") private val restOperations: RestOperations
+    @param:Value("\${FAMILIE_TILBAKE_API_URL}") private val familieTilbakeApiUrl: String,
+    @param:Qualifier("azure") private val restOperations: RestOperations
 ) :
     AbstractRestClient(restOperations, "familie-tilbake") {
 
@@ -156,7 +156,7 @@ class FamilieTilbakeKlient(
 
     fun endreAnsvarligSaksbehandler(behandlingId: String, nyAnsvarligSaksbehandler: String): Ressurs<String> {
         val uri =
-            URI.create("$familieTilbakeApiUrl//api/autotest/behandling/$behandlingId/endre/saksbehandler/$nyAnsvarligSaksbehandler")
+            URI.create("$familieTilbakeApiUrl/api/autotest/behandling/$behandlingId/endre/saksbehandler/$nyAnsvarligSaksbehandler")
 
         return putForEntity(uri, "")
     }

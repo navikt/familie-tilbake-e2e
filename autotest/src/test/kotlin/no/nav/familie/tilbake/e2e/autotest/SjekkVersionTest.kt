@@ -8,7 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest(classes = [ApplicationConfig::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SjekkVersionTest(@Autowired private val familieTilbakeKlient: FamilieTilbakeKlient) {
+class SjekkVersionTest {
+    @Autowired
+    lateinit var familieTilbakeKlient: FamilieTilbakeKlient
 
     @Test
     fun `hentVersjonInfo skal hente versjon og dermed teste om familie-tilbake er oppe`() {
