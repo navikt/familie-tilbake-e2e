@@ -1,17 +1,19 @@
 package no.nav.familie.tilbake.e2e.autotest
 
-import no.nav.familie.http.config.INaisProxyCustomizer
 import no.nav.familie.http.config.RestTemplateAzure
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import org.springframework.boot.SpringBootConfiguration
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
-import org.springframework.context.annotation.Profile
-import org.springframework.web.client.RestTemplate
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinFeature
+import tools.jackson.module.kotlin.kotlinModule
 
 @SpringBootConfiguration
 @ComponentScan(ApplicationConfig.pakkenavn)
@@ -22,20 +24,25 @@ class ApplicationConfig {
 
     companion object {
 
-        const val pakkenavn = "no.nav.familie.tilbake.e2e"
+        const val pakkenavn = "no.nav.familie.tilbake"
+    }
+
+    @Primary
+    @Bean
+    fun customizeJackson(): JsonMapperBuilderCustomizer {
+        return JsonMapperBuilderCustomizer { builder ->
+            builder.addModule(kotlinModule {
+                configure(KotlinFeature.KotlinPropertyNameAsImplicitName, true)
+            })
+        }
     }
 
     @Bean
-    @Profile("local")
     @Primary
-    fun restTemplateBuilder(): RestTemplateBuilder {
-        return RestTemplateBuilder(LocalINaisProxyCustomiser())
-    }
-
-    class LocalINaisProxyCustomiser : INaisProxyCustomizer {
-
-        override fun customize(restTemplate: RestTemplate) {
-            // Should do nothing
-        }
+    fun restTemplateBuilder(jsonMapper: JsonMapper): RestTemplateBuilder {
+        return RestTemplateBuilder({ restTemplate ->
+            restTemplate.messageConverters.removeIf { it is JacksonJsonHttpMessageConverter }
+            restTemplate.messageConverters.add(JacksonJsonHttpMessageConverter(jsonMapper))
+        })
     }
 }
