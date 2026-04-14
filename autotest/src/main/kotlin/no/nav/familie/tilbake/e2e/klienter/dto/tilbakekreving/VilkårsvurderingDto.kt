@@ -62,9 +62,15 @@ data class VurdertAktsomhetDto(
     val begrunnelse: String,
     val særligeGrunner: List<VurdertSærligGrunnDto>? = null,
     val særligeGrunnerTilReduksjon: Boolean = false,
-    val tilbakekrevSmåbeløp: Boolean = true,
+    val unnlates4Rettsgebyr: SkalUnnlates,
     val særligeGrunnerBegrunnelse: String? = null
 )
+
+enum class SkalUnnlates {
+    UNNLATES,
+    TILBAKEKREVES,
+    OVER_4_RETTSGEBYR,
+}
 
 data class VurdertSærligGrunnDto(
     val særligGrunn: SærligGrunn,
@@ -96,7 +102,7 @@ data class AktsomhetDto(
     val begrunnelse: String,
     val særligeGrunner: List<SærligGrunnDto>? = null,
     val særligeGrunnerTilReduksjon: Boolean? = null,
-    val tilbakekrevSmåbeløp: Boolean? = null,
+    val unnlates4Rettsgebyr: SkalUnnlates?,
     val særligeGrunnerBegrunnelse: String? = null
 )
 

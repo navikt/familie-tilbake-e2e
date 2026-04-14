@@ -9,6 +9,7 @@ import no.nav.familie.tilbake.e2e.felles.Saksbehandler
 import no.nav.familie.tilbake.e2e.felles.Scenario
 import no.nav.familie.tilbake.e2e.klienter.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
+import no.nav.familie.tilbake.e2e.klienter.dto.SkalUnnlates
 import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.Behandlingsresultatstype
@@ -88,6 +89,7 @@ class OpprettTilbakekrevingBATest {
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
                 aktsomhet = Aktsomhet.FORSETT,
                 andelTilbakekreves = BigDecimal(100),
+                unnlates4Rettsgebyr = null,
                 særligeGrunner = listOf(
                     SærligGrunn.GRAD_AV_UAKTSOMHET,
                     SærligGrunn.STØRRELSE_BELØP,
@@ -162,6 +164,7 @@ class OpprettTilbakekrevingBATest {
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
                 aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
                 andelTilbakekreves = BigDecimal(100),
+                unnlates4Rettsgebyr = SkalUnnlates.TILBAKEKREVES,
                 særligeGrunner = listOf(
                     SærligGrunn.GRAD_AV_UAKTSOMHET,
                     SærligGrunn.STØRRELSE_BELØP,
@@ -220,7 +223,7 @@ class OpprettTilbakekrevingBATest {
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
                 aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
                 særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING),
-                tilbakekrevSmåbeløp = false
+                unnlates4Rettsgebyr = SkalUnnlates.UNNLATES
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
@@ -268,6 +271,7 @@ class OpprettTilbakekrevingBATest {
 
             behandleVilkårsvurdering(
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
+                unnlates4Rettsgebyr = null,
                 beløpTilbakekreves = BigDecimal(4400.0)
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
@@ -343,6 +347,7 @@ class OpprettTilbakekrevingBATest {
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
                 aktsomhet = Aktsomhet.FORSETT,
                 andelTilbakekreves = BigDecimal(100),
+                unnlates4Rettsgebyr = null,
                 særligeGrunner = listOf(
                     SærligGrunn.GRAD_AV_UAKTSOMHET,
                     SærligGrunn.STØRRELSE_BELØP,
@@ -389,7 +394,8 @@ class OpprettTilbakekrevingBATest {
 
             behandleVilkårsvurdering(
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
-                aktsomhet = Aktsomhet.FORSETT
+                aktsomhet = Aktsomhet.FORSETT,
+                unnlates4Rettsgebyr = null,
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
@@ -434,7 +440,8 @@ class OpprettTilbakekrevingBATest {
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
                 aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
                 særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
-                andelTilbakekreves = BigDecimal(50)
+                andelTilbakekreves = BigDecimal(50),
+                unnlates4Rettsgebyr = null,
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
@@ -484,7 +491,8 @@ class OpprettTilbakekrevingBATest {
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
                 aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
                 særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
-                andelTilbakekreves = BigDecimal(50)
+                andelTilbakekreves = BigDecimal(50),
+                unnlates4Rettsgebyr = null,
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
@@ -557,7 +565,8 @@ class OpprettTilbakekrevingBATest {
                     SærligGrunn.GRAD_AV_UAKTSOMHET,
                     SærligGrunn.STØRRELSE_BELØP,
                     SærligGrunn.ANNET
-                )
+                ),
+                unnlates4Rettsgebyr = null,
             )
 
             behandleForeslåVedtak()
@@ -606,7 +615,8 @@ class OpprettTilbakekrevingBATest {
                     SærligGrunn.GRAD_AV_UAKTSOMHET,
                     SærligGrunn.STØRRELSE_BELØP,
                     SærligGrunn.ANNET
-                )
+                ),
+                unnlates4Rettsgebyr = SkalUnnlates.TILBAKEKREVES,
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
             endreAnsvarligSaksbehandler(Saksbehandler.SAKSBEHANDLER_IDENT)
@@ -651,11 +661,12 @@ class OpprettTilbakekrevingBATest {
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.FORSTO_BURDE_FORSTÅTT,
                 aktsomhet = Aktsomhet.FORSETT,
                 andelTilbakekreves = BigDecimal(100),
+                unnlates4Rettsgebyr = null,
                 særligeGrunner = listOf(
                     SærligGrunn.GRAD_AV_UAKTSOMHET,
                     SærligGrunn.STØRRELSE_BELØP,
                     SærligGrunn.ANNET
-                )
+                ),
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
@@ -732,7 +743,8 @@ class OpprettTilbakekrevingBATest {
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
                 aktsomhet = Aktsomhet.GROV_UAKTSOMHET,
                 særligeGrunner = listOf(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET),
-                andelTilbakekreves = BigDecimal(50)
+                andelTilbakekreves = BigDecimal(50),
+                unnlates4Rettsgebyr = null,
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 

@@ -5,6 +5,7 @@ import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
 import no.nav.familie.tilbake.e2e.klienter.dto.AktsomhetDto
 import no.nav.familie.tilbake.e2e.klienter.dto.GodTroDto
 import no.nav.familie.tilbake.e2e.klienter.dto.HentVilkårsvurderingDto
+import no.nav.familie.tilbake.e2e.klienter.dto.SkalUnnlates
 import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunnDto
 import no.nav.familie.tilbake.e2e.klienter.dto.VilkårsvurderingDto
@@ -21,7 +22,7 @@ class BehandleVilkårsvurderingData(
     val andelTilbakekreves: BigDecimal?,
     val beløpTilbakekreves: BigDecimal?,
     val ileggRenter: Boolean,
-    val tilbakekrevSmåbeløp: Boolean?,
+    val unnlates4Rettsgebyr: SkalUnnlates?,
     val ytelsestype: Ytelsestype
 ) {
 
@@ -58,7 +59,7 @@ class BehandleVilkårsvurderingData(
                                 },
                                 andelTilbakekreves = andelTilbakekreves,
                                 beløpTilbakekreves = beløpTilbakekreves,
-                                tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
+                                unnlates4Rettsgebyr = unnlates4Rettsgebyr,
                                 særligeGrunner = særligeGrunner,
                                 ileggRenter = utledRenter(
                                     ileggRenter = ileggRenter,
@@ -91,7 +92,7 @@ class BehandleVilkårsvurderingData(
         aktsomhet: Aktsomhet?,
         andelTilbakekreves: BigDecimal?,
         beløpTilbakekreves: BigDecimal?,
-        tilbakekrevSmåbeløp: Boolean?,
+        unnlates4Rettsgebyr: SkalUnnlates?,
         særligeGrunner: List<SærligGrunn>,
         ileggRenter: Boolean,
         feilutbetaltBeløp: BigDecimal
@@ -100,7 +101,8 @@ class BehandleVilkårsvurderingData(
             Aktsomhet.FORSETT -> AktsomhetDto(
                 aktsomhet = aktsomhet,
                 ileggRenter = ileggRenter,
-                begrunnelse = BEGRUNNELSE
+                begrunnelse = BEGRUNNELSE,
+                unnlates4Rettsgebyr = unnlates4Rettsgebyr,
             )
             Aktsomhet.GROV_UAKTSOMHET,
             Aktsomhet.SIMPEL_UAKTSOMHET -> AktsomhetDto(
@@ -115,7 +117,7 @@ class BehandleVilkårsvurderingData(
                 ileggRenter = ileggRenter,
                 begrunnelse = BEGRUNNELSE,
                 særligeGrunnerTilReduksjon = (andelTilbakekreves != BigDecimal(100)),
-                tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
+                unnlates4Rettsgebyr = unnlates4Rettsgebyr,
                 særligeGrunner = utledSærligeGrunner(særligeGrunner),
                 særligeGrunnerBegrunnelse = BEGRUNNELSE
             )

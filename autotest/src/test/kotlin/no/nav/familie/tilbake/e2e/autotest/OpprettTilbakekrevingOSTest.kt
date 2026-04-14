@@ -83,7 +83,8 @@ class OpprettTilbakekrevingOSTest {
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
                 aktsomhet = Aktsomhet.SIMPEL_UAKTSOMHET,
                 særligeGrunner = listOf(SærligGrunn.STØRRELSE_BELØP, SærligGrunn.ANNET),
-                andelTilbakekreves = BigDecimal.valueOf(60.0)
+                andelTilbakekreves = BigDecimal.valueOf(60.0),
+                unnlates4Rettsgebyr = null,
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
@@ -134,7 +135,8 @@ class OpprettTilbakekrevingOSTest {
             behandleVilkårsvurdering(
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.GOD_TRO,
                 beløpErIBehold = true,
-                beløpTilbakekreves = BigDecimal.valueOf(2400)
+                beløpTilbakekreves = BigDecimal.valueOf(2400),
+                unnlates4Rettsgebyr = null,
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 
@@ -175,7 +177,8 @@ class OpprettTilbakekrevingOSTest {
 
             behandleVilkårsvurdering(
                 vilkårvurderingsresultat = Vilkårsvurderingsresultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
-                aktsomhet = Aktsomhet.FORSETT
+                aktsomhet = Aktsomhet.FORSETT,
+                unnlates4Rettsgebyr = null,
             )
             erBehandlingISteg(Behandlingssteg.FORESLÅ_VEDTAK, Behandlingsstegstatus.KLAR)
 

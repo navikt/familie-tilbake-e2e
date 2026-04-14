@@ -23,6 +23,7 @@ import no.nav.familie.tilbake.e2e.felles.utils.LogiskPeriodeUtil.utledLogiskPeri
 import no.nav.familie.tilbake.e2e.felles.utils.Vent
 import no.nav.familie.tilbake.e2e.klienter.FamilieTilbakeKlient
 import no.nav.familie.tilbake.e2e.klienter.dto.Aktsomhet
+import no.nav.familie.tilbake.e2e.klienter.dto.SkalUnnlates
 import no.nav.familie.tilbake.e2e.klienter.dto.SærligGrunn
 import no.nav.familie.tilbake.e2e.klienter.dto.Vilkårsvurderingsresultat
 import no.nav.familie.tilbake.e2e.klienter.dto.tilbakekreving.BehandlingPåVentDto
@@ -335,7 +336,7 @@ class Saksbehandler(
         beløpErIBehold: Boolean = true,
         andelTilbakekreves: BigDecimal? = null,
         beløpTilbakekreves: BigDecimal? = null,
-        tilbakekrevSmåbeløp: Boolean? = null,
+        unnlates4Rettsgebyr: SkalUnnlates?,
         ileggRenter: Boolean = false
     ) {
         behandleVilkårsvurdering(
@@ -346,7 +347,7 @@ class Saksbehandler(
             beløpErIBehold,
             andelTilbakekreves,
             beløpTilbakekreves,
-            tilbakekrevSmåbeløp,
+            unnlates4Rettsgebyr,
             ileggRenter
         )
     }
@@ -358,7 +359,7 @@ class Saksbehandler(
         beløpErIBehold: Boolean = true,
         andelTilbakekreves: BigDecimal? = null,
         beløpTilbakekreves: BigDecimal? = null,
-        tilbakekrevSmåbeløp: Boolean? = null,
+        unnlates4Rettsgebyr: SkalUnnlates? = null,
         ileggRenter: Boolean = false
     ) {
         assertNotNull(gjeldendeBehandling.revurderingBehandlingId, "Revurdering må være opprettet!")
@@ -370,7 +371,7 @@ class Saksbehandler(
             beløpErIBehold,
             andelTilbakekreves,
             beløpTilbakekreves,
-            tilbakekrevSmåbeløp,
+            unnlates4Rettsgebyr,
             ileggRenter
         )
     }
@@ -383,7 +384,7 @@ class Saksbehandler(
         beløpErIBehold: Boolean = true,
         andelTilbakekreves: BigDecimal? = null,
         beløpTilbakekreves: BigDecimal? = null,
-        tilbakekrevSmåbeløp: Boolean? = null,
+        unnlates4Rettsgebyr: SkalUnnlates? = null,
         ileggRenter: Boolean = false
     ) {
         val hentVilkårsvurderingResponse =
@@ -396,7 +397,7 @@ class Saksbehandler(
             beløpErIBehold = beløpErIBehold,
             andelTilbakekreves = andelTilbakekreves,
             beløpTilbakekreves = beløpTilbakekreves,
-            tilbakekrevSmåbeløp = tilbakekrevSmåbeløp,
+            unnlates4Rettsgebyr = unnlates4Rettsgebyr,
             ileggRenter = ileggRenter,
             ytelsestype = gjeldendeBehandling.ytelsestype
         ).lag()
