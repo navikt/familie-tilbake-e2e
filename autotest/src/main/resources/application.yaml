@@ -10,7 +10,7 @@ no.nav.security.jwt:
     registration:
       familie-tilbake:
         resource-url: ${FAMILIE_TILBAKE_API_URL}
-        token-endpoint-url: http://localhost:1111/default/token
+        token-endpoint-url: http://localhost:1111/v2.0/token
         grant-type: client_credentials
         scope: ${FAMILIE_TILBAKE_SCOPE}
         authentication:
