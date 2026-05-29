@@ -27,7 +27,7 @@ services:
   familie-integrasjoner:
     restart: always
     platform: linux/amd64
-    image: europe-north1-docker.pkg.dev/nais-management-233d/tilbake/familie-integrasjoner:latest
+    image: europe-north1-docker.pkg.dev/nais-management-233d/tilbake/familie-integrasjoner:2026.05.26-08.37-fb53f3f
     depends_on:
       - familie-mock-server
       - mock-oauth2-server
