@@ -59,6 +59,9 @@ services:
       SPRING_PROFILES_ACTIVE: e2e
       APPD_ENABLED: 0
       FAMILIE_INTEGRASJONER_SCOPE: api://dev-fss.teamfamilie.familie-integrasjoner/.default
+      NO_NAV_SECURITY_JWT_ISSUER_AZUREAD_DISCOVERYURL: http://mock-oauth2-server:8080/default/.well-known/openid-configuration
+      NO_NAV_SECURITY_JWT_ISSUER_AZUREAD_REGISTRATION_FAMILIEINTEGRASJONER_TOKENENDPOINTURL: http://mock-oauth2-server:8080/default/.well-known/openid-configuration
+      NO_NAV_SECURITY_JWT_ISSUER_AZUREAD_REGISTRATION_FAMILIEINTEGRASJONERCLIENTCREDENTIALS_TOKENENDPOINTURL: http://mock-oauth2-server:8080/default/.well-known/openid-configuration
       AZURE_APP_CLIENT_ID: dev-gcp.tilbake.tilbakekreving-backend
       TILBAKE_CLIENT_ID: dev-gcp.tilbake.tilbakekreving-backend
       TILBAKE_CLIENT_SECRET: no_need_in_test
