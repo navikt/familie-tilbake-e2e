@@ -37,6 +37,7 @@ jobs:
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           team: tilbake
       - name: Start apper
+        timeout-minutes: 4
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         run: |
           cd e2e; ./e2e.sh
@@ -47,12 +48,15 @@ jobs:
         if: "!contains(github.event.head_commit.message, 'e2e skip')"
         run: cd autotest; mvn --settings .m2/maven-settings.xml -Dtest="**" test
       - name: Samle Docker-logs ved feil
+        if: failure()
         uses: jwalton/gh-docker-logs@v2.0.1
         with:
           dest: './logs'
       - name: Tar logs
+        if: failure()
         run: tar cvzf ./logs.tgz ./logs
       - name: Laste opp logs til GitHub
+        if: failure()
         uses: actions/upload-artifact@master
         with:
           name: docker-logs-${{ github.run_number }}.tgz
